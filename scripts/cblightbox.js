@@ -32,6 +32,7 @@
 			zoom : false,
 			zoomDuration : 300,
 			breakpoint : 800,
+			counter : true,
 			captionPosition : 'outside', // inside/outside
 			animationEffect : 'zoom', //fade/zoom
 			animationDuration : 500,
@@ -667,7 +668,7 @@
 					captionTpl.appendTo(tpl.find(".cb-lightbox-content"));
 				}
 
-				if(typeof group !== 'undefined'){
+				if(typeof group !== 'undefined' && settings.counter){
 					var counter = $("<div class=cb-lightbox-counter></div>");
 
 					$("<span class=cb-counter-current></span> / <span class=cb-counter-total></span>").appendTo(counter);

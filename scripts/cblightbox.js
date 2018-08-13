@@ -1,6 +1,6 @@
 /*
-* CBLightbox 3.6.0 Jquery
-* Copyright 2017 Christin Bombelka
+* CBLightbox 3.6.1 jQuery
+* Copyright 2018 Christin Bombelka
 */
 
 (function($){
@@ -28,7 +28,6 @@
 			maxWidth: 9999,
 			margin: 40,
 			mobilemargin: 0,
-			fade : 250,
 			zoom : false,
 			zoomDuration : 300,
 			breakpoint : 800,
@@ -36,6 +35,7 @@
 			captionPosition : 'outside', // inside/outside
 			animationEffect : 'zoom', //fade/zoom
 			animationDuration : 500,
+			animationFade: 500,
 		}, options);
 
 		function transformImage(w, h, x, y, scaleW, scaleH, updateData){
@@ -185,7 +185,7 @@
 
 	        $('.cb-lightbox-error').remove();
 			$('.cb-lightbox-content').removeClass('cb-lightbox-error-show');
-			$('.cb-lightbox').fadeIn(settings.fade);
+			$('.cb-lightbox').fadeIn(settings.animationDuration);
 
 			if(type == "image"){
 				elementImage = $('<img src="" alt="image" class="cb-lightbox-image">');
@@ -350,7 +350,7 @@
 
 	 		$('html').removeClass('cb-lightbox-animate-opening');
 
-	 		container.fadeIn(250);
+	 		container.fadeIn(settings.animationFade);
 		};
 
 		function reposition(){
@@ -416,7 +416,7 @@
 
 				container = $('.cb-lightbox-wrap-image');
 				container.removeClass('cb-lightbox-image-current').addClass('cb-lightbox-image-remove');
-				container.fadeOut(250, function(){
+				container.fadeOut(settings.animationFade, function(){
 					$('.cb-lightbox-image-remove').remove();
 				});
 
@@ -465,7 +465,7 @@
 						});
 
 					}else{
-						box.fadeOut(settings.fade, function(){
+						box.fadeOut(settings.animationDuration, function(){
 							detroyDraggable();
 							$(".cb-lightbox").remove();
 							$("html").removeClass("cb-lightbox-lock cb-lightbox-margin");
@@ -693,7 +693,7 @@
 					$('html').addClass('cb-lightbox-animate-opening');
 				}
 
-				$('.cb-lightbox').fadeIn(settings.fade);
+				$('.cb-lightbox').fadeIn(settings.animationDuration);
 
 				updateCaption(item);
 				LoadImage(source);

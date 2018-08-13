@@ -641,8 +641,6 @@
 				source = item.attr('href');
 				group = item.data("cblightbox");
 
-				console.log(group);
-
 				if(typeof group !== 'undefined'){
 					_this_index = item.index('a[data-cblightbox="'+ group +'"]');
 				}else

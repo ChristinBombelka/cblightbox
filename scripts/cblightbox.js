@@ -647,6 +647,11 @@
 
 				source = item.attr('href');
 				group = item.data("cblightbox");
+				grouplength = 0;
+
+				if(typeof group !== 'undefined'){
+					grouplength = $('a[data-cblightbox="'+ group +'"]').length;
+				}
 
 				if(typeof group !== 'undefined'){
 					_this_index = item.index('a[data-cblightbox="'+ group +'"]');
@@ -659,8 +664,7 @@
 				tpl = $("<div class='cb-lightbox'></div>").append("<div class=cb-lightbox-overlay></div><div class=cb-lightbox-content><div class=cb-lightbox-close></div><div class=cb-lightbox-loading></div><div class=cb-lightbox-images></div></div>");
 				tpl.find(".cb-lightbox-loading").append('<div class="cb-lightbox-loading-animation"></div>');
 
-
-				if(typeof group !== 'undefined'){
+				if(grouplength > 1){
 					var arrows = $("<div class='cb-lightbox-arrow-prev cb-lightbox-arrow'><span></span></div><div class='cb-lightbox-arrow-next cb-lightbox-arrow'><span></span></div>")
 					arrows.appendTo(tpl.find(".cb-lightbox-content"));
 				}
@@ -673,7 +677,7 @@
 					captionTpl.appendTo(tpl.find(".cb-lightbox-content"));
 				}
 
-				if(typeof group !== 'undefined' && settings.counter){
+				if(grouplength > 1 && settings.counter){
 					var counter = $("<div class=cb-lightbox-counter></div>");
 
 					$("<span class=cb-counter-current></span> / <span class=cb-counter-total></span>").appendTo(counter);

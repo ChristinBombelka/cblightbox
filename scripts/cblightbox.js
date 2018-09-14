@@ -36,6 +36,7 @@
 			animationEffect : 'zoom', //fade/zoom
 			animationDuration : 500,
 			animationFade: 500,
+			afterInit: $.noop,
 		}, options);
 
 		function transformImage(w, h, x, y, scaleW, scaleH, updateData){
@@ -685,8 +686,8 @@
 				tpl.data('group', group);
 				tpl.appendTo("body");
 
-				if ($.isFunction(settings.lightboxIsInit)) {
-			 	   settings.lightboxIsInit.call(this, tpl);
+				if ($.isFunction(settings.afterInit)) {
+			 	   settings.afterInit.call(this, tpl);
 				}
 
 				if(settings.animationEffect == 'zoom'){

@@ -167,8 +167,8 @@
 				el = $('a[href="' + source + '"]');
 			}
 
-			$(".cb-selected").removeClass("cb-selected");
-			el.addClass("cb-selected");
+			$(".cb-lightbox-is-selected").removeClass("cb-lightbox-is-selected");
+			el.addClass("cb-lightbox-is-selected");
 
 			if(source.match(/(^data:image\/[a-z0-9+\/=]*,)|(\.(jp(e|g|eg)|gif|png|bmp|webp|svg|ico)((\?|#).*)?$)/i) ) {
                 type = 'image';
@@ -255,7 +255,7 @@
 		};
 
 		function fitImage(){
-			var el = $(".cb-selected"),
+			var el = $(".cb-lightbox-is-selected"),
 				box = $('.cb-lightbox'),
 				container = box.find('.cb-lightbox-image-current'),
 				img = container.find('.cb-lightbox-image'),
@@ -448,7 +448,7 @@
 			$(document).on("click", ".cb-lightbox-content, .cb-lightbox-close", function(e){
 				if(($(e.target).hasClass("cb-lightbox-wrap-image") && $("html").hasClass("cb-dragging-active")) || ($(e.target).hasClass("cb-lightbox-close") || $(e.target).hasClass("cb-lightbox-content")) && !$(e.target).hasClass("cb-lightbox-arrow")){
 
-					var el = $(".cb-selected"),
+					var el = $(".cb-lightbox-is-selected"),
 						previewImage = el.find('img'),
 						box = $('.cb-lightbox'),
 						container = box.find('.cb-lightbox-wrap-image');
@@ -469,6 +469,7 @@
 							detroyDraggable();
 							$(".cb-lightbox").remove();
 							$("html").removeClass("cb-lightbox-lock cb-lightbox-margin cb-lightbox-animate-closing");
+							$('.js-cblightbox').removeClass('cb-lightbox-is-selected');
 						});
 
 					}else{
@@ -476,6 +477,7 @@
 							detroyDraggable();
 							$(".cb-lightbox").remove();
 							$("html").removeClass("cb-lightbox-lock cb-lightbox-margin");
+							$('.js-cblightbox').removeClass('cb-lightbox-is-selected');
 						});
 					}
 				}

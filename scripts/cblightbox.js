@@ -1,5 +1,5 @@
 /*
-* CBLightbox 3.6.1 jQuery
+* CBLightbox 3.6.2 jQuery
 * Copyright 2018 Christin Bombelka
 */
 

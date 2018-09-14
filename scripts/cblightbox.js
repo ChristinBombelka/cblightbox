@@ -37,6 +37,7 @@
 			animationDuration : 500,
 			animationFade: 500,
 			afterInit: $.noop,
+			afterFit: $.noop,
 		}, options);
 
 		function transformImage(w, h, x, y, scaleW, scaleH, updateData){
@@ -347,6 +348,11 @@
 		 			'lastLeft': positionLeft,
 		 			'lastTop': positionTop
 		 		});
+
+		 		if ($.isFunction(settings.afterFit)) {
+			 		settings.afterFit.call(this, container);
+				}
+
 			}, animationDuration);
 
 	 		$('html').removeClass('cb-lightbox-animate-opening');

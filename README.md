@@ -21,6 +21,19 @@ $(".js-cblightbox").cblightbox();
 </body>
 </html>
  ```
+### Group images
+
+To Group images in a Lightbox, add your image group a data attribute with the same name.
+
+`data-cblightbox="group"`
+
+### Captions
+
+Add a data attribute with your caption.
+
+`data-caption="Lorm ypsum"`
+
+
 ## Options
 
 ```js
@@ -79,8 +92,14 @@ $(".js-cblightbox").cblightbox();
 
 ## Events
 
-### lightboxIsInit
+### afterInit
 
 Fired when lightbox is initialized
 
-`lightboxIsInit: function(container)`
+`afterInit: function(container){}`
+
+### afterFit
+
+Fired when image is fit in viewport
+
+`afterFit: function(container){}`

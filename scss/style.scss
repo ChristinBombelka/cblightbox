@@ -35,6 +35,19 @@ a{
   display: block;
 }
 
+.block{
+    margin-top: 50px;
+    text-align: center;
+
+    & + .block{
+        margin-top: 50px;
+    }
+}
+
+.block-title{
+    margin-bottom: 10px;
+}
+
 .images{
     display: flex;
     flex-wrap: wrap;

@@ -21,19 +21,6 @@ $(".js-cblightbox").cblightbox();
 </body>
 </html>
  ```
-### Group images
-
-To Group images in a Lightbox, add your image group a data attribute with the same name.
-
-`data-cblightbox="group"`
-
-### Captions
-
-Add a data attribute with your caption.
-
-`data-caption="Lorm ypsum"`
-
-
 ## Options
 
 ```js
@@ -82,7 +69,7 @@ Add a data attribute with your caption.
     /*  Values: number
      *  Open/Close animation speed in ms
      */
-    animationFade: 500,
+    slideDuration: 500,
     /*  Values: number
      *  Prev/Next animation speed
      */
@@ -96,10 +83,10 @@ Add a data attribute with your caption.
 
 Fired when lightbox is initialized
 
-`afterInit: function(container){}`
+`afterInit: function(container)`
 
 ### afterFit
 
-Fired when image is fit in viewport
+Fired when lightbox is fit image
 
-`afterFit: function(container){}`
+`afterFit: function(container)`

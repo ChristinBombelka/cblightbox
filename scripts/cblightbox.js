@@ -211,6 +211,8 @@
 			var slide = $('<div class="cb-lightbox-slide cb-lightbox-slide-current"></div>'),
 				wrapImage = $('<div class="cb-lightbox-slide-image"></div>');
 
+			updateCaption(el);
+
 			wrapImage.appendTo(slide);
 			slide.appendTo($('.cb-lightbox-slides'));
 			slide.data('type', type);
@@ -262,16 +264,18 @@
 				elementImage = $('<img class="cb-lightbox-image">');
 				elementPlaceholder = $('<img class="cb-lightbox-image-placeholder">');
 
-				if(el.find('img').length){
+				var previewImage = el.find('img');
+
+				if(previewImage.length && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64'){
 					placeholderImage = el.find('img').attr('src');
 				}else{
-					placeholderImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+					placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
 				}
-
-				elementPlaceholder.attr('src', placeholderImage);
 
 				elementImage.prependTo(wrapImage);
 				elementPlaceholder.prependTo(wrapImage);
+
+				elementPlaceholder.attr('src', placeholderImage);
 
 				previewImage = el.find('img');
 
@@ -301,7 +305,7 @@
 				}).one('load', function(e){
 
 					setTimeout(function(){
-						elementPlaceholder.fadeOut(100);
+						elementPlaceholder.hide();
 						container.removeClass('cb-lightbox-is-loading');
 					}, 100);
 
@@ -521,7 +525,6 @@
 			new_image = images.eq(_this_index);
 			source = new_image.attr('href');
 
-			updateCaption(new_image);
 			LoadImage(source, _this_index, new_image);
 	    }
 
@@ -638,6 +641,10 @@
 		}
 
 		if (!$(document).data('cb-lightbox-initialized')) {
+			var clickTimer = false,
+				userXTouch = 0,
+				userYTouch = 0;
+
 			$(document).on('click', '.cb-lightbox-arrow', function(){
 				if($(this).hasClass('cb-lightbox-arrow-prev')){
 					slide('previews');
@@ -664,9 +671,6 @@
 				}
 			});
 
-			var clickTimer = false,
-				userXTouch = 0,
-				userYTouch = 0;
 			$(document).on("mousedown touchstart", '.cb-lightbox-draggable', function(e){
 
 				clickTimer = true;

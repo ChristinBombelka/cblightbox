@@ -566,6 +566,73 @@
 			}
 		}
 
+		function init(item, settings){
+			var $s = settings,
+				source = item.attr('href'),
+				group = item.data("group"),
+				grouplength = 0;
+
+			if(typeof group !== 'undefined'){
+				grouplength = $('a[data-group="'+ group +'"]').length;
+			}
+
+			if(typeof group !== 'undefined'){
+				_this_index = item.index('a[data-group="'+ group +'"]');
+			}else{
+				_this_index = item.index(item);
+			}
+
+			tpl = $('<div class="cb-lightbox"></div>').append('<div class="cb-lightbox-overlay"></div><div class="cb-lightbox-content"><div class="cb-lightbox-close"></div><div class="cb-lightbox-loading"></div><div class="cb-lightbox-slides"></div></div>');
+			tpl.find(".cb-lightbox-loading").append('<div class="cb-lightbox-loading-animation"></div>');
+
+			if(grouplength > 1){
+				var arrows = $('<div class="cb-lightbox-arrow-prev cb-lightbox-arrow"><span></span></div><div class="cb-lightbox-arrow-next cb-lightbox-arrow"><span></span></div>');
+				arrows.appendTo(tpl.find(".cb-lightbox-content"));
+			}
+
+			captionTpl = $('<div class="cb-lightbox-info"></div>');
+
+			if($s.captionPosition == 'inside'){
+				captionTpl.appendTo(tpl.find(".cb-lightbox-slide"));
+			}else{
+				captionTpl.appendTo(tpl.find(".cb-lightbox-content"));
+			}
+
+			if(grouplength > 1 && $s.counter){
+				var counter = $('<div class="cb-lightbox-counter"></div>');
+
+				$('<span class="cb-counter-current"></span> / <span class="cb-counter-total"></span>').appendTo(counter);
+
+				counter.find(".cb-counter-total").text($('a[data-group="'+ group +'"]').length);
+				counter.find(".cb-counter-current").text(_this_index + 1);
+
+				tpl.find(".cb-lightbox-info").append(counter);
+			}
+
+			//lock background
+			if($("body").height() > $(window).height()){
+				$("html").addClass("cb-lightbox-lock cb-lightbox-margin");
+			}
+
+			tpl.data({
+				'group': group,
+				'settings': $s
+			});
+
+			tpl.appendTo("body");
+
+			if ($.isFunction($s.afterInit)) {
+		 	   $s.afterInit.call(this, tpl);
+			}
+
+			if($s.animationEffect == 'zoom'){
+				$('html').addClass('cb-lightbox-animate-opening');
+			}
+
+			LoadImage(source, false, item);
+
+		}
+
 		if (!$(document).data('cb-lightbox-initialized')) {
 			$(document).on('click', '.cb-lightbox-arrow', function(){
 				if($(this).hasClass('cb-lightbox-arrow-prev')){
@@ -756,76 +823,12 @@
 		return $(this).each(function(){
 			var item = $(this);
 
-			//get settings
 			var settings = $.extend({}, defaults, options);
 
 			item.on("click", function(event){
 				event.preventDefault();
 
-				source = item.attr('href');
-				group = item.data("group");
-				grouplength = 0;
-
-				if(typeof group !== 'undefined'){
-					grouplength = $('a[data-group="'+ group +'"]').length;
-				}
-
-				if(typeof group !== 'undefined'){
-					_this_index = item.index('a[data-group="'+ group +'"]');
-				}else{
-					_this_index = item.index(item);
-				}
-
-				//Template Base
-				tpl = $('<div class="cb-lightbox"></div>').append('<div class="cb-lightbox-overlay"></div><div class="cb-lightbox-content"><div class="cb-lightbox-close"></div><div class="cb-lightbox-loading"></div><div class="cb-lightbox-slides"></div></div>');
-				tpl.find(".cb-lightbox-loading").append('<div class="cb-lightbox-loading-animation"></div>');
-
-				if(grouplength > 1){
-					var arrows = $('<div class="cb-lightbox-arrow-prev cb-lightbox-arrow"><span></span></div><div class="cb-lightbox-arrow-next cb-lightbox-arrow"><span></span></div>');
-					arrows.appendTo(tpl.find(".cb-lightbox-content"));
-				}
-
-				captionTpl = $('<div class="cb-lightbox-info"></div>');
-
-				if(settings.captionPosition == 'inside'){
-					captionTpl.appendTo(tpl.find(".cb-lightbox-slide"));
-				}else{
-					captionTpl.appendTo(tpl.find(".cb-lightbox-content"));
-				}
-
-				if(grouplength > 1 && settings.counter){
-					var counter = $('<div class="cb-lightbox-counter"></div>');
-
-					$('<span class="cb-counter-current"></span> / <span class="cb-counter-total"></span>').appendTo(counter);
-
-					counter.find(".cb-counter-total").text($('a[data-group="'+ group +'"]').length);
-					counter.find(".cb-counter-current").text(_this_index + 1);
-
-					tpl.find(".cb-lightbox-info").append(counter);
-				}
-
-				//lock background
-				if($("body").height() > $(window).height()){
-					$("html").addClass("cb-lightbox-lock cb-lightbox-margin");
-				}
-
-				tpl.data({
-					'group': group,
-					'settings': settings
-				});
-
-				tpl.appendTo("body");
-
-				if ($.isFunction(settings.afterInit)) {
-			 	   settings.afterInit.call(this, tpl);
-				}
-
-				if(settings.animationEffect == 'zoom'){
-					$('html').addClass('cb-lightbox-animate-opening');
-				}
-
-				updateCaption(item);
-				LoadImage(source, false, item);
+				init(item, settings);
 			});
 		});
 	}

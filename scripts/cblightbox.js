@@ -314,9 +314,13 @@
 			}else if(type == "iframe"){
 				var iframe = $('<iframe src="" class="cb-lightbox-iframe" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>').appendTo(wrapImage);
 
+				container.addClass('cb-lightbox-is-loading');
+
+				fitImage();
+
 				iframe.attr("src", source);
 				iframe.on("load", function(){
-					fitImage();
+					container.removeClass('cb-lightbox-is-loading');
 				});
 			}
 		};

@@ -307,7 +307,7 @@
 					setTimeout(function(){
 						elementPlaceholder.hide();
 						container.removeClass('cb-lightbox-is-loading');
-					}, 100);
+					}, 150);
 
 				}).attr('src', source);
 

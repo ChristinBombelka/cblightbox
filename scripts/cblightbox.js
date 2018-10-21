@@ -1,7 +1,7 @@
 /*
  * CBLightbox 3.7.0 jQuery
  * 2018-09-27
- * Copyright 2018 Christin Bombelka
+ * Copyright christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
 
@@ -261,10 +261,10 @@
 			$('.cb-lightbox-content').removeClass('cb-lightbox-error-show');
 
 			if(type == "image"){
-				elementImage = $('<img class="cb-lightbox-image">');
-				elementPlaceholder = $('<img class="cb-lightbox-image-placeholder">');
 
-				var previewImage = el.find('img');
+				var previewImage = el.find('img'),
+					$img = $('<img />'),
+					elementPlaceholder = $('<img />');
 
 				if(previewImage.length && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64'){
 					placeholderImage = el.find('img').attr('src');
@@ -272,20 +272,37 @@
 					placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
 				}
 
-				elementImage.prependTo(wrapImage);
-				elementPlaceholder.prependTo(wrapImage);
-
-				elementPlaceholder.attr('src', placeholderImage);
-
-				previewImage = el.find('img');
+				elementPlaceholder
+					.addClass('cb-lightbox-image-placeholder')
+					.attr('src', placeholderImage)
+					.prependTo(wrapImage);
 
 				if($('html').hasClass('cb-lightbox-animate-opening')){
-
 					var offsetTop = previewImage.offset().top - $(window).scrollTop();
 						offsetLeft = previewImage.offset().left;
 
 					transformImage(previewImage.width(), previewImage.height(), offsetLeft, offsetTop, 1, 1, false);
 				};
+
+				//fix for elementImage - load visibile image
+				elementPlaceholder.css('opacity', 0.999);
+
+				container.addClass('cb-lightbox-is-loading');
+
+				var elementImage = $img.one('error', function(){
+					elementImage.remove();
+					elementPlaceholder.remove();
+
+					error(container);
+				}).one('load', function(e){
+					setTimeout(function(){
+						elementPlaceholder.hide();
+						container.removeClass('cb-lightbox-is-loading');
+					}, Math.min( 300, Math.max( 1000, elementImage.data('height') / 1600 )));
+				})
+				.addClass('cb-lightbox-image')
+				.prependTo(wrapImage)
+				.attr('src', source);
 
 				getImageSize(el, elementImage, function(width, height){
 					elementImage.data({
@@ -296,23 +313,9 @@
 					fitImage();
 				});
 
-				elementImage.one('error', function(){
-					elementImage.remove();
-					elementPlaceholder.remove();
-
-					error(container);
-
-				}).one('load', function(e){
-
-					setTimeout(function(){
-						elementPlaceholder.hide();
-						container.removeClass('cb-lightbox-is-loading');
-					}, 150);
-
-				}).attr('src', source);
-
-				if(!elementImage[0].complete){
-					container.addClass('cb-lightbox-is-loading');
+				if(($img[0].complete || $img[0].readyState == 'complete') && $img[0].naturalWidth && $img[0].naturalHeight){
+					elementPlaceholder.hide();
+					container.removeClass('cb-lightbox-is-loading');
 				}
 
 			}else if(type == "iframe"){

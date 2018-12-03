@@ -39,6 +39,7 @@
 			mobilemargin: 0,
 			zoom : false,
 			zoomDuration : 300,
+			zoomOffset : 0,
 			breakpoint : 800,
 			counter : true,
 			captionPosition : 'outside', // inside/outside
@@ -86,15 +87,15 @@
 	        slide.css('transition-duration', $s.zoomDuration + 'ms');
 
 			if(image.data('width') > $(window).width()){
-				var positionX = Math.max(image.data('width') * clickX - ($(window).width() / 2), 0),
-					positionX = -Math.min(image.data('width') - $(window).width(), positionX);
+				var positionX = Math.max(image.data('width') * clickX - ($(window).width() / 2) - $s.zoomOffset[3], -$s.zoomOffset[3]);
+					positionX = -Math.min(image.data('width') - $(window).width() + $s.zoomOffset[1], positionX);
 			}else{
 				var positionX = ($(window).width() - image.data('width')) / 2;
 			}
 
 			if(image.data('height') > $(window).height()){
-				var positionY = Math.max(image.data('height') * clickY - ($(window).height() / 2), 0),
-					positionY = -Math.min(image.data('height') - $(window).height(), positionY);
+				var positionY = Math.max(image.data('height') * clickY - ($(window).height() / 2) - $s.zoomOffset[0], -$s.zoomOffset[0]),
+					positionY = -Math.min(image.data('height') - $(window).height() + $s.zoomOffset[2], positionY);
 			}else{
 				var positionY = ($(window).height() - image.data('height')) / 2;
 			}
@@ -450,18 +451,18 @@
 		    	return;
 		    }
 
-		    if(lastoffset.x > 0 && image.width() > $(window).width()){
-		    	moveX = 0;
-		    }else if(Math.abs(lastoffset.x) > image.width() - $(window).width() && image.width() > $(window).width()){
-		    	moveX = $(window).width() - image.width();
+		    if(lastoffset.x > $s.zoomOffset[3] && image.width() > $(window).width()){
+		    	moveX = $s.zoomOffset[3];
+		    }else if(Math.abs(lastoffset.x) - $s.zoomOffset[1] > image.width() - $(window).width() && image.width() > $(window).width()){
+		    	moveX = $(window).width() - image.width() - $s.zoomOffset[1];
 		    }else{
 		    	moveX = lastoffset.x;
 		    }
 
-		    if(lastoffset.y > 0 && image.height() > $(window).height()){
-		    	moveY = 0;
-		    }else if(Math.abs(lastoffset.y) > image.height() - $(window).height() && image.height() > $(window).height()){
-		    	moveY = $(window).height() - image.height();
+		    if(lastoffset.y > $s.zoomOffset[0] && image.height() > $(window).height()){
+		    	moveY = $s.zoomOffset[0];
+		    }else if(Math.abs(lastoffset.y) - $s.zoomOffset[2] > image.height() - $(window).height() && image.height() > $(window).height()){
+		    	moveY = $(window).height() - image.height() - $s.zoomOffset[2];
 		    }
 		    else{
 		    	moveY = lastoffset.y;
@@ -631,6 +632,19 @@
 				$("html").addClass("cb-lightbox-lock cb-lightbox-margin");
 			}
 
+			//set zoomOffset to data
+			var zoomOffset = $s.zoomOffset;
+
+			if ($.type(zoomOffset) === "number" ) {
+                zoomOffset = [ zoomOffset, zoomOffset, zoomOffset, zoomOffset ];
+            }
+
+            if (zoomOffset.length == 2) {
+                zoomOffset = [zoomOffset[0], zoomOffset[1], zoomOffset[0], zoomOffset[1]];
+            }
+
+            $s.zoomOffset = zoomOffset;
+
 			tpl.data({
 				'group': group,
 				'settings': $s
@@ -708,6 +722,7 @@
 				e.preventDefault();
 
 			    var container = $(this),
+			    	$s = container.closest('.cb-lightbox').data('settings'),
 			    	image = container.find('.cb-lightbox-image');
 
 			    var lastOffset = container.data('lastTransform'),
@@ -739,22 +754,22 @@
 
 			        if(image.width() < $(window).width()){
 			        	newX = ($(window).width() - image.width()) / 2;
-			        }else if(newX > 0){
-			        	newX = newX / 3;
-			        }else if(Math.abs(newX) > image.width() - $(window).width() && image.width() > $(window).width()){
+			        }else if(newX > $s.zoomOffset[3]){
+			        	newX = ((newX - $s.zoomOffset[3]) / 3) + $s.zoomOffset[3];
+			        }else if(Math.abs(newX) - $s.zoomOffset[1] > image.width() - $(window).width() && image.width() > $(window).width()){
 			        	var maxX = $(window).width() - image.width();
 
-			        	newX = (-Math.abs(newX) - maxX) / 3 + maxX;
+			        	newX = ((-Math.abs(newX + $s.zoomOffset[1]) - maxX) / 3) + maxX - $s.zoomOffset[1];
 			        }
 
 			        if(image.height() < $(window).height()){
-			        	newY =  ($(window).height() - image.height()) / 2;;
-			        }else if(newY > 0){
-			        	newY = newY / 3;
-			        }else  if(Math.abs(newY) > image.height() - $(window).height() && image.height() > $(window).height()){
+			        	newY = ($(window).height() - image.height()) / 2;;
+			        }else if(newY > $s.zoomOffset[0]){
+			        	newY = ((newY - $s.zoomOffset[0]) / 3) + $s.zoomOffset[0];
+			        }else  if(Math.abs(newY) - $s.zoomOffset[2] > image.height() - $(window).height() && image.height() > $(window).height()){
 			        	var maxY = $(window).height() - image.height();
 
-			        	newY = (-Math.abs(newY) - maxY) / 3 + maxY;
+			        	newY = ((-Math.abs(newY + $s.zoomOffset[2]) - maxY) / 3) + maxY - $s.zoomOffset[2];
 			        }
 
 			        container.css('transform','translate3d(' + newX + 'px, ' + newY + 'px, 0px)');

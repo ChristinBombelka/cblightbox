@@ -12,6 +12,7 @@ $(function() {
         'animationDuration': 1000,
         'slideDuration': 500,
         'zoom': true,
+        'zoomOffset': [60, 60],
         'animationEffect': 'zoom'
     });
 

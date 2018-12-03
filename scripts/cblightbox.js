@@ -9,7 +9,8 @@
 	var caption,
 		type,
 		tpl,
-		runningTimeout;
+		runningTimeout,
+		closing;
 
 	$.fn.cblightbox = function(options){
 
@@ -534,6 +535,8 @@
 		function close(){
 			clearTimeout(runningTimeout);
 
+			closing = true;
+
 			var el = $(".cb-lightbox-is-selected"),
 				previewImage = el.find('img'),
 				container = $('.cb-lightbox'),
@@ -559,6 +562,8 @@
 					$(".cb-lightbox").remove();
 					$("html").removeClass("cb-lightbox-lock cb-lightbox-margin cb-lightbox-animate-closing");
 					el.removeClass('cb-lightbox-is-selected');
+
+					closing = false;
 				}, $s.animationDuration);
 			}else{
 				container.css({
@@ -572,6 +577,8 @@
 					$(".cb-lightbox").remove();
 					$("html").removeClass("cb-lightbox-lock cb-lightbox-margin");
 					el.removeClass('cb-lightbox-is-selected');
+
+					closing = false;
 				}, $s.animationDuration);
 			}
 		}
@@ -681,6 +688,10 @@
 					clickTimer = false;
 				}, 300);
 
+				if(closing){
+					return;
+				}
+
 				if(e.type == "mousedown"){
 					if(e.which != 1){
 						return false;
@@ -774,6 +785,10 @@
 					if(!item.hasClass("cb-dragging")){
 
 						if(clickTimer == false){
+							return;
+						}
+
+						if(closing){
 							return;
 						}
 

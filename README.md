@@ -49,6 +49,10 @@ $(".js-cblightbox").cblightbox();
     /*  Values: number
      *  Animation speed to zoom into images
      */
+    zoomOffset: 0,
+    /*  Value: number
+     *   Offset Position on zoomed
+     */
     breakpoint: 800,
     /*  Values: number
      *  Mobile breakpoint to use mobile margins

@@ -70,7 +70,7 @@
 		}
 
 		function initDraggable(userX, userY){
-	    	if(!$("html").hasClass("cb-lightbox-dragging-active") || $('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
+	    	if(!$(".cb-lightbox").hasClass("cb-lightbox-is-zoomed") || $('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
 	    		return;
 	    	}
 
@@ -144,7 +144,7 @@
 
 		    	transformImage(slide.data('lastWidth'), slide.data('lastHeight'), slide.data('lastLeft'), slide.data('lastTop'), 1, 1, false);
 
-	    		$("html").removeClass("cb-lightbox-dragging-active");
+	    		$(".cb-lightbox").removeClass("cb-lightbox-is-zoomed");
 		   		slide.removeClass("cb-lightbox-draggable-init")
 		   		slide.data('lastTransform', '');
 
@@ -485,7 +485,7 @@
 	    		group = container.data('group'),
 				images = $('a[data-group="'+ group +'"]');
 
-			if($('html').hasClass('cb-lightbox-dragging-active')){
+			if(container.hasClass('cb-lightbox-is-zoomed')){
 				return;
 			}
 
@@ -690,7 +690,7 @@
 					return;
 				}
 
-				if(($(e.target).hasClass("cb-lightbox-slide") && $("html").hasClass("cb-lightbox-dragging-active")) || ($(e.target).hasClass("cb-lightbox-close") || $(e.target).hasClass("cb-lightbox-content")) && !$(e.target).hasClass("cb-lightbox-arrow")){
+				if(($(e.target).hasClass("cb-lightbox-slide") && $(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")) || ($(e.target).hasClass("cb-lightbox-close") || $(e.target).hasClass("cb-lightbox-content")) && !$(e.target).hasClass("cb-lightbox-arrow")){
 					close();
 				}
 			});
@@ -715,7 +715,7 @@
 					userYTouch = e.originalEvent.touches[0].clientY - $(this).offset().top;
 				}
 
-				if(!$("html").hasClass("cb-lightbox-dragging-active")){
+				if(!$(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
 					return false;
 				}
 
@@ -763,7 +763,7 @@
 			        }
 
 			        if(image.height() < $(window).height()){
-			        	newY = ($(window).height() - image.height()) / 2;;
+			        	newY = ($(window).height() - image.height()) / 2;
 			        }else if(newY > $s.zoomOffset[0]){
 			        	newY = ((newY - $s.zoomOffset[0]) / 3) + $s.zoomOffset[0];
 			        }else  if(Math.abs(newY) - $s.zoomOffset[2] > image.height() - $(window).height() && image.height() > $(window).height()){
@@ -811,9 +811,9 @@
 						var userX = e.offsetX,
 							userY = e.offsetY;
 
-						$("html").toggleClass("cb-lightbox-dragging-active");
+						$(".cb-lightbox").toggleClass("cb-lightbox-is-zoomed");
 
-					   	if($("html").hasClass("cb-lightbox-dragging-active")){
+					   	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
 					   		initDraggable(userX, userY);
 					   	}else{
 							detroyDraggable();
@@ -836,7 +836,7 @@
 				}
 
 				if(!item.hasClass("cb-dragging") && $(e.target).closest('.cb-lightbox-slide').hasClass("cb-lightbox-draggable")){
-					$("html").toggleClass("cb-lightbox-dragging-active");
+					$(".cb-lightbox").toggleClass("cb-lightbox-is-zoomed");
 
 				   	if($(e.target).closest('.cb-lightbox-slide').hasClass("cb-lightbox-draggable") && !item.hasClass("cb-lightbox-draggable-init")){
 				   		initDraggable(userXTouch, userYTouch);

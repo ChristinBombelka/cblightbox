@@ -10,7 +10,8 @@
 		type,
 		tpl,
 		runningTimeout,
-		closing;
+		closing,
+		draggableInit;
 
 	$.fn.cblightbox = function(options){
 
@@ -105,7 +106,7 @@
 
 	        transformImage(false, false, positionX, positionY, scaleWidth, scaleHeight, true);
 
-		    setTimeout(function(){
+		    draggableInit = setTimeout(function(){
 		    	slide.css('transition-duration', '');
 
 		    	transformImage(image.data('width'), image.data('height'), positionX, positionY, 1, 1, false);
@@ -121,6 +122,8 @@
 	    	if(!slide.hasClass("cb-lightbox-draggable-init")){
 	    		return
 	    	}
+
+			clearTimeout(draggableInit);
 
 	    	var	scaleWidth = slide.data('lastWidth') / image.width(),
 	       		scaleHeight = slide.data('lastHeight') / image.height(),

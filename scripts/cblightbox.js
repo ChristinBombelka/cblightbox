@@ -218,6 +218,7 @@
 			wrapImage.appendTo(slide);
 			slide.appendTo($('.cb-lightbox-slides'));
 			slide.data('type', type);
+			slide.addClass('cb-lightbox-hide-image');
 
 			if($('.cb-lightbox-slide').length > 1 || $('.cb-lightbox-error').length){
 				wrapImage
@@ -286,9 +287,6 @@
 					transformImage(previewImage.width(), previewImage.height(), offsetLeft, offsetTop, 1, 1, false);
 				};
 
-				//fix for elementImage - load visibile image
-				elementPlaceholder.css('opacity', 0.999);
-
 				container.addClass('cb-lightbox-is-loading');
 
 				var elementImage = $img.one('error', function(){
@@ -297,6 +295,9 @@
 
 					error(container);
 				}).one('load', function(e){
+
+					slide.removeClass('cb-lightbox-hide-image');
+
 					setTimeout(function(){
 						elementPlaceholder.hide();
 						container.removeClass('cb-lightbox-is-loading');
@@ -318,6 +319,7 @@
 				if(($img[0].complete || $img[0].readyState == 'complete') && $img[0].naturalWidth && $img[0].naturalHeight){
 					elementPlaceholder.hide();
 					container.removeClass('cb-lightbox-is-loading');
+					slide.removeClass('cb-lightbox-hide-image');
 				}
 
 			}else if(type == "iframe"){

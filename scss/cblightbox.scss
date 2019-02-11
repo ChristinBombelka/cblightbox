@@ -143,6 +143,12 @@
 	}
 }
 
+.cb-lightbox-hide-image{
+	.cb-lightbox-image{
+		opacity: 0.01;
+	}
+}
+
 .cb-lightbox-animate-opening,
 .cb-lightbox-animate-closing{
 	.cb-lightbox-close,

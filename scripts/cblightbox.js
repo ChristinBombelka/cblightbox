@@ -222,7 +222,6 @@
 
 			if($('.cb-lightbox-slide').length > 1 || $('.cb-lightbox-error').length){
 				wrapImage
-					.addClass('cb-lightbox-el-is-animating')
 					.css({
 						'opacity': 0,
 						'transition-duration': $s.slideDuration + 'ms',

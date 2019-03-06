@@ -11,7 +11,8 @@
 		tpl,
 		runningTimeout,
 		closing,
-		draggableInit;
+		draggableInit,
+		draggableDestroy;
 
 	$.fn.cblightbox = function(options){
 
@@ -76,6 +77,7 @@
 	    	}
 
 	    	clearTimeout(runningTimeout);
+			clearTimeout(draggableDestroy);
 
 	    	$(".cb-lightbox-slide").addClass("cb-lightbox-draggable-init");
 
@@ -142,7 +144,7 @@
 		    	});
 	    	}
 
-	    	setTimeout(function(){
+	    	draggableDestroy = setTimeout(function(){
 	    		slide.css('transition-duration', '');
 
 		    	transformImage(slide.data('lastWidth'), slide.data('lastHeight'), slide.data('lastLeft'), slide.data('lastTop'), 1, 1, false);

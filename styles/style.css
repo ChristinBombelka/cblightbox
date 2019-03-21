@@ -8,6 +8,11 @@ img { width: 100%; height: auto; display: block; }
 
 a { display: block; }
 
+.block { margin-top: 50px; text-align: center; }
+.block + .block { margin-top: 50px; }
+
+.block-title { margin-bottom: 10px; }
+
 .images { display: -webkit-box; display: -ms-flexbox; display: flex; -ms-flex-wrap: wrap; flex-wrap: wrap; -webkit-box-pack: center; -ms-flex-pack: center; justify-content: center; -webkit-box-align: center; -ms-flex-align: center; align-items: center; }
 
 .image { display: inline-block; position: relative; width: 150px; }

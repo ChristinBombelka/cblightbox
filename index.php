@@ -81,6 +81,13 @@ echo '<a href="'.$aImage->image.'" class="image js-lightbox-fade '.$orientation.
 </div>
 
 <div class="block">
+	<div class="block-title">Iframe</div>
+	<div class="images">
+		<a href="https://www.youtube.com/embed/EUX6lXTX9zQ" class="js-lightbox" data-width="1920" data-height="1080">Iframe</a>
+	</div>
+</div>
+
+<div class="block">
 	<div class="block-title">Broken images</div>
 	<div class="images">
 		<a href="" class="image js-lightbox-fade landscape" data-group="" data-caption="" data-width="2400" data-height="1600"><img src="thumbs/Foto_161_s.jpg"></a>

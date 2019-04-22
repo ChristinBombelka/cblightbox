@@ -139,10 +139,10 @@
 .cb-lightbox-animate-opening .cb-lightbox-arrow,
 .cb-lightbox-animate-opening .cb-lightbox-info,
 .cb-lightbox-animate-opening .cb-lightbox-error,
-.cb-lightbox-animate-closing .cb-lightbox-close,
-.cb-lightbox-animate-closing .cb-lightbox-arrow,
-.cb-lightbox-animate-closing .cb-lightbox-info,
-.cb-lightbox-animate-closing .cb-lightbox-error {
+.cb-lightbox-is-closing .cb-lightbox-close,
+.cb-lightbox-is-closing .cb-lightbox-arrow,
+.cb-lightbox-is-closing .cb-lightbox-info,
+.cb-lightbox-is-closing .cb-lightbox-error {
   display: none; }
 
 .cb-lightbox-arrow {

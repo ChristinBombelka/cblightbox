@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.7.0 jQuery
- * 2018-09-27
+ * CBLightbox 3.8.0 jQuery
+ * 2019-04-19
  * Copyright christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -10,9 +10,7 @@
 		type,
 		tpl,
 		runningTimeout,
-		closing,
-		draggableInit,
-		draggableDestroy;
+		closing;
 
 	$.fn.cblightbox = function(options){
 
@@ -48,37 +46,105 @@
 			animationEffect : 'fade', //fade/zoom
 			animationDuration : 250,
 			slideDuration: 250,
+			zoomOffset: 0,
 			afterInit: $.noop,
 			afterFit: $.noop,
 		}
 
-		function transformImage(w, h, x, y, scaleW, scaleH, updateData){
-			var slide = $('.cb-lightbox-slide-current');
+		function error(container){
+			$('<div class="cb-lightbox-error">Sorry, this image can\'t loaded!</div>').appendTo(container.find('.cb-lightbox-content'));
 
-			slide.css({
-	        	'transform': 'translate3d(' + x + 'px, ' + y + 'px, 0px) scale(' + scaleW + ', ' + scaleH + ')',
-	        });
+			container
+				.removeClass('cb-lightbox-is-loading')
+				.addClass('cb-lightbox-error-show');
+		}
 
-			if(w || h){
-				slide.css({
-					'width': w,
-			    	'height': h
-				});
+		function setTranslate(el, values){
+			var str = '',
+				css = {};
+
+			if(values.top !== undefined && values.left !== undefined){
+				str = values.left  + 'px, ' + values.top + 'px';
+				str = 'translate3d(' + str + ', 0px)';
+
+				el.data('lastTransform', {x: values.left, y: values.top});
 			}
 
-			if(updateData){
-				slide.data('lastTransform', {x: x, y: y});
+			if(values.scaleX && values.scaleY){
+				str = (str.length ? str + ' ' : '') + 'scale(' + values.scaleX + ', ' + values.scaleY + ')';
+			}
+
+			if (str.length) {
+                css.transform = str;
+            }
+
+            if(values.width !== undefined){
+            	css.width = values.width;
+            }
+
+            if(values.height !== undefined){
+            	css.height = values.height;
+            }
+
+            if(values.opacity !== undefined){
+            	css.opacity = values.opacity;
+            }
+
+           	return el.css(css);
+		}
+
+		function animateEnd(el, to){
+			el.css('transition-duration', '');
+
+			if(el.closest('.cb-lightbox').hasClass('cb-lightbox-is-closing')){
+				return;
+			}
+
+			if(to.scaleX !== undefined && to.scaleY !== undefined){
+				image = el.find(".cb-lightbox-image");
+
+				if(to.toWidth && to.toHeight){
+					to.width = to.toWidth;
+					to.height = to.toHeight
+				}else if($('.cb-lightbox-is-zoomed').length && image.data('width') && image.data('height')){
+					to.width = image.data('width');
+					to.height = image.data('height');
+				}else{
+					to.width = $('.cb-lightbox-slide-current').data('fitWidth');
+					to.height = $('.cb-lightbox-slide-current').data('fitHeight');
+				}
+
+				to.scaleX = 1;
+				to.scaleY = 1;
+
+				setTranslate(el, to);
 			}
 		}
 
+		function animate(el, to, duration, animationEnd){
+			el.css('transition-duration', duration + 'ms');
+
+			setTranslate(el, to);
+
+			clearTimeout(el.data('timer'));
+
+			el.data('timer', setTimeout(function(){
+				animateEnd(el, to);
+			}, duration + 20));
+		}
+
 		function initDraggable(userX, userY){
-	    	if(!$(".cb-lightbox").hasClass("cb-lightbox-is-zoomed") || $('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
+	    	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed") || $('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
+	    		return;
+	    	}
+
+	    	if(closing){
 	    		return;
 	    	}
 
 	    	clearTimeout(runningTimeout);
-			clearTimeout(draggableDestroy);
 
+	    	$(".cb-lightbox").addClass("cb-lightbox-is-zoomed")
 	    	$(".cb-lightbox-slide").addClass("cb-lightbox-draggable-init");
 
 	        var slide = $('.cb-lightbox-slide'),
@@ -86,8 +152,6 @@
 	        	image = slide.find(".cb-lightbox-image"),
 	        	clickX = userX / slide.width(),
 				clickY = userY / slide.height();
-
-	        slide.css('transition-duration', $s.zoomDuration + 'ms');
 
 			if(image.data('width') > $(window).width()){
 				var positionX = Math.max(image.data('width') * clickX - ($(window).width() / 2) - $s.zoomOffset[3], -$s.zoomOffset[3]);
@@ -103,63 +167,62 @@
 				var positionY = ($(window).height() - image.data('height')) / 2;
 			}
 
-	        scaleWidth = image.data('width') / image.width();
+			scaleWidth = image.data('width') / image.width();
 	        scaleHeight = image.data('height') / image.height();
 
-	        transformImage(false, false, positionX, positionY, scaleWidth, scaleHeight, true);
-
-		    draggableInit = setTimeout(function(){
-		    	slide.css('transition-duration', '');
-
-		    	transformImage(image.data('width'), image.data('height'), positionX, positionY, 1, 1, false);
-
-		    }, $s.zoomDuration);
+			animate(slide, {
+				top: positionY,
+				left: positionX,
+				scaleX: scaleWidth,
+				scaleY: scaleHeight
+			}, $s.zoomDuration);
 	    }
 
 	    function detroyDraggable(disableAnimation){
-	    	var slide = $(".cb-lightbox-slide"),
-				$s = slide.closest('.cb-lightbox').data('settings'),
-				image = slide.find('.cb-lightbox-image');
+	    	var container = $(".cb-lightbox"),
+	    		slide = $(".cb-lightbox-slide");
 
-	    	if(!slide.hasClass("cb-lightbox-draggable-init")){
-	    		return
+	    	if(!container.length || !slide.length){
+	    		return;
 	    	}
 
-			clearTimeout(draggableInit);
+			var $s = slide.closest('.cb-lightbox').data('settings'),
+				image = slide.find('.cb-lightbox-image'),
+				duration = $s.zoomDuration;
 
-	    	var	scaleWidth = slide.data('lastWidth') / image.width(),
-	       		scaleHeight = slide.data('lastHeight') / image.height(),
-	       		duration = 0;
+			if(!container.hasClass("cb-lightbox-is-zoomed")){
+				return;
+			}
 
-	    	if(typeof disableAnimation === 'undefined'){
+	    	if(!slide.hasClass("cb-lightbox-draggable-init")){
+	    		return;
+	    	}
+
+	    	var	scaleWidth = slide.data('fitWidth') / image.width(),
+	       		scaleHeight = slide.data('fitHeight') / image.height();
+
+	    	if(typeof disableAnimation !== 'undefined'){
+	    		duration = 0;
 	    		disableAnimation = false;
 	    	}
 
-	    	if(!disableAnimation){
-	    		slide.css('transition-duration', $s.zoomDuration + 'ms');
-	    		duration = $s.zoomDuration;
+    		animate(slide, {
+    			toWidth: slide.data('fitWidth'),
+				toHeight: slide.data('fitHeight'),
+				top: slide.data('fitTop'),
+				left: slide.data('fitLeft'),
+				scaleX: scaleWidth,
+				scaleY: scaleHeight
+			}, duration);
 
-	    		setTimeout(function(){
-	    			transformImage(false, false, slide.data('lastLeft'), slide.data('lastTop'), scaleWidth, scaleHeight, false);
-		    	});
-	    	}
-
-	    	draggableDestroy = setTimeout(function(){
-	    		slide.css('transition-duration', '');
-
-		    	transformImage(slide.data('lastWidth'), slide.data('lastHeight'), slide.data('lastLeft'), slide.data('lastTop'), 1, 1, false);
-
-	    		$(".cb-lightbox").removeClass("cb-lightbox-is-zoomed");
-		   		slide.removeClass("cb-lightbox-draggable-init")
-		   		slide.data('lastTransform', '');
-
-	    	}, $s.zoomDuration);
+    		container.removeClass("cb-lightbox-is-zoomed")
+    		slide.removeClass("cb-lightbox-draggable-init");
 	    }
 
-	    function updateCaption(element){
+	    function updateCaption(item){
 			$(".cb-lightbox-caption").remove();
 
-			caption = element.data("caption");
+			caption = item.data("caption");
 			if(caption){
 				$("<div class='cb-lightbox-caption'>"+ caption +"</div>").appendTo($(".cb-lightbox-info"));
 			}
@@ -182,29 +245,26 @@
 			}
 		}
 
-		function error(container){
-			$('<div class="cb-lightbox-error">Sorry, this image can\'t loaded!</div>').appendTo(container.find('.cb-lightbox-content'));
+		function getSlide(source, i, item, fitAndShow){
 
-			container
-				.removeClass('cb-lightbox-is-loading')
-				.addClass('cb-lightbox-error-show');
-		}
+			if(typeof fitAndShow === "undefined"){
+				fitAndShow = false;
+			}	
 
-		function LoadImage(source, i, el){
-			if(typeof i != 'undefined'){
+			if(typeof i != "undefined"){
 				$(".counter-current").text(i + 1);
 			}
 
-			if(typeof el == 'undefined'){
-				el = $('a[href="' + source + '"]');
+			if(typeof item == "undefined"){
+				item = $('a[href="' + source + '"]');
 			}
-
-			$(".cb-lightbox-is-selected").removeClass("cb-lightbox-is-selected");
-			el.addClass("cb-lightbox-is-selected");
 
 			var container = $('.cb-lightbox'),
 				$s = container.data('settings'),
 				placeholderImage;
+
+			$(".cb-lightbox-is-selected").removeClass("cb-lightbox-is-selected");
+			item.addClass("cb-lightbox-is-selected");
 
 			if(source.match(/(^data:image\/[a-z0-9+\/=]*,)|(\.(jp(e|g|eg)|gif|png|bmp|webp|svg|ico)((\?|#).*)?$)/i) ) {
                 type = 'image';
@@ -218,85 +278,49 @@
 			var slide = $('<div class="cb-lightbox-slide cb-lightbox-slide-current"></div>'),
 				wrapImage = $('<div class="cb-lightbox-slide-image"></div>');
 
-			updateCaption(el);
+			updateCaption(item);
 
 			wrapImage.appendTo(slide);
 			slide.appendTo($('.cb-lightbox-slides'));
 			slide.data('type', type);
 			slide.addClass('cb-lightbox-hide-image');
 
-			if($('.cb-lightbox-slide').length > 1 || $('.cb-lightbox-error').length){
-				wrapImage
-					.css({
-						'opacity': 0,
-						'transition-duration': $s.slideDuration + 'ms',
-					});
-
-				cleanDom();
-
-				wrapImage.css({
-					opacity: ''
-				});
-			}else{
-
-				if($s.animationEffect == 'zoom'){
-					container.find('.cb-lightbox-overlay').css({
-						'opacity': 0,
-						'transition-duration': $s.animationDuration + 'ms'
-					});
-
-					cleanDom();
-
-					container.find('.cb-lightbox-overlay').css('opacity', 1);
-					wrapImage.css({
-						'transition-duration': $s.slideDuration + 'ms'
-					});
-
-				}else{
-					container.css('opacity', 0);
-
-					cleanDom();
-
-					container.css({
-						'opacity': '',
-						'transition-duration': $s.animationDuration + 'ms'
-					}).addClass('cb-lightbox-is-open');
-				}
-			}
-
-	        $('.cb-lightbox-error').remove();
+			$('.cb-lightbox-error').remove();
 			$('.cb-lightbox-content').removeClass('cb-lightbox-error-show');
 
 			if(type == "image"){
 
-				var previewImage = el.find('img'),
+				var previewImage = item.find('img'),
 					$img = $('<img />'),
 					elementPlaceholder = $('<img />');
 
 				if(previewImage.length && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64'){
-					placeholderImage = el.find('img').attr('src');
+					placeholderImage = item.find('img').attr('src');
 				}else{
 					placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
 				}
 
+				$img
+					.addClass('cb-lightbox-image')
+					.appendTo(wrapImage);
+
 				elementPlaceholder
 					.addClass('cb-lightbox-image-placeholder')
 					.attr('src', placeholderImage)
-					.prependTo(wrapImage);
+					.appendTo(wrapImage);
 
-				if($('html').hasClass('cb-lightbox-animate-opening')){
-					var offsetTop = previewImage.offset().top - $(window).scrollTop();
-						offsetLeft = previewImage.offset().left;
-
-					transformImage(previewImage.width(), previewImage.height(), offsetLeft, offsetTop, 1, 1, false);
-				};
+				getImageSize(item, $img, function(width, height){
+					$img.data({
+						'width': width,
+						'height': height,
+					});
+				});
 
 				container.addClass('cb-lightbox-is-loading');
 
-				var elementImage = $img.one('error', function(){
-					elementImage.remove();
+				$img.one('error', function(){
+					$img.remove();
 					elementPlaceholder.remove();
-
 					error(container);
 				}).one('load', function(e){
 
@@ -305,20 +329,8 @@
 					setTimeout(function(){
 						elementPlaceholder.hide();
 						container.removeClass('cb-lightbox-is-loading');
-					}, Math.min( 300, Math.max( 1000, elementImage.data('height') / 1600 )));
-				})
-				.addClass('cb-lightbox-image')
-				.prependTo(wrapImage)
-				.attr('src', source);
-
-				getImageSize(el, elementImage, function(width, height){
-					elementImage.data({
-						'width': width,
-						'height': height,
-					});
-
-					fitImage();
-				});
+					}, Math.min( 300, Math.max( 1000, $img.data('height') / 1600 )));
+				}).attr('src', source);
 
 				if(($img[0].complete || $img[0].readyState == 'complete') && $img[0].naturalWidth && $img[0].naturalHeight){
 					elementPlaceholder.hide();
@@ -327,27 +339,168 @@
 				}
 
 			}else if(type == "iframe"){
-				var iframe = $('<iframe src="" class="cb-lightbox-iframe" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>').appendTo(wrapImage);
+
+				slide.removeClass('cb-lightbox-hide-image');
+
+				var iframe = $('<iframe src="" class="cb-lightbox-image cb-lightbox-iframe" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>').appendTo(wrapImage);
 
 				container.addClass('cb-lightbox-is-loading');
 
-				fitImage();
+				iframe
+					.attr("src", source)
+					.data({
+						'width': item.data('width') ? item.data('width') : 16  ,
+						'height': item.data('height') ? item.data('height') : 9,
+					});
 
-				iframe.attr("src", source);
 				iframe.on("load", function(){
 					container.removeClass('cb-lightbox-is-loading');
 				});
 			}
-		};
 
-		function fitImage(){
+
+			if(fitAndShow){
+				var values = fitImage(slide);
+
+				setTranslate(slide, {
+					width: values.width,
+					height: values.height,
+					top: values.top,
+					left: values.left,
+					opacity: 0
+				});
+
+				setTimeout(function(){
+					animate(slide, {
+						opacity: 1,
+					},  $s.slideDuration);
+				}, 20);
+			}
+			
+			return slide;
+		}
+
+		function open(item, $s){
+			var source = item.attr('href'),
+				slide = getSlide(source, false, item),
+				container = $('.cb-lightbox');
+
+			animate(container, false, $s.slideDuration);
+
+			if(slide && $s.animationEffect == 'zoom'){
+				var previewImage = item.find('img');
+
+				if(!previewImage.length){
+					previewImage = item;
+				}
+
+				var	offsetTop = previewImage.offset().top - $(window).scrollTop(),
+					offsetLeft = previewImage.offset().left;
+			
+				setTranslate(slide, {
+					width: previewImage.width(),
+					height: previewImage.height(),
+					top: offsetTop,
+					left: offsetLeft,
+				});
+
+				var values = fitImage(slide);
+
+				animate(slide, {
+					top: values.top,
+					left: values.left,
+					scaleX: values.scaleX,
+					scaleY: values.scaleY
+				}, $s.animationDuration);
+
+			}else if(slide && $s.animationEffect == 'fade'){
+
+				var values = fitImage(slide);
+
+				setTranslate(slide, {
+					width: values.width,
+					height: values.height,
+					top: values.top,
+					left: values.left,
+					opacity: 0
+				});
+
+				setTimeout(function(){
+					animate(slide, {
+						opacity: 1,
+					}, $s.animationDuration);
+				}, 10);
+			}
+
+			setTimeout(function(){
+				container.addClass('cb-lightbox-is-open');
+			});
+		}
+
+		function close(){
+			clearTimeout(runningTimeout);
+
+			closing = true;
+
 			var el = $(".cb-lightbox-is-selected"),
+				previewImage = el.find('img'),
 				container = $('.cb-lightbox'),
 				$s = container.data('settings'),
-				slide = container.find('.cb-lightbox-slide-current'),
+				slide = container.find('.cb-lightbox-slide');
+
+			if(!previewImage.length){
+				previewImage = el;
+			}
+
+			animate(container, false, $s.animationDuration);
+
+			container
+				.removeClass('cb-lightbox-is-open')
+				.addClass('cb-lightbox-is-closing');
+
+			if($s.animationEffect == 'zoom' && el.is(':visible')){
+				var	scaleWidth =  previewImage.width() / slide.width(),
+					scaleHeight = previewImage.height() / slide.height(),
+					offsetTop = previewImage.offset().top - $(window).scrollTop();
+					offsetLeft = previewImage.offset().left;
+
+				animate(slide, {
+					top: offsetTop,
+					left: offsetLeft,
+					scaleX: scaleWidth,
+					scaleY: scaleHeight,
+				}, $s.animationDuration);
+
+			}else if($s.animationEffect == 'fade'){
+				
+				animate(slide, {
+					opacity: 0,
+				}, $s.animationDuration);
+
+				$('.cb-lightbox').removeClass('cb-lightbox-is-open');
+			}
+
+			setTimeout(function(){
+				detroyDraggable();
+				$(".cb-lightbox").remove();
+				$("html").removeClass("cb-lightbox-lock cb-lightbox-margin");
+				el.removeClass('cb-lightbox-is-selected');
+				closing = false;
+			}, $s.animationDuration);
+		}
+
+		function fitImage(slide){
+			var item = $(".cb-lightbox-is-selected"),
+				container = $('.cb-lightbox'),
+				$s = container.data('settings'),
 				img = slide.find('.cb-lightbox-image'),
-				type = slide.data('type'),
-				animationDuration = 0;
+				type = slide.data('type');
+
+			if(item.find('img').length){
+				itemImage = item.find('img');
+			}else{
+				itemImage = item;
+			}	
 
 			if(type == 'image'){
 				if(typeof img != 'undefined'){
@@ -360,9 +513,9 @@
 				}
 			}else{
 
-				if(el.attr("data-height")){
+				if(item.data('height') && item.data('width')){
 					imgHeight = container.height();
-					imgWidth = imgHeight / el.data("height") * el.data("width");
+					imgWidth = imgHeight / item.data("height") * item.data("width");
 				}else{
 					//Default 16/9
 					imgHeight = container.height();
@@ -370,22 +523,8 @@
 				}
 			}
 
-			if ($(window).width() < $s.breakpoint) {
-				var margin = $s.mobilemargin;
-			}else{
-				var margin = $s.margin;
-			}
-
-			if ($.type(margin) === "number" ) {
-                margin = [ margin, margin, margin, margin ];
-            }
-
-            if (margin.length == 2) {
-                margin = [margin[0], margin[1], margin[0], margin[1]];
-            }
-
-			var wrapperHeight = container.height() - (margin[0] + margin[2]),
-				wrapperWidth = container.width() - (margin[1] + margin[3]);
+			var wrapperHeight = container.height() - ($s.margin[0] + $s.margin[2]),
+				wrapperWidth = container.width() - ($s.margin[1] + $s.margin[3]);
 
 			var captionHeight = 0;
 			if($(".cb-lightbox-info").length){
@@ -403,37 +542,18 @@
 				newImgHeight = imgHeight;
 			}
 
-			positionTop = Math.max(($(window).height() - newImgHeight - captionHeight) / 2, margin[0]);
+			positionTop = Math.max(($(window).height() - newImgHeight - captionHeight) / 2, $s.margin[0]);
 			positionLeft = (container.width() - newImgWidth) / 2;
 
-			if($('html').hasClass('cb-lightbox-animate-opening')){
-				var	scaleWidth = newImgWidth / el.find('img').width(),
-   					scaleHeight = newImgHeight / el.find('img').height(),
-   					animationDuration = $s.animationDuration;
-
-				elPostion = el.offset();
-
-				slide.css('transition-duration', animationDuration + 'ms');
-
-				transformImage(false, false, positionLeft, positionTop, scaleWidth, scaleHeight, false);
-			}
+			var	scaleWidth = newImgWidth / itemImage.width(),
+   				scaleHeight = newImgHeight / itemImage.height();
 
 			slide.data({
-	 			'lastHeight': newImgHeight,
-	 			'lastWidth': newImgWidth,
-	 			'lastLeft': positionLeft,
-	 			'lastTop': positionTop
+	 			'fitHeight': newImgHeight,
+	 			'fitWidth': newImgWidth,
+	 			'fitLeft': positionLeft,
+	 			'fitTop': positionTop
 	 		});
-
-			runningTimeout = setTimeout(function(){
-				slide.css('transition-duration', '');
-
-				transformImage(newImgWidth, newImgHeight, positionLeft, positionTop, 1, 1, false);
-
-		 		if ($.isFunction($s.afterFit)) {
-			 		$s.afterFit.call(this, slide);
-				}
-			}, animationDuration);
 
 			if((imgWidth > $(window).width() || imgHeight > $(window).height()) && $s.zoom){
 				slide.addClass('cb-lightbox-draggable');
@@ -441,9 +561,14 @@
 				slide.removeClass('cb-lightbox-draggable');
 			}
 
-	 		$('html').removeClass('cb-lightbox-animate-opening');
-
-	 		slide.addClass('cb-lightbox-is-open');
+	 		return {
+	 			width: newImgWidth, 
+	 			height: newImgHeight, 
+	 			top: positionTop, 
+	 			left: positionLeft,
+	 			scaleX: scaleWidth,
+	 			scaleY: scaleHeight
+	 		};
 		};
 
 		function reposition(){
@@ -472,20 +597,17 @@
 		    }
 		    else{
 		    	moveY = lastoffset.y;
-		    }
+		    }	
 
 		    if(lastoffset.x != moveX || lastoffset.y != moveY){
-		    	slide.css('transition-duration', $s.animationDuration + 'ms');
-	    		slide.css('transform','translate3d(' + moveX + 'px, ' + moveY + 'px, 0px)');
-    			slide.data('lastTransform', {x: moveX, y: moveY });
+		    	animate(slide, {
+		    		top: moveY,
+		    		left: moveX,
+		    	}, 250);
 		    }
-
-	        setTimeout(function(){
-	        	slide.css('transition-duration', '');
-		    }, 100);
 	    }
 
-	    function slide(direction){
+	    function slideTo(direction){
 	    	var container = $(".cb-lightbox"),
 				$s = container.data('settings'),
 	    		group = container.data('group'),
@@ -499,14 +621,14 @@
 				_this_index = _this_index - 1;
 
 				if(_this_index < 0){
-					_this = images.length-1;
+					_this = images.length - 1;
 					_this_index = _this;
 				}
 
 			}else if(direction == 'next'){
 				_this_index = _this_index + 1;
 
-				if(_this_index > images.length-1){
+				if(_this_index > images.length - 1){
 					_this_index = 0;
 				}
 			}
@@ -516,83 +638,40 @@
 
 			slide.removeClass('cb-lightbox-slide-current').addClass('cb-lightbox-image-remove');
 
-			wrapImage.css({
-				'opacity': 1,
-				'transition-duration': $s.slideDuration + 'ms',
-			});
-
-			cleanDom();
-
-			wrapImage.css({
-				'opacity': 0,
-			});
+			animate(wrapImage, {
+				opacity: 0,
+			}, $s.slideDuration);
 
 			setTimeout(function(){
 				slide.remove();
-			},$s.slideDuration);
+			}, $s.slideDuration);
 
 			container.find('.cb-counter-current').text(_this_index + 1);
 
 			new_image = images.eq(_this_index);
 			source = new_image.attr('href');
 
-			LoadImage(source, _this_index, new_image);
+			getSlide(source, _this_index, new_image, true);
 	    }
 
-		function close(){
-			clearTimeout(runningTimeout);
-
-			closing = true;
-
-			var el = $(".cb-lightbox-is-selected"),
-				previewImage = el.find('img'),
-				container = $('.cb-lightbox'),
-				$s = container.data('settings'),
-				slide = container.find('.cb-lightbox-slide');
-
-			if($s.animationEffect == 'zoom' && el.is(':visible')){
-				var	scaleWidth =  previewImage.width() / slide.width(),
-					scaleHeight = previewImage.height() / slide.height(),
-					offsetTop = previewImage.offset().top - $(window).scrollTop();
-					offsetLeft = previewImage.offset().left;
-
-				$('html').addClass('cb-lightbox-animate-closing');
-
-				slide.css('transition-duration', $s.animationDuration + 'ms');
-
-				transformImage(false, false, offsetLeft, offsetTop, scaleWidth, scaleHeight, false);
-
-				container.find('.cb-lightbox-overlay').css('opacity', 0);
-
-				setTimeout(function(){
-					detroyDraggable();
-					$(".cb-lightbox").remove();
-					$("html").removeClass("cb-lightbox-lock cb-lightbox-margin cb-lightbox-animate-closing");
-					el.removeClass('cb-lightbox-is-selected');
-
-					closing = false;
-				}, $s.animationDuration);
-			}else{
-				container.css({
-					'opacity': 0,
-				});
-
-				container.removeClass('cb-lightbox-is-open');
-
-				setTimeout(function(){
-					detroyDraggable();
-					$(".cb-lightbox").remove();
-					$("html").removeClass("cb-lightbox-lock cb-lightbox-margin");
-					el.removeClass('cb-lightbox-is-selected');
-
-					closing = false;
-				}, $s.animationDuration);
+	    function getDistance( point2, point1, coordinate ) {
+			if ( !point1 || !point2 ) {
+				return 0;
 			}
-		}
+
+			if ( coordinate === 'x' ) {
+				return point2 - point1;
+
+			} else if ( coordinate === 'y' ) {
+				return point2 - point1;
+			}
+
+			return Math.sqrt( Math.pow( point2 - point1, 2 ) + Math.pow( point2 - point1, 2 ) );
+		};
 
 		function init(item, settings){
 			var $s = settings,
-				source = item.attr('href'),
+				//source = item.attr('href'),
 				group = item.data("group"),
 				grouplength = 0;
 
@@ -638,7 +717,7 @@
 				$("html").addClass("cb-lightbox-lock cb-lightbox-margin");
 			}
 
-			//set zoomOffset to data
+			//set zoomOffset
 			var zoomOffset = $s.zoomOffset;
 
 			if ($.type(zoomOffset) === "number" ) {
@@ -651,6 +730,23 @@
 
             $s.zoomOffset = zoomOffset;
 
+            //set margins
+            if ($(window).width() < $s.breakpoint) {
+				var margin = $s.mobilemargin;
+			}else{
+				var margin = $s.margin;
+			}
+
+			if ($.type($s.margin) === "number" ) {
+                margin = [ $s.margin, $s.margin, $s.margin, $s.margin ];
+            }
+
+            if ($s.margin.length == 2) {
+                margin = [$s.margin[0], $s.margin[1], $s.margin[0], $s.margin[1]];
+            }
+
+            $s.margin = margin; 
+
 			tpl.data({
 				'group': group,
 				'settings': $s
@@ -662,37 +758,37 @@
 		 	   $s.afterInit.call(this, tpl);
 			}
 
-			if($s.animationEffect == 'zoom'){
-				$('html').addClass('cb-lightbox-animate-opening');
-			}
-
-			LoadImage(source, false, item);
-
+			open(item, $s);
 		}
 
 		if (!$(document).data('cb-lightbox-initialized')) {
 			var clickTimer = false,
 				userXTouch = 0,
-				userYTouch = 0;
+				userYTouch = 0,
+				startTime,
+				endX,
+				endY,
+				distanceX,
+				distanceY;
 
 			$(document).on('click', '.cb-lightbox-arrow', function(){
 				if($(this).hasClass('cb-lightbox-arrow-prev')){
-					slide('previews');
+					slideTo('previews');
 				}else{
-					slide('next');
+					slideTo('next');
 				}
 			});
 
 			$(document).on("keyup", function(e){
 				if(e.keyCode == 37){
-					slide('previews');
+					slideTo('previews');
 				}else if(e.keyCode == 39){
-					slide('next');
+					slideTo('next');
 				}
 			});
 
 			$(document).on("click", ".cb-lightbox-content, .cb-lightbox-close", function(e){
-				if($('html').hasClass('cb-lightbox-animate-closing')){
+				if($('.cb-lightbox').hasClass('cb-lightbox-is-closing')){
 					return;
 				}
 
@@ -700,6 +796,7 @@
 					close();
 				}
 			});
+
 
 			$(document).on("mousedown touchstart", '.cb-lightbox-draggable', function(e){
 
@@ -711,6 +808,8 @@
 				if(closing){
 					return;
 				}
+
+				startTime = new Date().getTime();
 
 				if(e.type == "mousedown"){
 					if(e.which != 1){
@@ -727,20 +826,20 @@
 
 				e.preventDefault();
 
-			    var container = $(this),
-			    	$s = container.closest('.cb-lightbox').data('settings'),
-			    	image = container.find('.cb-lightbox-image');
+			    var slide = $(this),
+			    	$s = slide.closest('.cb-lightbox').data('settings'),
+			    	image = slide.find('.cb-lightbox-image');
 
-			    var lastOffset = container.data('lastTransform'),
+			    var lastOffset = slide.data('lastTransform'),
 			    	lastOffsetX = lastOffset ? lastOffset.x : 0,
 			        lastOffsetY = lastOffset ? lastOffset.y : 0;
 
 			    if(e.type == "touchstart"){
-			    	var startX = e.originalEvent.touches[0].pageX - lastOffsetX,
-			    		startY = e.originalEvent.touches[0].pageY - lastOffsetY;
+			    	startX = e.originalEvent.touches[0].pageX - lastOffsetX;
+					startY = e.originalEvent.touches[0].pageY - lastOffsetY;
 			    }else{
-			    	var startX = e.pageX - lastOffsetX,
-			    		startY = e.pageY - lastOffsetY;
+			    	startX = e.pageX - lastOffsetX,
+			    	startY = e.pageY - lastOffsetY;
 			    }
 
 			    $(document).bind("mousemove.cb-lightbox touchmove.cb-lightbox", function(e){
@@ -754,7 +853,7 @@
 
 			        //check element is dragging
 			        if(lastOffsetX != newX && lastOffsetY != newY){
-						container.addClass("cb-dragging");
+						slide.addClass("cb-lightbox-is-dragging");
 						clickTimer = false;
 			        }
 
@@ -768,6 +867,7 @@
 			        	newX = ((-Math.abs(newX + $s.zoomOffset[1]) - maxX) / 3) + maxX - $s.zoomOffset[1];
 			        }
 
+
 			        if(image.height() < $(window).height()){
 			        	newY = ($(window).height() - image.height()) / 2;
 			        }else if(newY > $s.zoomOffset[0]){
@@ -778,22 +878,28 @@
 			        	newY = ((-Math.abs(newY + $s.zoomOffset[2]) - maxY) / 3) + maxY - $s.zoomOffset[2];
 			        }
 
-			        container.css('transform','translate3d(' + newX + 'px, ' + newY + 'px, 0px)');
-			        container.data('lastTransform', {x: newX, y: newY });
+			        endX = newX;
+			        endY = newY;
+
+			        distanceX = getDistance(newX, lastOffsetX, 'x');
+			        distanceY = getDistance(newY, lastOffsetY, 'y');
+
+			        setTranslate(slide, {
+			        	top: newY,
+			        	left: newX
+			        });
 			    });
 			});
 
 			$(document).on("mouseup", function(e){
-				if(e.type == "mouseup" && !$("html").hasClass("cb-lightbox-touch")){
 
-					var item = $(".cb-lightbox-draggable");
-					$(this).unbind("mousemove.cb-lightbox");
+				if(e.type == "mouseup" && !$("html").hasClass("cb-lightbox-touch")){
 					e.preventDefault();
 
-					if(clickTimer == false && item.hasClass("cb-dragging")){
-						reposition();
-					}
-
+					var item = $(".cb-lightbox-draggable");
+					
+					$(this).unbind("mousemove.cb-lightbox");
+					
 					if(e.which != 1 || $('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
 						return false;
 					}
@@ -802,34 +908,57 @@
 						$(this).unbind("mousemove.cb-lightbox");
 						return false
 					}
+					
+					if(clickTimer){
+						//handle after click
 
-					if(!item.hasClass("cb-dragging")){
+						if(!item.hasClass("cb-lightbox-is-dragging")){
 
-						if(clickTimer == false){
-							return;
+							if(closing){
+								return;
+							}
+
+							//move to click position
+							var userX = e.offsetX,
+								userY = e.offsetY;
+
+						   	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
+						   		detroyDraggable();
+						   	}else{
+								initDraggable(userX, userY);
+						   	}
+
+						}else{
+						    $(this).off("mousemove.cb-lightbox");
 						}
-
-						if(closing){
-							return;
-						}
-
-						//move to click position
-						var userX = e.offsetX,
-							userY = e.offsetY;
-
-						$(".cb-lightbox").toggleClass("cb-lightbox-is-zoomed");
-
-					   	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
-					   		initDraggable(userX, userY);
-					   	}else{
-							detroyDraggable();
-					   	}
 
 					}else{
-					    $(this).off("mousemove.cb-lightbox");
+						//handle all other
+
+						if($('.cb-lightbox-is-zoomed').length){
+
+							var dMs  = Math.max( (new Date().getTime() ) - startTime, 1),
+								speed = 500;
+
+							// Speed in px/ms
+							var velocityX = distanceX / dMs * 0.5,
+								velocityY = distanceY / dMs * 0.5;
+
+								newOffsetX = endX + (velocityX * speed);
+								newOffsetY = endY + (velocityY * speed);
+
+							animate(item, {
+								left: newOffsetX,
+								top: newOffsetY
+							}, 500);
+
+					        setTimeout(function(){
+					        	reposition();
+					        }, 520);
+						}	
 					}
 
-					item.removeClass("cb-dragging");
+					item.removeClass("cb-lightbox-is-dragging");					
 				}
 			});
 
@@ -837,11 +966,11 @@
 				var item = $(".cb-lightbox-draggable");
 				$(this).unbind("mousemove.cb-lightbox");
 
-				if(clickTimer == false && item.hasClass("cb-dragging")){
+				if(clickTimer == false && item.hasClass("cb-lightbox-is-dragging")){
 					reposition();
 				}
 
-				if(!item.hasClass("cb-dragging") && $(e.target).closest('.cb-lightbox-slide').hasClass("cb-lightbox-draggable")){
+				if(!item.hasClass("cb-lightbox-is-dragging") && $(e.target).closest('.cb-lightbox-slide').hasClass("cb-lightbox-draggable")){
 					$(".cb-lightbox").toggleClass("cb-lightbox-is-zoomed");
 
 				   	if($(e.target).closest('.cb-lightbox-slide').hasClass("cb-lightbox-draggable") && !item.hasClass("cb-lightbox-draggable-init")){
@@ -851,7 +980,7 @@
 				   	}
 				}
 
-				item.removeClass("cb-dragging");
+				item.removeClass("cb-lightbox-is-dragging");
 			});
 
 			$(window).on("resize", function(){
@@ -860,7 +989,15 @@
 				}
 
 				if($('.cb-lightbox').length){
-					fitImage();
+					var slide = $('.cb-lightbox-slide'), 
+						values = fitImage(slide);
+
+					animate(slide, {
+						width: values.width,
+						height: values.height,
+						top: values.top,
+						left: values.left,
+					}, 0);
 				}
 			});
 

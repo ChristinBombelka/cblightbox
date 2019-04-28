@@ -1085,8 +1085,17 @@
 
 				mouseUp = true;
 				clearTimeout(positionInterval);
+				clearTimeout(momentTimer);
 
 				$('.cb-lightbox').removeClass('cb-lightbox-is-grabbing');
+
+				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content')){
+					return;
+				}
+
+				if(e.which != 1){
+					return
+				}
 
 				if(e.type == "mouseup"){
 					e.preventDefault();
@@ -1101,13 +1110,7 @@
 					
 					if(clickTimer){
 						//handle after click
-
 						if(!item.hasClass("cb-lightbox-is-dragging")){
-
-							if(closing){
-								return;
-							}
-
 							//move to click position
 							if(e.type == "mouseup"){
 								var userX = e.offsetX,
@@ -1132,7 +1135,7 @@
 						if($('.cb-lightbox-is-zoomed').length){
 						    initMoveMoment(item);
 						}	
-					}
+					}	
 
 					item.removeClass("cb-lightbox-is-dragging");					
 				}

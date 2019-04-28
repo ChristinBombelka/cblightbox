@@ -609,25 +609,29 @@
 	    	//reset dragging position
 		    var slide = $('.cb-lightbox-slide'),
 				$s = slide.closest('.cb-lightbox').data('settings'),
-		    	image = slide.find('.cb-lightbox-image');
-		    	lastoffset = slide.data('lastTransform');
+		    	image = slide.find('.cb-lightbox-image'),
+		    	lastoffset = slide.data('lastTransform'),
+		    	windowWidth = $(window).width(),
+		    	windowHeight = $(window).height(),
+		    	imageWidth = image.data('width'),
+		    	imageHeight = image.data('height');
 
 		    if(!lastoffset){
 		    	return;
 		    }
 
-		    if(lastoffset.x > $s.zoomOffset[3] && image.width() > $(window).width()){
+		    if(lastoffset.x > $s.zoomOffset[3] && imageWidth > windowWidth){
 		    	moveX = $s.zoomOffset[3];
-		    }else if(Math.abs(lastoffset.x) - $s.zoomOffset[1] > image.width() - $(window).width() && image.width() > $(window).width()){
-		    	moveX = $(window).width() - image.width() - $s.zoomOffset[1];
+		    }else if(Math.abs(lastoffset.x) - $s.zoomOffset[1] > imageWidth - windowWidth && imageWidth > windowWidth){
+		    	moveX = windowWidth - imageWidth - $s.zoomOffset[1];
 		    }else{
 		    	moveX = lastoffset.x;
 		    }
 
-		    if(lastoffset.y > $s.zoomOffset[0] && image.height() > $(window).height()){
+		    if(lastoffset.y > $s.zoomOffset[0] && imageHeight > windowHeight){
 		    	moveY = $s.zoomOffset[0];
-		    }else if(Math.abs(lastoffset.y) - $s.zoomOffset[2] > image.height() - $(window).height() && image.height() > $(window).height()){
-		    	moveY = $(window).height() - image.height() - $s.zoomOffset[2];
+		    }else if(Math.abs(lastoffset.y) - $s.zoomOffset[2] > imageHeight - windowHeight && imageHeight > windowHeight){
+		    	moveY = windowHeight - imageHeight - $s.zoomOffset[2];
 		    }
 		    else{
 		    	moveY = lastoffset.y;
@@ -1012,11 +1016,16 @@
 
 			    var slide = $(this),
 			    	$s = slide.closest('.cb-lightbox').data('settings'),
-			    	image = slide.find('.cb-lightbox-image');
-
-			    var lastOffset = slide.data('lastTransform'),
+			    	image = slide.find('.cb-lightbox-image'),
+			    	lastOffset = slide.data('lastTransform'),
 			    	lastOffsetX = lastOffset ? lastOffset.x : 0,
-			        lastOffsetY = lastOffset ? lastOffset.y : 0;
+			        lastOffsetY = lastOffset ? lastOffset.y : 0,
+			        windowWidth = $(window).width(),
+			    	windowHeight = $(window).height(),
+			    	imageWidth = image.data('width'),
+			    	imageHeight = image.data('height'),
+			    	maxX = windowWidth - imageWidth,
+			    	maxY = windowHeight - imageHeight;
 
 			    if(e.type == "touchstart"){
 			    	startX = e.originalEvent.touches[0].pageX - lastOffsetX;
@@ -1046,24 +1055,19 @@
 						clickTimer = false;
 			        }
 
-			        if(image.width() < $(window).width()){
-			        	newX = ($(window).width() - image.width()) / 2;
+			        if(imageWidth < windowWidth){
+			        	newX = (windowWidth - imageWidth) / 2;
 			        }else if(newX > $s.zoomOffset[3]){
 			        	newX = ((newX - $s.zoomOffset[3]) / 3) + $s.zoomOffset[3];
-			        }else if(Math.abs(newX) - $s.zoomOffset[1] > image.width() - $(window).width() && image.width() > $(window).width()){
-			        	var maxX = $(window).width() - image.width();
-
+			        }else if(Math.abs(newX) - $s.zoomOffset[1] > imageWidth - windowWidth && imageWidth > windowWidth){
 			        	newX = ((-Math.abs(newX + $s.zoomOffset[1]) - maxX) / 3) + maxX - $s.zoomOffset[1];
 			        }
 
-
-			        if(image.height() < $(window).height()){
-			        	newY = ($(window).height() - image.height()) / 2;
+			        if(imageHeight < windowHeight){
+			        	newY = (windowHeight - imageHeight) / 2;
 			        }else if(newY > $s.zoomOffset[0]){
 			        	newY = ((newY - $s.zoomOffset[0]) / 3) + $s.zoomOffset[0];
-			        }else  if(Math.abs(newY) - $s.zoomOffset[2] > image.height() - $(window).height() && image.height() > $(window).height()){
-			        	var maxY = $(window).height() - image.height();
-
+			        }else  if(Math.abs(newY) - $s.zoomOffset[2] > imageHeight - windowHeight && imageHeight > windowHeight){
 			        	newY = ((-Math.abs(newY + $s.zoomOffset[2]) - maxY) / 3) + maxY - $s.zoomOffset[2];
 			        }
 

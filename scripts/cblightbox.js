@@ -1,6 +1,6 @@
 /*
  * CBLightbox 3.8.0 jQuery
- * 2019-04-19
+ * 2019-04-28
  * Copyright christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -10,7 +10,15 @@
 		type,
 		tpl,
 		runningTimeout,
-		closing;
+		closing,
+		lastPoint = {}, 
+		currentPoint = {},
+		lastT,
+		currentT,
+		lastTimeMouseMoved,
+		mouseUp = true,
+		positionInterval,
+		momentTimer;
 
 	$.fn.cblightbox = function(options){
 
@@ -43,10 +51,10 @@
 			breakpoint : 800,
 			counter : true,
 			captionPosition : 'outside', // inside/outside
-			animationEffect : 'fade', //fade/zoom
-			animationDuration : 250,
+			openCloseEffect : 'fade', //fade/zoom
+			openCloseDuration : 250,
 			slideDuration: 250,
-			zoomOffset: 0,
+			slideEffect: 'fade', //slide/fade
 			afterInit: $.noop,
 			afterFit: $.noop,
 		}
@@ -63,8 +71,8 @@
 			var str = '',
 				css = {};
 
-			if(values.top !== undefined && values.left !== undefined){
-				str = values.left  + 'px, ' + values.top + 'px';
+			if(values.top !== undefined || values.left !== undefined){
+				str = (values.left === undefined ? el.position().left : values.left) + 'px, ' + (values.top === undefined ? el.position().top : values.top) + 'px';
 				str = 'translate3d(' + str + ', 0px)';
 
 				el.data('lastTransform', {x: values.left, y: values.top});
@@ -93,7 +101,7 @@
            	return el.css(css);
 		}
 
-		function animateEnd(el, to){
+		function _animateEnd(el, to){
 			el.css('transition-duration', '');
 
 			if(el.closest('.cb-lightbox').hasClass('cb-lightbox-is-closing')){
@@ -121,7 +129,7 @@
 			}
 		}
 
-		function animate(el, to, duration, animationEnd){
+		function _animate(el, to, duration, animationEnd){
 			el.css('transition-duration', duration + 'ms');
 
 			setTranslate(el, to);
@@ -129,7 +137,7 @@
 			clearTimeout(el.data('timer'));
 
 			el.data('timer', setTimeout(function(){
-				animateEnd(el, to);
+				_animateEnd(el, to);
 			}, duration + 20));
 		}
 
@@ -170,7 +178,7 @@
 			scaleWidth = image.data('width') / image.width();
 	        scaleHeight = image.data('height') / image.height();
 
-			animate(slide, {
+			_animate(slide, {
 				top: positionY,
 				left: positionX,
 				scaleX: scaleWidth,
@@ -206,7 +214,7 @@
 	    		disableAnimation = false;
 	    	}
 
-    		animate(slide, {
+    		_animate(slide, {
     			toWidth: slide.data('fitWidth'),
 				toHeight: slide.data('fitHeight'),
 				top: slide.data('fitTop'),
@@ -245,7 +253,7 @@
 			}
 		}
 
-		function getSlide(source, i, item, fitAndShow){
+		function getSlide(source, i, item, fitAndShow, direction){
 
 			if(typeof fitAndShow === "undefined"){
 				fitAndShow = false;
@@ -364,17 +372,43 @@
 
 				setTranslate(slide, {
 					width: values.width,
-					height: values.height,
-					top: values.top,
-					left: values.left,
-					opacity: 0
+					height: values.height,				
 				});
 
-				setTimeout(function(){
-					animate(slide, {
-						opacity: 1,
-					},  $s.slideDuration);
-				}, 20);
+				if($s.slideEffect == 'slide'){
+
+					var currentLeft = ($(window).width() - slide.width()) / 2;
+
+					if(direction == 'previews'){
+						var slideIn = -(slide.width() + currentLeft); 
+					}else{
+						var slideIn = currentLeft + $(window).width();
+					}
+
+					setTranslate(slide, {
+						top: values.top,
+						left: slideIn,				
+					});
+
+					setTimeout(function(){
+						_animate(slide, {
+							left: values.left,
+						},  $s.slideDuration);
+					}, 20);
+
+				}else{
+					setTranslate(slide, {
+						top: values.top,
+						left: values.left,
+						opacity: 0
+					});
+
+					setTimeout(function(){
+						_animate(slide, {
+							opacity: 1,
+						},  $s.slideDuration);
+					}, 20);
+				}
 			}
 			
 			return slide;
@@ -382,12 +416,12 @@
 
 		function open(item, $s){
 			var source = item.attr('href'),
-				slide = getSlide(source, false, item),
+				slide = getSlide(source, false, item, false, false),
 				container = $('.cb-lightbox');
 
-			animate(container, false, $s.slideDuration);
+			_animate(container, false, $s.openCloseDuration);
 
-			if(slide && $s.animationEffect == 'zoom'){
+			if(slide && $s.openCloseEffect == 'zoom'){
 				var previewImage = item.find('img');
 
 				if(!previewImage.length){
@@ -406,14 +440,14 @@
 
 				var values = fitImage(slide);
 
-				animate(slide, {
+				_animate(slide, {
 					top: values.top,
 					left: values.left,
 					scaleX: values.scaleX,
 					scaleY: values.scaleY
-				}, $s.animationDuration);
+				}, $s.openCloseDuration);
 
-			}else if(slide && $s.animationEffect == 'fade'){
+			}else if(slide && $s.openCloseEffect == 'fade'){
 
 				var values = fitImage(slide);
 
@@ -426,9 +460,9 @@
 				});
 
 				setTimeout(function(){
-					animate(slide, {
+					_animate(slide, {
 						opacity: 1,
-					}, $s.animationDuration);
+					}, $s.openCloseDuration);
 				}, 10);
 			}
 
@@ -452,30 +486,30 @@
 				previewImage = el;
 			}
 
-			animate(container, false, $s.animationDuration);
+			_animate(container, false, $s.openCloseDuration);
 
 			container
 				.removeClass('cb-lightbox-is-open')
 				.addClass('cb-lightbox-is-closing');
 
-			if($s.animationEffect == 'zoom' && el.is(':visible')){
+			if($s.openCloseEffect == 'zoom' && el.is(':visible')){
 				var	scaleWidth =  previewImage.width() / slide.width(),
 					scaleHeight = previewImage.height() / slide.height(),
 					offsetTop = previewImage.offset().top - $(window).scrollTop();
 					offsetLeft = previewImage.offset().left;
 
-				animate(slide, {
+				_animate(slide, {
 					top: offsetTop,
 					left: offsetLeft,
 					scaleX: scaleWidth,
 					scaleY: scaleHeight,
-				}, $s.animationDuration);
+				}, $s.openCloseDuration);
 
-			}else if($s.animationEffect == 'fade'){
+			}else if($s.openCloseEffect == 'fade'){
 				
-				animate(slide, {
+				_animate(slide, {
 					opacity: 0,
-				}, $s.animationDuration);
+				}, $s.openCloseDuration);
 
 				$('.cb-lightbox').removeClass('cb-lightbox-is-open');
 			}
@@ -486,7 +520,7 @@
 				$("html").removeClass("cb-lightbox-lock cb-lightbox-margin");
 				el.removeClass('cb-lightbox-is-selected');
 				closing = false;
-			}, $s.animationDuration);
+			}, $s.openCloseDuration);
 		}
 
 		function fitImage(slide){
@@ -600,7 +634,7 @@
 		    }	
 
 		    if(lastoffset.x != moveX || lastoffset.y != moveY){
-		    	animate(slide, {
+		    	_animate(slide, {
 		    		top: moveY,
 		    		left: moveX,
 		    	}, 250);
@@ -638,9 +672,25 @@
 
 			slide.removeClass('cb-lightbox-slide-current').addClass('cb-lightbox-image-remove');
 
-			animate(wrapImage, {
-				opacity: 0,
-			}, $s.slideDuration);
+			if($s.slideEffect == 'slide'){
+
+				var currentLeft = ($(window).width() - slide.width()) / 2;
+
+				if(direction == 'previews'){
+					var slideOut = currentLeft + $(window).width();
+				}else{
+					var slideOut = -(slide.width() + currentLeft);
+				}
+
+				_animate(slide, {
+					'left': slideOut,
+				}, $s.slideDuration);
+
+			}else{
+				_animate(wrapImage, {
+					opacity: 0,
+				}, $s.slideDuration);
+			}
 
 			setTimeout(function(){
 				slide.remove();
@@ -651,23 +701,163 @@
 			new_image = images.eq(_this_index);
 			source = new_image.attr('href');
 
-			getSlide(source, _this_index, new_image, true);
+			getSlide(source, _this_index, new_image, true, direction);
 	    }
 
-	    function getDistance( point2, point1, coordinate ) {
-			if ( !point1 || !point2 ) {
-				return 0;
+	    function getSpeed(){
+			var distanceX = currentPoint.x - lastPoint.x,
+	            distanceY = currentPoint.y - lastPoint.y,
+	            distanceT = Math.max(currentT - lastT, 1),
+	            maxSpeedX = 4,
+				maxSpeedY = 4;
+
+			// Speed in px/ms velocity
+			var speedX = Math.max(Math.min(distanceX / distanceT, maxSpeedX), -maxSpeedX) * 10,   
+				speedY = Math.max(Math.min(distanceY / distanceT, maxSpeedY), -maxSpeedY) * 10;
+
+	     	return {sX: speedX, sY: speedY}
+	    }
+
+	    function logMousePosition(){
+			if(mouseUp){
+				return;
 			}
 
-			if ( coordinate === 'x' ) {
-				return point2 - point1;
+			//log mouse positions
+	       	positionInterval = setTimeout(function(){
+	       		if(currentPoint.x && currentPoint.y){
+		         	lastPoint = {x: currentPoint.x, y: currentPoint.y};
+					lastT = new Date().getTime();
+				}
 
-			} else if ( coordinate === 'y' ) {
-				return point2 - point1;
-			}
+				//console.log()
 
-			return Math.sqrt( Math.pow( point2 - point1, 2 ) + Math.pow( point2 - point1, 2 ) );
-		};
+				logMousePosition();
+	       	}, 100);
+		}
+
+		function initMoveMoment(item){
+			var $s = $('.cb-lightbox').data('settings'),
+				speed = getSpeed(),
+				speedX = speed.sX,
+				speedY = speed.sY,
+				minX = $s.zoomOffset[3],
+				maxX = $(window).width() - item.width() -  $s.zoomOffset[1],
+				minY = $s.zoomOffset[0],
+				maxY = $(window).height() - item.height() -  $s.zoomOffset[2],
+				friction = 0.95, //stow down 
+				distance = Math.sqrt(Math.pow(lastPoint.x - currentPoint.x, 2) + Math.pow(lastPoint.y - currentPoint.y, 2)), // Distance moved (Euclidean distance)
+				returnX = false,
+ 				returnY = false,
+ 				directionX,
+ 				directionY,
+ 				bounceDivision = 20;
+
+	 		//min distence to move object
+	 		if(distance > 1){
+
+				function moveMoment(){
+					momentTimer = setTimeout(function(){
+						if((Math.abs(speedX) > 0.4 || Math.abs(speedY) > 0.4) || currentPoint.x > minX || currentPoint.x < maxX ||  currentPoint.y > minY || currentPoint.y < maxY){
+
+							//check end position by speed, bounce back
+							if((Math.abs(speedX) < 0.41 && (currentPoint.x > minX || currentPoint.x < maxX)) || returnX){
+								
+								if(returnX){
+									//bounce back and stop on end position
+									if(directionX == 'right'){
+										if(currentPoint.x < minX ){
+											currentPoint.x = minX;
+											speedX = 0;
+										}
+									}else{
+										if(currentPoint.x > maxX){
+											currentPoint.x = maxX;
+											speedX = 0;
+										}
+									}
+								}else{
+
+									if(currentPoint.x > minX){
+										//bounce back from left to right >>
+										speedX = - Math.abs(currentPoint.x - minX) / bounceDivision; 
+										directionX = 'right';
+									}else{
+										//bounce back from right to left <<
+										speedX =  Math.abs(currentPoint.x - maxX) / bounceDivision;
+										directionX = 'left';
+									}
+								}
+								returnX = true;
+
+							}else{
+								if(currentPoint.x > minX || currentPoint.x < maxX){
+									speedX = speedX * 0.8;
+								}else{
+									speedX = speedX * friction;
+								}
+							}
+
+							if((Math.abs(speedY) < 0.41 && (currentPoint.y > minY || currentPoint.y < maxY)) || returnY){
+								if(returnY){
+									//stop on end poiint
+									if(directionY == 'bottom'){
+										if(currentPoint.y < minY){
+											currentPoint.y = minY;
+											speedY = 0;
+										}
+									}else{
+										if(currentPoint.y > maxY){
+											currentPoint.y = maxY;
+											speedY = 0;
+										}
+									}
+
+								}else{
+
+									if(currentPoint.y > minY){
+										//bounce to bottom \/
+										speedY = -Math.abs(currentPoint.y - minY) / bounceDivision; 
+										directionY = 'bottom';
+									}else{
+										//bounce to left /\
+										speedY = Math.abs(currentPoint.y - maxY) / bounceDivision;
+										directionY = 'top';
+									}
+								}
+								returnY = true;
+
+							}else{
+								if(currentPoint.y > minY || currentPoint.y < maxY){
+									speedY = speedY * 0.8;	
+								}else{
+									speedY = speedY * friction;
+								}
+							}
+
+							//set points
+							currentPoint.x = currentPoint.x + speedX;
+							currentPoint.y = currentPoint.y + speedY;
+
+							//move to points
+							setTranslate(item, {
+								left: currentPoint.x,
+								top: currentPoint.y
+							});
+
+							moveMoment();
+						}else{
+							clearTimeout(momentTimer);
+						}
+					}, 10);
+				}
+
+				moveMoment();
+
+		    }else{
+		    	reposition();
+		    }
+		}	
 
 		function init(item, settings){
 			var $s = settings,
@@ -764,12 +954,7 @@
 		if (!$(document).data('cb-lightbox-initialized')) {
 			var clickTimer = false,
 				userXTouch = 0,
-				userYTouch = 0,
-				startTime,
-				endX,
-				endY,
-				distanceX,
-				distanceY;
+				userYTouch = 0;
 
 			$(document).on('click', '.cb-lightbox-arrow', function(){
 				if($(this).hasClass('cb-lightbox-arrow-prev')){
@@ -797,19 +982,16 @@
 				}
 			});
 
-
 			$(document).on("mousedown touchstart", '.cb-lightbox-draggable', function(e){
 
 				clickTimer = true;
 				setTimeout(function(){
 					clickTimer = false;
-				}, 300);
+				}, 200);
 
 				if(closing){
 					return;
 				}
-
-				startTime = new Date().getTime();
 
 				if(e.type == "mousedown"){
 					if(e.which != 1){
@@ -843,6 +1025,11 @@
 			    	startX = e.pageX - lastOffsetX,
 			    	startY = e.pageY - lastOffsetY;
 			    }
+
+			    clearTimeout(momentTimer);
+
+			    mouseUp = false;
+			    logMousePosition();
 
 			    $(document).bind("mousemove.cb-lightbox touchmove.cb-lightbox", function(e){
 			    	if(e.type == "touchmove"){
@@ -880,35 +1067,31 @@
 			        	newY = ((-Math.abs(newY + $s.zoomOffset[2]) - maxY) / 3) + maxY - $s.zoomOffset[2];
 			        }
 
-			        endX = newX;
-			        endY = newY;
-
-			        distanceX = getDistance(newX, lastOffsetX, 'x');
-			        distanceY = getDistance(newY, lastOffsetY, 'y');
+			        currentPoint = {x: newX, y: newY};
+	        		currentT = new Date().getTime();
 
 			        setTranslate(slide, {
 			        	top: newY,
 			        	left: newX
-			        });
+			        });			         
 			    });
 			});
 
-			$(document).on("mouseup", function(e){
+			$(document).on("mouseup touchend", function(e){
 
-				if(e.type == "mouseup" && !$("html").hasClass("cb-lightbox-touch")){
+				mouseUp = true;
+				clearTimeout(positionInterval);
+
 				$('.cb-lightbox').removeClass('cb-lightbox-is-grabbing');
+
+				if(e.type == "mouseup"){
 					e.preventDefault();
 
 					var item = $(".cb-lightbox-draggable");
 					
 					$(this).unbind("mousemove.cb-lightbox");
 					
-					if(e.which != 1 || $('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
-						return false;
-					}
-
-					if(!$(e.target).closest('.cb-lightbox-slide').hasClass("cb-lightbox-draggable")){
-						$(this).unbind("mousemove.cb-lightbox");
+					if($('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
 						return false
 					}
 					
@@ -922,8 +1105,13 @@
 							}
 
 							//move to click position
-							var userX = e.offsetX,
-								userY = e.offsetY;
+							if(e.type == "mouseup"){
+								var userX = e.offsetX,
+									userY = e.offsetY;
+							}else{
+								var userX = userXTouch, 
+									userY = userYTouch;
+							}
 
 						   	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
 						   		detroyDraggable();
@@ -937,53 +1125,13 @@
 
 					}else{
 						//handle all other
-
 						if($('.cb-lightbox-is-zoomed').length){
-
-							var dMs  = Math.max( (new Date().getTime() ) - startTime, 1),
-								speed = 500;
-
-							// Speed in px/ms
-							var velocityX = distanceX / dMs * 0.5,
-								velocityY = distanceY / dMs * 0.5;
-
-								newOffsetX = endX + (velocityX * speed);
-								newOffsetY = endY + (velocityY * speed);
-
-							animate(item, {
-								left: newOffsetX,
-								top: newOffsetY
-							}, 500);
-
-					        setTimeout(function(){
-					        	reposition();
-					        }, 520);
+						    initMoveMoment(item);
 						}	
 					}
 
 					item.removeClass("cb-lightbox-is-dragging");					
 				}
-			});
-
-			$(document).on("touchend", function(e){
-				var item = $(".cb-lightbox-draggable");
-				$(this).unbind("mousemove.cb-lightbox");
-
-				if(clickTimer == false && item.hasClass("cb-lightbox-is-dragging")){
-					reposition();
-				}
-
-				if(!item.hasClass("cb-lightbox-is-dragging") && $(e.target).closest('.cb-lightbox-slide').hasClass("cb-lightbox-draggable")){
-					$(".cb-lightbox").toggleClass("cb-lightbox-is-zoomed");
-
-				   	if($(e.target).closest('.cb-lightbox-slide').hasClass("cb-lightbox-draggable") && !item.hasClass("cb-lightbox-draggable-init")){
-				   		initDraggable(userXTouch, userYTouch);
-				   	}else{
-						detroyDraggable();
-				   	}
-				}
-
-				item.removeClass("cb-lightbox-is-dragging");
 			});
 
 			$(window).on("resize", function(){
@@ -995,7 +1143,7 @@
 					var slide = $('.cb-lightbox-slide'), 
 						values = fitImage(slide);
 
-					animate(slide, {
+					_animate(slide, {
 						width: values.width,
 						height: values.height,
 						top: values.top,

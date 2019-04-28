@@ -1036,6 +1036,7 @@
 			    }
 
 			    clearTimeout(momentTimer);
+			    lastT = new Date().getTime();
 
 			    mouseUp = false;
 			    logMousePosition();
@@ -1072,7 +1073,6 @@
 			        }
 
 			        currentPoint = {x: newX, y: newY};
-	        		currentT = new Date().getTime();
 
 			        setTranslate(slide, {
 			        	top: newY,

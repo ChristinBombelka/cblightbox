@@ -824,6 +824,8 @@
 					return false;
 				}
 
+				$('.cb-lightbox').addClass('cb-lightbox-is-grabbing');
+
 				e.preventDefault();
 
 			    var slide = $(this),
@@ -894,6 +896,7 @@
 			$(document).on("mouseup", function(e){
 
 				if(e.type == "mouseup" && !$("html").hasClass("cb-lightbox-touch")){
+				$('.cb-lightbox').removeClass('cb-lightbox-is-grabbing');
 					e.preventDefault();
 
 					var item = $(".cb-lightbox-draggable");

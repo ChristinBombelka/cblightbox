@@ -280,6 +280,20 @@
 	.cb-lightbox-info{
 		display: none;
 	}
+
+	.cb-lightbox-draggable{
+		cursor: grab;
+	    cursor: -moz-grab;
+	    cursor: -webkit-grab;
+	}
+
+	&.cb-lightbox-is-grabbing{
+		.cb-lightbox-draggable{
+			cursor: grabbing;
+		    cursor: -moz-grabbing;
+		    cursor: -webkit-grabbing;
+		}
+	}
 }
 
 .dragarea{
@@ -292,11 +306,8 @@
 	cursor: -webkit-zoom-in;
 	cursor: -moz-zoom-in;
 	cursor: zoom-in;
-
-	.cb-lightbox-draggable-init{
-		cursor: move;
-	}
 }
+
 
 .cb-lightbox-is-open{
 	.cb-lightbox-overlay{

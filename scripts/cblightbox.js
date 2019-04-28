@@ -156,7 +156,7 @@
 	    	$(".cb-lightbox-slide").addClass("cb-lightbox-draggable-init");
 
 	        var slide = $('.cb-lightbox-slide'),
-				$s = slide.closest('.cb-lightbox').data('settings'),
+				$s = $('.cb-lightbox').data('settings'),
 	        	image = slide.find(".cb-lightbox-image"),
 	        	clickX = userX / slide.width(),
 				clickY = userY / slide.height();

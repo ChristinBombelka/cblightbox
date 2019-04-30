@@ -143,8 +143,6 @@
 	    		return;
 	    	}
 
-	    	clearTimeout(runningTimeout);
-
 	    	$(".cb-lightbox").addClass("cb-lightbox-is-zoomed")
 	    	$(".cb-lightbox-slide").addClass("cb-lightbox-draggable-init");
 
@@ -465,8 +463,6 @@
 		}
 
 		function close(){
-			clearTimeout(runningTimeout);
-
 			closing = true;
 
 			var el = $(".cb-lightbox-is-selected"),

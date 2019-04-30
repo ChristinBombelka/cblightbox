@@ -14,6 +14,6 @@ $(function() {
         'slideEffect': 'slide',
         'slideDuration': 500,
         'zoom': true,
-        'zoomOffset' : 50,       
+        'zoomOffset' : 0,       
     });
 });

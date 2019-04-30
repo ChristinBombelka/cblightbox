@@ -56,6 +56,10 @@
 				.addClass('cb-lightbox-error-show');
 		}
 
+		function isTouchDevice(){
+			return 'ontouchstart' in window || navigator.maxTouchPoints;
+		}
+
 		function setTranslate(el, values){
 			var str = '',
 				css = {};
@@ -1034,7 +1038,7 @@
 				}
 			});
 
-			$(document).on("mousedown touchstart", '.cb-lightbox-draggable', function(e){
+			$(document).on(isTouchDevice() ? 'touchstart' : 'mousedown', '.cb-lightbox-draggable', function(e){
 
 				clickTimer = true;
 				setTimeout(function(){
@@ -1089,7 +1093,7 @@
 			    mouseUp = false;
 			    logMousePosition();
 
-			    $(document).bind("mousemove.cb-lightbox touchmove.cb-lightbox", function(e){
+			    $(document).bind(isTouchDevice() ? 'touchmove.cb-lightbox' : 'mousemove.cb-lightbox', function(e){
 			    	if(e.type == "touchmove"){
 			    		var newX = e.originalEvent.touches[0].pageX - startX,
 				            newY = e.originalEvent.touches[0].pageY - startY;
@@ -1129,33 +1133,31 @@
 			    });
 			});
 
-			$(document).on("mouseup touchend", function(e){
+			$(document).on(isTouchDevice() ? 'touchend' : 'mouseup', function(e){
 
 				mouseUp = true;
 				clearTimeout(positionInterval);
 				clearTimeout(momentTimer);
 
 				$('.cb-lightbox').removeClass('cb-lightbox-is-grabbing');
+				$(this).unbind("mousemove.cb-lightbox, touchmove.cb-lightbox");
 
-				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content')){
+				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || closing){
 					return;
 				}
 
-				if(e.which != 1){
+				if(e.which != 1 && e.which != 0 ){
 					return
 				}
 
-				if(e.type == "mouseup"){
-					e.preventDefault();
+				if(e.type == 'mouseup' || e.type == 'touchend'){
 
 					var item = $(".cb-lightbox-draggable");
-					
-					$(this).unbind("mousemove.cb-lightbox");
-					
+										
 					if($('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
 						return false
 					}
-					
+				
 					if(clickTimer){
 						//handle after click
 						if(!item.hasClass("cb-lightbox-is-dragging")){

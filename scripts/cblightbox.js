@@ -1035,6 +1035,7 @@
 			});
 
 			$(document).on(isTouchDevice() ? 'touchstart' : 'mousedown', '.cb-lightbox-draggable', function(e){
+				e.preventDefault();
 
 				clickTimer = true;
 				setTimeout(function(){

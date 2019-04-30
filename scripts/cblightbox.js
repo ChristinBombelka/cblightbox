@@ -1099,7 +1099,7 @@
 			        }
 
 			        //check element is dragging
-			        if(lastOffsetX != newX && lastOffsetY != newY){
+			        if(Math.abs(lastOffsetX - newX) > 2 || Math.abs(lastOffsetY - newY) > 2){
 						slide.addClass("cb-lightbox-is-dragging");
 						clickTimer = false;
 			        }

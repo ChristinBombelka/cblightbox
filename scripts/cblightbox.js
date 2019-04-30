@@ -1135,7 +1135,7 @@
 				clearTimeout(momentTimer);
 
 				$('.cb-lightbox').removeClass('cb-lightbox-is-grabbing');
-				$(this).unbind("mousemove.cb-lightbox, touchmove.cb-lightbox");
+				$(this).unbind("mousemove.cb-lightbox touchmove.cb-lightbox");
 
 				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || closing){
 					return;
@@ -1172,7 +1172,7 @@
 						   	}
 
 						}else{
-						    $(this).off("mousemove.cb-lightbox");
+						    $(this).off("mousemove.cb-lightbox touchmove.cb-lightbox");
 						}
 
 					}else{

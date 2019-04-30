@@ -1060,8 +1060,6 @@
 
 				$('.cb-lightbox').addClass('cb-lightbox-is-grabbing');
 
-				e.preventDefault();
-
 			    var slide = $(this),
 			    	$s = slide.closest('.cb-lightbox').data('settings'),
 			    	image = slide.find('.cb-lightbox-image'),

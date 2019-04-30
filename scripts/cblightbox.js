@@ -509,7 +509,7 @@
 				$("html").removeClass("cb-lightbox-lock cb-lightbox-margin");
 				el.removeClass('cb-lightbox-is-selected');
 				closing = false;
-			}, $s.openCloseDuration);
+			}, $s.openCloseDuration + 20);
 		}
 
 		function fitImage(slide){

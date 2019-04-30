@@ -7,18 +7,7 @@
 
 (function($){
 	var caption,
-		type,
-		tpl,
-		runningTimeout,
-		closing,
-		lastPoint = {}, 
-		currentPoint = {},
-		lastT,
-		currentT,
-		lastTimeMouseMoved,
-		mouseUp = true,
-		positionInterval,
-		momentTimer;
+		closing;
 
 	$.fn.cblightbox = function(options){
 
@@ -708,20 +697,43 @@
 			getSlide(source, _this_index, new_image, true, direction);
 	    }
 
-	    function getSpeed(){
-			var distanceX = currentPoint.x - lastPoint.x,
-	            distanceY = currentPoint.y - lastPoint.y,
-	            distanceT = Math.max(currentT - lastT, 1),
-	            maxSpeedX = 4,
-				maxSpeedY = 4;
+	    //global momentum variables
+	    var speed = {},
+	    	maxSpeedX = 10,
+			maxSpeedY = 10,
+	    	timeDiff,
+	    	distance = {},
+	    	lastPoint = {}, 
+			currentPoint = {},
+			lastTimeMouseMoved,
+			mouseUp = true,
+			positionInterval,
+			momentTimer,
+			slowDownRatio = {},
+			slowDownRatioReverse = {},
+ 			speedDecleration = {},
+ 			speedDecelerationRatioAbs = {};
 
-			// Speed in px/ms velocity
-			var speedX = Math.max(Math.min(distanceX / distanceT, maxSpeedX), -maxSpeedX) * 10,   
-				speedY = Math.max(Math.min(distanceY / distanceT, maxSpeedY), -maxSpeedY) * 10;
+		function calculateAnimtionOffset(axis){
+			speedDecleration[axis] = speedDecleration[axis] * (slowDownRatio[axis] + slowDownRatioReverse[axis] - slowDownRatioReverse[axis] * timeDiff / 10);
+			speedDecelerationRatioAbs[axis] = Math.abs(speed[axis] * speedDecleration[axis]);
+			distanceOffset = speed[axis] * speedDecleration[axis] * timeDiff;
 
-	     	return {sX: speedX, sY: speedY}
-	    }
+			return distanceOffset;
+		}
 
+		function getEasing(easing, k){
+			if(easing == 'sineOut'){
+				return Math.sin(k * (Math.PI / 2));
+			}else if(easing == 'sineInOut'){
+				return - (Math.cos(Math.PI * k) - 1) / 2;
+			}
+		}
+
+		function getNewBouncePosition(maxMin, current, time, duration){
+			return (maxMin - current) * getEasing('sineOut', time / duration ) + current;
+		}
+		
 	    function logMousePosition(){
 			if(mouseUp){
 				return;
@@ -729,120 +741,156 @@
 
 			//log mouse positions
 	       	positionInterval = setTimeout(function(){
-	       		if(currentPoint.x && currentPoint.y){
-		         	lastPoint = {x: currentPoint.x, y: currentPoint.y};
-					lastT = new Date().getTime();
-				}
+	       		
+		         	currentT = new Date().getTime();
+		         	timeDiff = currentT - lastT;
 
-				//console.log()
+		         	distance = {
+		         		x: (currentPoint.x - lastPoint.x) / 1.5,
+		         		y: (currentPoint.y - lastPoint.y) / 1.5 
+		         	};
+		         	
+		         	lastPoint = {
+		         		x: currentPoint.x, 
+		         		y: currentPoint.y
+		         	};
+
+					lastT = currentT;
 
 				logMousePosition();
-	       	}, 100);
+	       	}, 20);
 		}
 
+		
 		function initMoveMoment(item){
 			var $s = $('.cb-lightbox').data('settings'),
-				speed = getSpeed(),
-				speedX = speed.sX,
-				speedY = speed.sY,
 				minX = $s.zoomOffset[3],
 				maxX = $(window).width() - item.width() -  $s.zoomOffset[1],
 				minY = $s.zoomOffset[0],
 				maxY = $(window).height() - item.height() -  $s.zoomOffset[2],
-				friction = 0.95, //stow down 
-				distance = Math.sqrt(Math.pow(lastPoint.x - currentPoint.x, 2) + Math.pow(lastPoint.y - currentPoint.y, 2)), // Distance moved (Euclidean distance)
-				returnX = false,
- 				returnY = false,
- 				directionX,
- 				directionY,
- 				bounceDivision = 20;
+				startTimeX = false,
+	 			startTimeY = false;
+	 			completeX = false,
+	 			completeY = false;
+ 			
+ 			speedDecleration = {
+ 				x: 1, 
+ 				y: 1
+ 			};
+ 			//stow down
+ 			slowDownRatio = {
+ 				x: 0.95,
+ 				y: 0.95,
+ 			},
+ 			slowDownRatioReverse = {
+				x: 1 - slowDownRatio.x, 
+				y: 1 - slowDownRatio.y
+			};
+
+			// Speed in px/ms velocity
+			speed.x = Math.max(Math.min(distance.x / timeDiff, maxSpeedX), -maxSpeedX);   
+			speed.y = Math.max(Math.min(distance.y / timeDiff, maxSpeedY), -maxSpeedY);
 
 	 		//min distence to move object
-	 		if(distance > 1){
+	 		if(Math.abs(distance.x) > 1 || Math.abs(distance.y) > 1){
 
 				function moveMoment(){
 					momentTimer = setTimeout(function(){
-						if((Math.abs(speedX) > 0.4 || Math.abs(speedY) > 0.4) || currentPoint.x > minX || currentPoint.x < maxX ||  currentPoint.y > minY || currentPoint.y < maxY){
 
-							//check end position by speed, bounce back
-							if((Math.abs(speedX) < 0.41 && (currentPoint.x > minX || currentPoint.x < maxX)) || returnX){
-								
-								if(returnX){
-									//bounce back and stop on end position
-									if(directionX == 'right'){
-										if(currentPoint.x < minX ){
-											currentPoint.x = minX;
-											speedX = 0;
-										}
-									}else{
-										if(currentPoint.x > maxX){
-											currentPoint.x = maxX;
-											speedX = 0;
-										}
-									}
-								}else{
+						if(startTimeX === false){
+							speedX = calculateAnimtionOffset('x');
+						}
 
-									if(currentPoint.x > minX){
-										//bounce back from left to right >>
-										speedX = - Math.abs(currentPoint.x - minX) / bounceDivision; 
-										directionX = 'right';
-									}else{
-										//bounce back from right to left <<
-										speedX =  Math.abs(currentPoint.x - maxX) / bounceDivision;
-										directionX = 'left';
+						if(startTimeY === false){
+							speedY = calculateAnimtionOffset('y');
+						}
+						if(Math.abs(speedX) > 0.04 || Math.abs(speedY) > 0.04 || completeX || completeY){
+							if((currentPoint.x > minX || currentPoint.x < maxX) && $('.cb-lightbox-image').data('width') > $(window).width()){
+								//In bouncing area left/right
+								if(currentPoint.x > minX || currentPoint.x < maxX){	
+									if(Math.abs(speedX) < 0.06){
+										if(startTimeX === false){
+											startTimeX = new Date().getTime();
+										}
+
+										tX = new Date().getTime() - startTimeX;
+										
+										if(tX >= 300){
+											//set to end position 	
+											if(currentPoint.x > minX){
+												setCurrentPointX = minX;
+											}else{
+												setCurrentPointX = maxX;
+											}	
+
+											speedX = 0; 
+											completeX = false;
+
+										}else{
+
+											completeX = true;
+
+											if(currentPoint.x > minX){
+												setCurrentPointX = getNewBouncePosition(minX, currentPoint.x, tX, 300);
+											}else{
+												setCurrentPointX = getNewBouncePosition(maxX, currentPoint.x, tX, 300);
+											}
+										}	
 									}
 								}
-								returnX = true;
 
-							}else{
-								if(currentPoint.x > minX || currentPoint.x < maxX){
-									speedX = speedX * 0.8;
-								}else{
-									speedX = speedX * friction;
-								}
+								slowDownRatio.x = 0.7;
 							}
 
-							if((Math.abs(speedY) < 0.41 && (currentPoint.y > minY || currentPoint.y < maxY)) || returnY){
-								if(returnY){
-									//stop on end poiint
-									if(directionY == 'bottom'){
-										if(currentPoint.y < minY){
-											currentPoint.y = minY;
-											speedY = 0;
+							if(!startTimeX){
+								setCurrentPointX = currentPoint.x + speedX;
+							}
+							
+							if((currentPoint.y > minY || currentPoint.y < maxY) &&  $('.cb-lightbox-image').data('height') > $(window).height()){
+								//In bouncing area top/bottom
+								if(currentPoint.y > minY || currentPoint.y < maxY){	
+
+									if(Math.abs(speedY) < 0.06){
+										if(startTimeY === false){
+											startTimeY = new Date().getTime();
 										}
-									}else{
-										if(currentPoint.y > maxY){
-											currentPoint.y = maxY;
-											speedY = 0;
+
+										tY = new Date().getTime() - startTimeY;
+
+										if(tY >= 300){
+											//set to end position 	
+											if(currentPoint.y > minY){
+												setCurrentPointY = minY;
+											}else{
+												setCurrentPointY = maxY;
+											}	
+
+											speedY = 0; 
+											completeY = false;
+										}else{
+
+											completeY = true;
+
+											if(currentPoint.y > minY){
+												setCurrentPointY = getNewBouncePosition(minY, currentPoint.y, tY, 300);
+											}else{
+												setCurrentPointY = getNewBouncePosition(maxY, currentPoint.y, tY, 300);
+											}
 										}
 									}
-
-								}else{
-
-									if(currentPoint.y > minY){
-										//bounce to bottom \/
-										speedY = -Math.abs(currentPoint.y - minY) / bounceDivision; 
-										directionY = 'bottom';
-									}else{
-										//bounce to left /\
-										speedY = Math.abs(currentPoint.y - maxY) / bounceDivision;
-										directionY = 'top';
-									}
 								}
-								returnY = true;
 
-							}else{
-								if(currentPoint.y > minY || currentPoint.y < maxY){
-									speedY = speedY * 0.8;	
-								}else{
-									speedY = speedY * friction;
-								}
+								slowDownRatio.y = 0.7;
+							} 
+
+							if(!startTimeY){
+								setCurrentPointY = currentPoint.y + speedY;
 							}
 
 							//set points
-							currentPoint.x = currentPoint.x + speedX;
-							currentPoint.y = currentPoint.y + speedY;
-
+							currentPoint.x = setCurrentPointX;
+							currentPoint.y = setCurrentPointY;  
+ 
 							//move to points
 							setTranslate(item, {
 								left: currentPoint.x,

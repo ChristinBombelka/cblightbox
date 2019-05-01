@@ -11,7 +11,7 @@ Open image in a overlayer lightbox. The Lightbox have a zoom function, to zoom i
 </head>
 <body>
 
-<a href="image.jpg" class="js-cblightbox" data-cblightbox="gallery" data-caption="Lorm ypsum"><img src="thumb.jpg"></a>
+<a href="image.jpg" class="js-cblightbox" data-cblightbox="gallery" data-width="1000" data-height="1500" data-caption="Lorm ypsum"><img src="thumb.jpg"></a>
 
 <script type="text/javascript" src="scripts/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="scripts/cblightbox.js"></script>
@@ -65,17 +65,25 @@ $(".js-cblightbox").cblightbox();
     /*  Values: outside, inside
      *  Caption position in Template
      */
-    animationEffect: 'zoom',
+    openCloseEffect: 'fade',
     /*  Values: zoom, fade
      *  Open/Close animation effect
      */
-    animationDuration: 500,
+    openCloseDuration: 250,
     /*  Values: number
      *  Open/Close animation speed in ms
      */
-    slideDuration: 500,
+    slideEffect: 'fade',
+    /* Values: fade, slide
+     * Slide animation effect
+     */
+    slideDuration: 250,
     /*  Values: number
      *  Prev/Next animation speed
+     */
+    previewSource: false,
+    /* Values: string
+     * Set preview source for lazyloaded images - previewSource: 'data-original' - this value are display when the preview image is empty or a base64 image
      */
 }
 ```

@@ -734,16 +734,8 @@
 			return distanceOffset;
 		}
 
-		function getEasing(easing, k){
-			if(easing == 'sineOut'){
-				return Math.sin(k * (Math.PI / 2));
-			}else if(easing == 'sineInOut'){
-				return - (Math.cos(Math.PI * k) - 1) / 2;
-			}
-		}
-
 		function getNewBouncePosition(maxMin, current, time, duration){
-			return (maxMin - current) * getEasing('sineOut', time / duration ) + current;
+			return (maxMin - current) * time / duration + current;
 		}
 		
 	    function logMousePosition(){

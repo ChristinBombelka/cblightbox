@@ -775,7 +775,10 @@
 				startTimeX = false,
 	 			startTimeY = false;
 	 			completeX = false,
-	 			completeY = false;
+	 			completeY = false,
+	 			currentImage = $('.cb-lightbox-image'),
+	 			setCurrentPointX = false,
+	 			setCurrentPointY = false;
  			
  			speedDecleration = {
  				x: 1, 
@@ -808,103 +811,107 @@
 						if(startTimeY === false){
 							speedY = calculateAnimtionOffset('y');
 						}
-						if(Math.abs(speedX) > 0.04 || Math.abs(speedY) > 0.04 || completeX || completeY){
-							if((currentPoint.x > minX || currentPoint.x < maxX) && $('.cb-lightbox-image').data('width') > $(window).width()){
-								//In bouncing area left/right
-								if(currentPoint.x > minX || currentPoint.x < maxX){	
-									if(Math.abs(speedX) < 0.06){
-										if(startTimeX === false){
-											startTimeX = new Date().getTime();
-										}
 
-										tX = new Date().getTime() - startTimeX;
-										
-										if(tX >= 300){
-											//set to end position 	
-											if(currentPoint.x > minX){
-												setCurrentPointX = minX;
-											}else{
-												setCurrentPointX = maxX;
-											}	
-
-											speedX = 0; 
-											completeX = false;
-
-										}else{
-
-											completeX = true;
-
-											if(currentPoint.x > minX){
-												setCurrentPointX = getNewBouncePosition(minX, currentPoint.x, tX, 300);
-											}else{
-												setCurrentPointX = getNewBouncePosition(maxX, currentPoint.x, tX, 300);
-											}
-										}	
+						if((Math.abs(speedX) > 0.04 || (currentPoint.x > minX || currentPoint.x < maxX)) && currentImage.data('width') > $(window).width()){
+							//In bouncing area left/right
+							if(currentPoint.x > minX || currentPoint.x < maxX){	
+								if(Math.abs(speedX) < 0.06){
+									if(startTimeX === false){
+										startTimeX = new Date().getTime();
 									}
+
+									tX = new Date().getTime() - startTimeX;
+									
+									if(tX >= 300){
+										//set to end position 	
+										if(currentPoint.x > minX){
+											setCurrentPointX = minX;
+										}else{
+											setCurrentPointX = maxX;
+										}	
+
+										speedX = 0; 
+										completeX = true;
+
+									}else{
+										if(currentPoint.x > minX){
+											setCurrentPointX = getNewBouncePosition(minX, currentPoint.x, tX, 300);
+										}else{
+											setCurrentPointX = getNewBouncePosition(maxX, currentPoint.x, tX, 300);
+										}
+									}	
 								}
 
 								slowDownRatio.x = 0.7;
 							}
 
-							if(!startTimeX){
-								setCurrentPointX = currentPoint.x + speedX;
-							}
-							
-							if((currentPoint.y > minY || currentPoint.y < maxY) &&  $('.cb-lightbox-image').data('height') > $(window).height()){
-								//In bouncing area top/bottom
-								if(currentPoint.y > minY || currentPoint.y < maxY){	
+						}else{
+							completeX = true;
+						}
 
-									if(Math.abs(speedY) < 0.06){
-										if(startTimeY === false){
-											startTimeY = new Date().getTime();
-										}
+						if(!startTimeX){
+							setCurrentPointX = currentPoint.x + speedX;
+						}
 
-										tY = new Date().getTime() - startTimeY;
+						if((Math.abs(speedY) > 0.04 || (currentPoint.y > minY || currentPoint.y < maxY)) && currentImage.data('height') > $(window).height()){
+							//In bouncing area top/bottom
+							if(currentPoint.y > minY || currentPoint.y < maxY){	
 
-										if(tY >= 300){
-											//set to end position 	
-											if(currentPoint.y > minY){
-												setCurrentPointY = minY;
-											}else{
-												setCurrentPointY = maxY;
-											}	
+								if(Math.abs(speedY) < 0.06){
+									if(startTimeY === false){
+										startTimeY = new Date().getTime();
+									}
 
-											speedY = 0; 
-											completeY = false;
+									tY = new Date().getTime() - startTimeY;
+
+									if(tY >= 300){
+										//set to end position 	
+										if(currentPoint.y > minY){
+											setCurrentPointY = minY;
 										}else{
+											setCurrentPointY = maxY;
+										}	
 
-											completeY = true;
+										speedY = 0;
+										completeY = true;
+										
+									}else{
 
-											if(currentPoint.y > minY){
-												setCurrentPointY = getNewBouncePosition(minY, currentPoint.y, tY, 300);
-											}else{
-												setCurrentPointY = getNewBouncePosition(maxY, currentPoint.y, tY, 300);
-											}
+										if(currentPoint.y > minY){
+											setCurrentPointY = getNewBouncePosition(minY, currentPoint.y, tY, 300);
+										}else{
+											setCurrentPointY = getNewBouncePosition(maxY, currentPoint.y, tY, 300);
 										}
 									}
 								}
 
 								slowDownRatio.y = 0.7;
-							} 
-
-							if(!startTimeY){
-								setCurrentPointY = currentPoint.y + speedY;
-							}
-
-							//set points
-							currentPoint.x = setCurrentPointX;
-							currentPoint.y = setCurrentPointY;  
- 
-							//move to points
-							setTranslate(item, {
-								left: currentPoint.x,
-								top: currentPoint.y
-							});
-
-							moveMoment();
+							}							
 						}else{
-							clearTimeout(momentTimer);
+							completeY = true;
 						}
+
+						if(!startTimeY){
+							setCurrentPointY = currentPoint.y + speedY;
+						}
+
+						//set points
+						currentPoint.x = setCurrentPointX ? setCurrentPointX : currentPoint.x;
+						currentPoint.y = setCurrentPointY ? setCurrentPointY : currentPoint.y;  
+
+						//move to points
+						setTranslate(item, {
+							left: currentPoint.x,
+							top: currentPoint.y
+						});
+
+						if(completeX && completeY){
+							clearTimeout(momentTimer);
+							return;
+						}
+						
+						moveMoment();
+							
 					}, 10);
 				}
 

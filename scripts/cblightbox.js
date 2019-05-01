@@ -1064,6 +1064,10 @@
 
 			$(document).on(is_touch_device() ? 'touchstart' : 'mousedown', '.cb-lightbox-draggable', function(e){
 
+				if(!is_touch_device()){
+			    	e.preventDefault();
+			    }
+
 				clickTimer = true;
 				setTimeout(function(){
 					clickTimer = false;
@@ -1116,10 +1120,6 @@
 			    logMousePosition();
 
 			    $(document).bind(is_touch_device() ? 'touchmove.cb-lightbox' : 'mousemove.cb-lightbox', function(e){
-			    	if(!is_touch_device()){
-			    		e.preventDefault();
-			    	}
-
 			    	if(e.type == "touchmove"){
 			    		var newX = e.originalEvent.touches[0].pageX - startX,
 				            newY = e.originalEvent.touches[0].pageY - startY;

@@ -1083,7 +1083,7 @@
 				}
 
 				if(!$(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
-					return false;
+					return;
 				}
 
 				$('.cb-lightbox').addClass('cb-lightbox-is-grabbing');
@@ -1116,6 +1116,10 @@
 			    logMousePosition();
 
 			    $(document).bind(is_touch_device() ? 'touchmove.cb-lightbox' : 'mousemove.cb-lightbox', function(e){
+			    	if(!is_touch_device()){
+			    		e.preventDefault();
+			    	}
+
 			    	if(e.type == "touchmove"){
 			    		var newX = e.originalEvent.touches[0].pageX - startX,
 				            newY = e.originalEvent.touches[0].pageY - startY;
@@ -1151,7 +1155,7 @@
 			        setTranslate(slide, {
 			        	top: newY,
 			        	left: newX
-			        });			         
+			        });	
 			    });
 			});
 
@@ -1239,9 +1243,10 @@
 
 			var settings = $.extend({}, defaults, options);
 
-			item.on("click", function(event){
-				event.preventDefault();
-
+			item.on("click", function(e){
+				e.stopPropagation();
+				e.preventDefault();
+			
 				init(item, settings);
 			});
 		});

@@ -78,6 +78,7 @@
 
 .cb-lightbox-slide-image{
 	background-color: #000;
+	backface-visibility: hidden; //optimize gpu rendering
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -252,8 +253,8 @@
 	.cb-lightbox-slide {
 		//width: 100% !important;
 		//height: 100% !important;
-		top: 0 !important;
-		left: 0 !important;
+		top: 0;
+		left: 0;
 		transform: none;
 		overflow: hidden;
 	}

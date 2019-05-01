@@ -14,6 +14,7 @@ $(function() {
         'slideEffect': 'slide',
         'slideDuration': 500,
         'zoom': true,
-        'zoomOffset' : 0,       
+        'zoomOffset' : 0,
+        'previewSource' : 'data-original',       
     });
 });

@@ -57,10 +57,6 @@
 				.addClass('cb-lightbox-error-show');
 		}
 
-		function isTouchDevice(){
-			return 'ontouchstart' in window || navigator.maxTouchPoints;
-		}
-
 		function setTranslate(el, values){
 			var str = '',
 				css = {};
@@ -494,8 +490,6 @@
 					container.addClass('cb-lightbox-is-open');
 				});
 			}	
-
-			
 		}
 
 		function close(){
@@ -789,7 +783,6 @@
 	       	}, 20);
 		}
 
-		
 		function initMoveMoment(item){
 			var $s = $('.cb-lightbox').data('settings'),
 				minX = $s.zoomOffset[3],
@@ -1069,8 +1062,7 @@
 				}
 			});
 
-			$(document).on(isTouchDevice() ? 'touchstart' : 'mousedown', '.cb-lightbox-draggable', function(e){
-				e.preventDefault();
+			$(document).on(is_touch_device() ? 'touchstart' : 'mousedown', '.cb-lightbox-draggable', function(e){
 
 				clickTimer = true;
 				setTimeout(function(){
@@ -1123,7 +1115,7 @@
 			    mouseUp = false;
 			    logMousePosition();
 
-			    $(document).bind(isTouchDevice() ? 'touchmove.cb-lightbox' : 'mousemove.cb-lightbox', function(e){
+			    $(document).bind(is_touch_device() ? 'touchmove.cb-lightbox' : 'mousemove.cb-lightbox', function(e){
 			    	if(e.type == "touchmove"){
 			    		var newX = e.originalEvent.touches[0].pageX - startX,
 				            newY = e.originalEvent.touches[0].pageY - startY;
@@ -1163,7 +1155,7 @@
 			    });
 			});
 
-			$(document).on(isTouchDevice() ? 'touchend' : 'mouseup', function(e){
+			$(document).on(is_touch_device() ? 'touchend' : 'mouseup', function(e){
 
 				mouseUp = true;
 				clearTimeout(positionInterval);

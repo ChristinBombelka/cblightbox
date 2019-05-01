@@ -1007,12 +1007,12 @@
 				var margin = $s.margin;
 			}
 
-			if ($.type($s.margin) === "number" ) {
-                margin = [ $s.margin, $s.margin, $s.margin, $s.margin ];
+			if ($.type(margin) === "number" ) {
+                margin = [ margin, margin, margin, margin ];
             }
 
-            if ($s.margin.length == 2) {
-                margin = [$s.margin[0], $s.margin[1], $s.margin[0], $s.margin[1]];
+            if (margin.length == 2) {
+                margin = [margin[0], margin[1], margin[0], margin[1]];
             }
 
             $s.margin = margin; 

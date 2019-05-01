@@ -234,7 +234,7 @@
 		    if(el.data('width') && el.data('height')){
 		    	callback.apply(this, [el.data('width'), el.data('height')]);
 		    }else{
-		    	 var wait = setInterval(function() {
+		    	var wait = setInterval(function() {
 			        var w = $img[0].naturalWidth,
 			            h = $img[0].naturalHeight;
 			        if (w && h) {
@@ -320,13 +320,6 @@
 					});
 				}
 
-				getImageSize(item, $img, function(width, height){
-					$img.data({
-						'width': width,
-						'height': height,
-					});
-				});
-
 				container.addClass('cb-lightbox-is-loading');
 
 				$img.one('error', function(){
@@ -348,6 +341,13 @@
 					container.removeClass('cb-lightbox-is-loading');
 					slide.removeClass('cb-lightbox-hide-image');
 				}
+
+				getImageSize(item, $img, function(width, height){
+					$img.data({
+						'width': width,
+						'height': height,
+					});
+				});
 
 			}else if(type == "iframe"){
 
@@ -371,6 +371,16 @@
 
 
 			if(fitAndShow){
+				//wait for imagesize;
+				var wait = setInterval(function() {
+			        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
+			            initFitAndShow();
+			            clearInterval(wait);
+			        }
+			    }, 100);
+			}
+
+			function initFitAndShow(){
 				var values = fitImage(slide);
 
 				setTranslate(slide, {
@@ -413,65 +423,79 @@
 					}, 20);
 				}
 			}
-			
+
 			return slide;
 		}
 
 		function open(item, $s){
+
 			var source = item.attr('href'),
 				slide = getSlide(source, false, item, false, false),
 				container = $('.cb-lightbox');
+			
+			//wait for imagesize;
+			var wait = setInterval(function() {
+		        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
+		            openStart();
+		            clearInterval(wait);
+		        }
+		    }, 100);
+			
+			function openStart(){
+				
+				_animate(container, false, $s.openCloseDuration);
 
-			_animate(container, false, $s.openCloseDuration);
+				if(slide && $s.openCloseEffect == 'zoom'){
+					var previewImage = item.find('img');
 
-			if(slide && $s.openCloseEffect == 'zoom'){
-				var previewImage = item.find('img');
+					if(!previewImage.length){
+						previewImage = item;
+					}
 
-				if(!previewImage.length){
-					previewImage = item;
+					var	offsetTop = previewImage.offset().top - $(window).scrollTop(),
+						offsetLeft = previewImage.offset().left;
+				
+					setTranslate(slide, {
+						width: previewImage.width(),
+						height: previewImage.height(),
+						top: offsetTop,
+						left: offsetLeft,
+					});
+
+					var values = fitImage(slide);
+
+					_animate(slide, {
+						top: values.top,
+						left: values.left,
+						scaleX: values.scaleX,
+						scaleY: values.scaleY
+					}, $s.openCloseDuration);
+
+				}else if(slide && $s.openCloseEffect == 'fade'){
+
+					var values = fitImage(slide);
+
+					setTranslate(slide, {
+						width: values.width,
+						height: values.height,
+						top: values.top,
+						left: values.left,
+						opacity: 0
+					});
+
+					setTimeout(function(){
+						_animate(slide, {
+							opacity: 1,
+						}, $s.openCloseDuration);
+					}, 10);
 				}
 
-				var	offsetTop = previewImage.offset().top - $(window).scrollTop(),
-					offsetLeft = previewImage.offset().left;
-			
-				setTranslate(slide, {
-					width: previewImage.width(),
-					height: previewImage.height(),
-					top: offsetTop,
-					left: offsetLeft,
-				});
-
-				var values = fitImage(slide);
-
-				_animate(slide, {
-					top: values.top,
-					left: values.left,
-					scaleX: values.scaleX,
-					scaleY: values.scaleY
-				}, $s.openCloseDuration);
-
-			}else if(slide && $s.openCloseEffect == 'fade'){
-
-				var values = fitImage(slide);
-
-				setTranslate(slide, {
-					width: values.width,
-					height: values.height,
-					top: values.top,
-					left: values.left,
-					opacity: 0
-				});
-
 				setTimeout(function(){
-					_animate(slide, {
-						opacity: 1,
-					}, $s.openCloseDuration);
-				}, 10);
-			}
+					container.addClass('cb-lightbox-is-open');
+				});
+			}	
 
-			setTimeout(function(){
-				container.addClass('cb-lightbox-is-open');
-			});
+			
 		}
 
 		function close(){

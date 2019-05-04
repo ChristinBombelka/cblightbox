@@ -243,13 +243,16 @@
 
 		function setImage(slide, source, item){
 			var elementPlaceholder = slide.find('.cb-lightbox-image-placeholder'),
-				container = $('.cb-lightbox');
-			
+				container = $('.cb-lightbox'),
+				loadingTimeout;
+
 			var $img = $('<img />').one('error', function(){
 				$img.remove();
 				elementPlaceholder.remove();
 				error(container);
 			}).one('load', function(e){
+
+				clearTimeout(loadingTimeout);
 
 				slide.removeClass('cb-lightbox-hide-image');
 
@@ -269,6 +272,11 @@
 				elementPlaceholder.hide();
 				container.removeClass('cb-lightbox-is-loading');
 				slide.removeClass('cb-lightbox-hide-image');
+				console.log('complete image');
+			}else{
+				loadingTimeout = setTimeout(function(){
+					container.addClass('cb-lightbox-is-loading');
+				}, 100);
 			}
 
 			getImageSize(item, $img, function(width, height){
@@ -333,8 +341,6 @@
 				}else{
 					placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
 				}				
-
-				container.addClass('cb-lightbox-is-loading');
 
 				var elementPlaceholder = $('<img />');
 

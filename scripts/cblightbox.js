@@ -267,12 +267,10 @@
 				.attr('src', source)
 				.appendTo(slide.find('.cb-lightbox-slide-image'));
 
-			
 			if(($img[0].complete || $img[0].readyState == 'complete') && $img[0].naturalWidth && $img[0].naturalHeight){
 				elementPlaceholder.hide();
 				container.removeClass('cb-lightbox-is-loading');
 				slide.removeClass('cb-lightbox-hide-image');
-				console.log('complete image');
 			}else{
 				loadingTimeout = setTimeout(function(){
 					container.addClass('cb-lightbox-is-loading');

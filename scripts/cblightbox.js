@@ -47,6 +47,8 @@
 			previewSource: false, //define preview image source on use lazyloading
 			afterInit: $.noop,
 			afterFit: $.noop,
+			afterSlide: $.noop,
+			afterClose: $.noop,
 		}
 
 		function error(container){
@@ -433,6 +435,11 @@
 						},  $s.slideDuration);
 					}, 20);
 				}
+				setTimeout(function(){
+					if ($.isFunction($s.afterSlide)) {
+				 	   $s.afterSlide.call(this, slide);
+					}
+				}, $s.slideDuration + 30);
 			}
 
 			return slide;
@@ -554,6 +561,11 @@
 				$("html").removeClass("cb-lightbox-lock cb-lightbox-margin");
 				el.removeClass('cb-lightbox-is-selected');
 				closing = false;
+
+				if ($.isFunction($s.afterClose)) {
+				 	$s.afterClose.call(this, container);
+				}
+
 			}, $s.openCloseDuration + 20);
 		}
 

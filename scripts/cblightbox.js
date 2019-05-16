@@ -796,7 +796,7 @@
 				}, $s.slideDuration);
 
 			}else{
-				_animate(wrapImage, {
+				_animate(slide, {
 					opacity: 0,
 				}, $s.slideDuration);
 			}

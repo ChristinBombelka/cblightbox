@@ -221,6 +221,31 @@
 	.cb-lightbox-slide &{
 		transform: translateY(100%);
 	}
+
+	.cb-lightbox-caption{
+		transform: translateX(-50%);
+		color: #fff;
+		padding: 15px 90px;
+		text-align: center;
+		min-width: 300px;
+		position: relative;
+	    left: 50%;
+	}
+}
+
+.cb-lightbox-slide-with-caption{
+	.cb-lightbox-caption{
+		transform: translateY(100%);
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+	}
+}
+
+.cb-lightbox-caption-hide{
+	position: fixed;
+	visibility: hidden;
 }
 
 .cb-lightbox-counter{
@@ -229,16 +254,6 @@
     position: absolute;
     right: 0;
     bottom: 0;
-}
-
-.cb-lightbox-caption{
-	transform: translatex(-50%);
-	color: #fff;
-	padding: 15px 90px;
-	text-align: center;
-	min-width: 300px;
-	position: relative;
-    left: 50%;
 }
 
 .cb-lightbox-lock{

@@ -629,6 +629,10 @@
 				slide.removeClass('cb-lightbox-draggable');
 			}
 
+			if ($.isFunction($s.afterFit)) {
+				$s.afterFit.call(this, slide);
+			}
+
 	 		return {
 	 			width: newImgWidth, 
 	 			height: newImgHeight, 

@@ -95,10 +95,22 @@ $(".js-cblightbox").cblightbox();
 
 Fired when lightbox is initialized
 
-`afterInit: function(container)`
+`afterInit: function(container){}`
 
 ### afterFit
 
 Fired when lightbox is fit image
 
-`afterFit: function(container)`
+`afterFit: function(container){}`
+
+### afterSlide
+
+Fired after slide complete 
+
+`afterSlide: function(container){}`
+
+### afterClose
+
+Fired after closed
+
+`afterClose: function(container){}`

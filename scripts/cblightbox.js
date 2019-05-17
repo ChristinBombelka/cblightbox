@@ -221,7 +221,7 @@
     		setTimeout(function(){
     			captionShow(slide);
     		}, duration + 30);
-    		
+
     		container.removeClass("cb-lightbox-is-zoomed")
     		slide.removeClass("cb-lightbox-draggable-init");
 	    }
@@ -261,7 +261,7 @@
 
 				var addTo = $(".cb-lightbox-info");
 			}
-			
+
 			if(caption){
 				var slideCaption = captionTpl.appendTo(addTo);
 
@@ -334,7 +334,7 @@
 
 			if(typeof fitAndShow === "undefined"){
 				fitAndShow = false;
-			}	
+			}
 
 			if(typeof i != "undefined"){
 				$(".counter-current").text(i + 1);
@@ -383,7 +383,7 @@
 					placeholderImage = item.find('img').attr( $s.previewSource );
 				}else{
 					placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
-				}				
+				}
 
 				var elementPlaceholder = $('<img />');
 
@@ -404,8 +404,8 @@
 
 					elementPlaceholder.fadeIn(250);
 					setImage(slide, source, item);
-				});						
-				
+				});
+
 			}else if(type == "iframe"){
 
 				slide.removeClass('cb-lightbox-hide-image');
@@ -441,7 +441,7 @@
 
 				setTranslate(slide, {
 					width: values.width,
-					height: values.height,				
+					height: values.height,
 				});
 
 				if($s.slideEffect == 'slide'){
@@ -449,14 +449,14 @@
 					var currentLeft = ($(window).width() - slide.width()) / 2;
 
 					if(direction == 'previews'){
-						var slideIn = -(slide.width() + currentLeft); 
+						var slideIn = -(slide.width() + currentLeft);
 					}else{
 						var slideIn = currentLeft + $(window).width();
 					}
 
 					setTranslate(slide, {
 						top: values.top,
-						left: slideIn,				
+						left: slideIn,
 					});
 
 					setTimeout(function(){
@@ -479,7 +479,7 @@
 						},  $s.slideDuration);
 					}, 20);
 
-					captionShow(slide);			
+					captionShow(slide);
 				}
 
 				setTimeout(function(){
@@ -497,7 +497,7 @@
 			var source = item.attr('href'),
 				slide = getSlide(source, false, item, false, false),
 				container = $('.cb-lightbox');
-			
+
 			//wait for imagesize;
 			var wait = setInterval(function() {
 		        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
@@ -523,7 +523,7 @@
 
 					var	offsetTop = previewImage.offset().top - $(window).scrollTop(),
 						offsetLeft = previewImage.offset().left;
-				
+
 					setTranslate(slide, {
 						width: previewImage.width(),
 						height: previewImage.height(),
@@ -619,7 +619,7 @@
 				}, $s.openCloseDuration);
 
 			}else if($s.openCloseEffect == 'fade'){
-				
+
 				_animate(slide, {
 					opacity: 0,
 				}, $s.openCloseDuration);
@@ -652,7 +652,7 @@
 				itemImage = item.find('img');
 			}else{
 				itemImage = item;
-			}	
+			}
 
 			if(type == 'image'){
 				if(typeof img != 'undefined'){
@@ -718,9 +718,9 @@
 			}
 
 	 		return {
-	 			width: newImgWidth, 
-	 			height: newImgHeight, 
-	 			top: positionTop, 
+	 			width: newImgWidth,
+	 			height: newImgHeight,
+	 			top: positionTop,
 	 			left: positionLeft,
 	 			scaleX: scaleWidth,
 	 			scaleY: scaleHeight
@@ -757,7 +757,7 @@
 		    }
 		    else{
 		    	moveY = lastoffset.y;
-		    }	
+		    }
 
 		    if(lastoffset.x != moveX || lastoffset.y != moveY){
 		    	_animate(slide, {
@@ -836,7 +836,7 @@
 			maxSpeedY = 10,
 	    	timeDiff,
 	    	distance = {},
-	    	lastPoint = {}, 
+	    	lastPoint = {},
 			currentPoint = {},
 			lastTimeMouseMoved,
 			mouseUp = true,
@@ -858,7 +858,7 @@
 		function getNewBouncePosition(maxMin, current, time, duration){
 			return (maxMin - current) * time / duration + current;
 		}
-		
+
 	    function logMousePosition(){
 			if(mouseUp){
 				return;
@@ -866,17 +866,17 @@
 
 			//log mouse positions
 	       	positionInterval = setTimeout(function(){
-	       		
+
 		         	currentT = new Date().getTime();
 		         	timeDiff = currentT - lastT;
 
 		         	distance = {
 		         		x: (currentPoint.x - lastPoint.x) / 1.5,
-		         		y: (currentPoint.y - lastPoint.y) / 1.5 
+		         		y: (currentPoint.y - lastPoint.y) / 1.5
 		         	};
-		         	
+
 		         	lastPoint = {
-		         		x: currentPoint.x, 
+		         		x: currentPoint.x,
 		         		y: currentPoint.y
 		         	};
 
@@ -899,9 +899,9 @@
 	 			currentImage = $('.cb-lightbox-image'),
 	 			setCurrentPointX = false,
 	 			setCurrentPointY = false;
- 			
+
  			speedDecleration = {
- 				x: 1, 
+ 				x: 1,
  				y: 1
  			};
  			//stow down
@@ -910,12 +910,12 @@
  				y: 0.95,
  			},
  			slowDownRatioReverse = {
-				x: 1 - slowDownRatio.x, 
+				x: 1 - slowDownRatio.x,
 				y: 1 - slowDownRatio.y
 			};
 
 			// Speed in px/ms velocity
-			speed.x = Math.max(Math.min(distance.x / timeDiff, maxSpeedX), -maxSpeedX);   
+			speed.x = Math.max(Math.min(distance.x / timeDiff, maxSpeedX), -maxSpeedX);
 			speed.y = Math.max(Math.min(distance.y / timeDiff, maxSpeedY), -maxSpeedY);
 
 	 		//min distence to move object
@@ -934,23 +934,23 @@
 
 						if((Math.abs(speedX) > 0.04 || (currentPoint.x > minX || currentPoint.x < maxX)) && currentImage.data('width') > $(window).width()){
 							//In bouncing area left/right
-							if(currentPoint.x > minX || currentPoint.x < maxX){	
+							if(currentPoint.x > minX || currentPoint.x < maxX){
 								if(Math.abs(speedX) < 0.06){
 									if(startTimeX === false){
 										startTimeX = new Date().getTime();
 									}
 
 									tX = new Date().getTime() - startTimeX;
-									
+
 									if(tX >= 300){
-										//set to end position 	
+										//set to end position
 										if(currentPoint.x > minX){
 											setCurrentPointX = minX;
 										}else{
 											setCurrentPointX = maxX;
-										}	
+										}
 
-										speedX = 0; 
+										speedX = 0;
 										completeX = true;
 
 									}else{
@@ -959,7 +959,7 @@
 										}else{
 											setCurrentPointX = getNewBouncePosition(maxX, currentPoint.x, tX, 300);
 										}
-									}	
+									}
 								}
 
 								slowDownRatio.x = 0.7;
@@ -975,7 +975,7 @@
 
 						if((Math.abs(speedY) > 0.04 || (currentPoint.y > minY || currentPoint.y < maxY)) && currentImage.data('height') > $(window).height()){
 							//In bouncing area top/bottom
-							if(currentPoint.y > minY || currentPoint.y < maxY){	
+							if(currentPoint.y > minY || currentPoint.y < maxY){
 
 								if(Math.abs(speedY) < 0.06){
 									if(startTimeY === false){
@@ -985,16 +985,16 @@
 									tY = new Date().getTime() - startTimeY;
 
 									if(tY >= 300){
-										//set to end position 	
+										//set to end position
 										if(currentPoint.y > minY){
 											setCurrentPointY = minY;
 										}else{
 											setCurrentPointY = maxY;
-										}	
+										}
 
 										speedY = 0;
 										completeY = true;
-										
+
 									}else{
 
 										if(currentPoint.y > minY){
@@ -1006,7 +1006,7 @@
 								}
 
 								slowDownRatio.y = 0.7;
-							}							
+							}
 						}else{
 							completeY = true;
 						}
@@ -1017,7 +1017,7 @@
 
 						//set points
 						currentPoint.x = setCurrentPointX ? setCurrentPointX : currentPoint.x;
-						currentPoint.y = setCurrentPointY ? setCurrentPointY : currentPoint.y;  
+						currentPoint.y = setCurrentPointY ? setCurrentPointY : currentPoint.y;
 
 						//move to points
 						setTranslate(item, {
@@ -1029,9 +1029,9 @@
 							clearTimeout(momentTimer);
 							return;
 						}
-						
+
 						moveMoment();
-							
+
 					}, 10);
 				}
 
@@ -1040,7 +1040,7 @@
 		    }else{
 		    	reposition();
 		    }
-		}	
+		}
 
 		function init(item, settings){
 			var $s = settings,
@@ -1114,7 +1114,7 @@
                 margin = [margin[0], margin[1], margin[0], margin[1]];
             }
 
-            $s.margin = margin; 
+            $s.margin = margin;
 
 			tpl.data({
 				'group': group,
@@ -1254,7 +1254,7 @@
 			        setTranslate(slide, {
 			        	top: newY,
 			        	left: newX
-			        });	
+			        });
 			    });
 			});
 
@@ -1278,11 +1278,11 @@
 				if(e.type == 'mouseup' || e.type == 'touchend'){
 
 					var item = $(".cb-lightbox-draggable");
-										
+
 					if($('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
 						return false
 					}
-				
+
 					if(clickTimer){
 						//handle after click
 						if(!item.hasClass("cb-lightbox-is-dragging")){
@@ -1291,7 +1291,7 @@
 								var userX = e.offsetX,
 									userY = e.offsetY;
 							}else{
-								var userX = userXTouch, 
+								var userX = userXTouch,
 									userY = userYTouch;
 							}
 
@@ -1309,10 +1309,10 @@
 						//handle all other
 						if($('.cb-lightbox-is-zoomed').length){
 						    initMoveMoment(item);
-						}	
-					}	
+						}
+					}
 
-					item.removeClass("cb-lightbox-is-dragging");					
+					item.removeClass("cb-lightbox-is-dragging");
 				}
 			});
 
@@ -1322,7 +1322,7 @@
 				}
 
 				if($('.cb-lightbox').length){
-					var slide = $('.cb-lightbox-slide'), 
+					var slide = $('.cb-lightbox-slide'),
 						values = fitImage(slide);
 
 					_animate(slide, {
@@ -1345,7 +1345,7 @@
 			item.on("click", function(e){
 				e.stopPropagation();
 				e.preventDefault();
-			
+
 				init(item, settings);
 			});
 		});

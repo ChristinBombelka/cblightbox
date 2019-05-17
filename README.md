@@ -101,16 +101,34 @@ Fired when lightbox is initialized
 
 Fired when lightbox is fit image
 
-`afterFit: function(container){}`
+`afterFit: function(container, slide){}`
 
 ### afterSlide
 
 Fired after slide complete 
 
-`afterSlide: function(container){}`
+`afterSlide: function(container, slide){}`
+
+### beforeOpen
+
+Fired before open
+
+`beforeOpen: function(container, slide){}`
+
+### aftereOpen
+
+Fired after open
+
+`aftereOpen: function(container, slide){}`
+
+### beforeClose
+
+Fired before close
+
+`beforeClose: function(container){}`
 
 ### afterClose
 
-Fired after closed
+Fired after close
 
 `afterClose: function(container){}`

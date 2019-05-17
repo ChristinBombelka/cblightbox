@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.8.1 jQuery
- * 2019-05-01
+ * CBLightbox 3.8.2 jQuery
+ * 2019-05-16
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -48,6 +48,9 @@
 			afterInit: $.noop,
 			afterFit: $.noop,
 			afterSlide: $.noop,
+			beforeOpen: $.noop,
+			afterOpen: $.noop,
+			beforeClose: $.noop,
 			afterClose: $.noop,
 		}
 
@@ -481,7 +484,7 @@
 
 				setTimeout(function(){
 					if ($.isFunction($s.afterSlide)) {
-				 	   $s.afterSlide.call(this, slide);
+				 	   $s.afterSlide.call(this, container, slide);
 					}
 				}, $s.slideDuration + 30);
 			}
@@ -502,9 +505,13 @@
 		            clearInterval(wait);
 		        }
 		    }, 100);
-			
+
 			function openStart(){
-				
+
+				if ($.isFunction($s.beforeOpen)) {
+				 	$s.beforeOpen.call(this, container, slide);
+				}
+
 				_animate(container, false, $s.openCloseDuration);
 
 				if(slide && $s.openCloseEffect == 'zoom'){
@@ -564,6 +571,12 @@
 				setTimeout(function(){
 					container.addClass('cb-lightbox-is-open');
 				});
+
+				setTimeout(function(){
+					if ($.isFunction($s.afterOpen)) {
+				 	   $s.afterOpen.call(this, container, slide);
+					}
+				}, $s.openCloseDuration + 30);
 			}
 		}
 
@@ -575,6 +588,10 @@
 				container = $('.cb-lightbox'),
 				$s = container.data('settings'),
 				slide = container.find('.cb-lightbox-slide');
+
+			if ($.isFunction($s.beforeClose)) {
+				$s.beforeClose.call(this, container);
+			}
 
 			if(!previewImage.length){
 				previewImage = el;
@@ -697,7 +714,7 @@
 			}
 
 			if ($.isFunction($s.afterFit)) {
-				$s.afterFit.call(this, slide);
+				$s.afterFit.call(this, container, slide);
 			}
 
 	 		return {

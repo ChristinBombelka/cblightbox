@@ -7,7 +7,8 @@
 
 (function($){
 	var caption,
-		closing;
+		closing,
+		slideing = false;
 
 	$.fn.cblightbox = function(options){
 
@@ -773,9 +774,11 @@
 	    		group = container.data('group'),
 				images = $('a[data-group="'+ group +'"]');
 
-			if(container.hasClass('cb-lightbox-is-zoomed')){
+			if(container.hasClass('cb-lightbox-is-zoomed') || slideing){
 				return;
 			}
+
+			slideing = true;
 
 			if(direction == 'previews'){
 				_this_index = _this_index - 1;
@@ -828,6 +831,10 @@
 			source = new_image.attr('href');
 
 			getSlide(source, _this_index, new_image, true, direction);
+
+			setTimeout(function(){
+				slideing = false;
+			}, 200)
 	    }
 
 	    //global momentum variables

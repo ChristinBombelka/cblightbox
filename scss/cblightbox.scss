@@ -135,16 +135,6 @@
 	}
 }
 
-.cb-lightbox-is-opening,
-.cb-lightbox-is-closing{
-	.cb-lightbox-close,
-	.cb-lightbox-arrow,
-	.cb-lightbox-info,
-	.cb-lightbox-error{
-		display: none;
-	}
-}
-
 .cb-lightbox-arrow{
 	position: fixed;
 	top: 40px;
@@ -279,11 +269,6 @@
 		overflow: hidden;
 	}
 
-	.cb-lightbox-arrow,
-	.cb-lightbox-info{
-		display: none;
-	}
-
 	.cb-lightbox-draggable{
 		cursor: grab;
 	    cursor: -moz-grab;
@@ -311,13 +296,45 @@
 	cursor: zoom-in;
 }
 
+.cb-lightbox-close,
+.cb-lightbox-arrow,
+.cb-lightbox-info,
+.cb-lightbox-error,
+.cb-lightbox-caption{
+	display: none;
+}
 
 .cb-lightbox-is-opening,
 .cb-lightbox-is-open{
 	.cb-lightbox-overlay{
 		opacity: 1;
 	}
+
+	.cb-lightbox-info
+	.cb-lightbox-caption{
+		display: block;
+	}
 }
+
+.cb-lightbox-is-open{
+	.cb-lightbox-close,
+	.cb-lightbox-arrow,
+	.cb-lightbox-info,
+	.cb-lightbox-error,
+	.cb-lightbox-caption{
+		display: block;
+	}
+}
+
+.cb-lightbox-is-zoomed,
+.cb-lightbox-is-closing{
+	.cb-lightbox-arrow,
+	.cb-lightbox-info,
+	.cb-lightbox-caption{
+		display: none;
+	}
+}
+
 
 //.cb-lightbox-dragging-active,
 .cb-lightbox-iframe{

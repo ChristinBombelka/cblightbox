@@ -133,16 +133,6 @@
 .cb-lightbox-hide-image .cb-lightbox-image {
   opacity: 0.01; }
 
-.cb-lightbox-is-opening .cb-lightbox-close,
-.cb-lightbox-is-opening .cb-lightbox-arrow,
-.cb-lightbox-is-opening .cb-lightbox-info,
-.cb-lightbox-is-opening .cb-lightbox-error,
-.cb-lightbox-is-closing .cb-lightbox-close,
-.cb-lightbox-is-closing .cb-lightbox-arrow,
-.cb-lightbox-is-closing .cb-lightbox-info,
-.cb-lightbox-is-closing .cb-lightbox-error {
-  display: none; }
-
 .cb-lightbox-arrow {
   position: fixed;
   top: 40px;
@@ -246,9 +236,6 @@
   -webkit-transform: none;
           transform: none;
   overflow: hidden; }
-.cb-lightbox-is-zoomed .cb-lightbox-arrow,
-.cb-lightbox-is-zoomed .cb-lightbox-info {
-  display: none; }
 .cb-lightbox-is-zoomed .cb-lightbox-draggable {
   cursor: grab;
   cursor: -webkit-grab; }
@@ -265,9 +252,36 @@
   cursor: -webkit-zoom-in;
   cursor: zoom-in; }
 
+.cb-lightbox-close,
+.cb-lightbox-arrow,
+.cb-lightbox-info,
+.cb-lightbox-error,
+.cb-lightbox-caption {
+  display: none; }
+
 .cb-lightbox-is-opening .cb-lightbox-overlay,
 .cb-lightbox-is-open .cb-lightbox-overlay {
   opacity: 1; }
+.cb-lightbox-is-opening .cb-lightbox-info
+.cb-lightbox-caption,
+.cb-lightbox-is-open .cb-lightbox-info
+.cb-lightbox-caption {
+  display: block; }
+
+.cb-lightbox-is-open .cb-lightbox-close,
+.cb-lightbox-is-open .cb-lightbox-arrow,
+.cb-lightbox-is-open .cb-lightbox-info,
+.cb-lightbox-is-open .cb-lightbox-error,
+.cb-lightbox-is-open .cb-lightbox-caption {
+  display: block; }
+
+.cb-lightbox-is-zoomed .cb-lightbox-arrow,
+.cb-lightbox-is-zoomed .cb-lightbox-info,
+.cb-lightbox-is-zoomed .cb-lightbox-caption,
+.cb-lightbox-is-closing .cb-lightbox-arrow,
+.cb-lightbox-is-closing .cb-lightbox-info,
+.cb-lightbox-is-closing .cb-lightbox-caption {
+  display: none; }
 
 .cb-lightbox-iframe {
   position: absolute;

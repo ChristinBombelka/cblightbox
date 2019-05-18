@@ -576,7 +576,7 @@
 						_animate(slide, {
 							opacity: 1,
 						}, $s.openCloseDuration);
-					}, 10);
+					}, 20);
 
 					setTimeout(function(){
 						captionShow(slide);
@@ -589,7 +589,7 @@
 					}
 
 					container.removeClass('cb-lightbox-is-opening').addClass('cb-lightbox-is-open');
-				}, $s.openCloseDuration + 30);
+				}, $s.openCloseDuration);
 
 				setTimeout(function(){
 					if ($.isFunction($s.afterOpen)) {

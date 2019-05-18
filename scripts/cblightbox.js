@@ -124,7 +124,7 @@
 			}
 		}
 
-		function _animate(el, to, duration, animationEnd){
+		function _animate(el, to, duration){
 			el.css('transition-duration', duration + 'ms');
 
 			setTranslate(el, to);

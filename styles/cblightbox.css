@@ -78,7 +78,7 @@
   position: absolute; }
 
 .cb-lightbox-slide-image {
-  background-color: #000;
+  background-color: transparent;
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
   position: absolute;

@@ -469,15 +469,18 @@
 					setTranslate(slide, {
 						top: values.top,
 						left: slideIn,
+						opacity: 0,
 					});
 
 					setTimeout(function(){
 						_animate(slide, {
 							left: values.left,
+							opacity: 1,
 						},  $s.slideDuration);
 					}, 20);
 
 					captionShow(slide);
+
 				}else{
 					setTranslate(slide, {
 						top: values.top,
@@ -825,9 +828,9 @@
 				}
 
 				_animate(slide, {
-					'left': slideOut,
+					left: slideOut,
+					opacity: 0,
 				}, $s.slideDuration);
-
 			}else{
 				_animate(slide, {
 					opacity: 0,

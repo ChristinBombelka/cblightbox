@@ -282,7 +282,7 @@
 			            clearInterval(wait);
 			            callback.apply(this, [w, h]);
 			        }
-			    }, 100);
+			    }, 50);
 			}
 		}
 
@@ -433,7 +433,7 @@
 			            initFitAndShow();
 			            clearInterval(wait);
 			        }
-			    }, 100);
+			    }, 50);
 			}
 
 			function initFitAndShow(){
@@ -504,7 +504,7 @@
 		            openStart();
 		            clearInterval(wait);
 		        }
-		    }, 100);
+		    }, 50);
 
 			function openStart(){
 

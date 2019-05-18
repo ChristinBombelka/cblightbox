@@ -58,9 +58,17 @@
 		function error(container){
 			$('<div class="cb-lightbox-error">Sorry, this image can\'t loaded!</div>').appendTo(container.find('.cb-lightbox-content'));
 
-			container
-				.removeClass('cb-lightbox-is-loading')
-				.addClass('cb-lightbox-error-show');
+			var $s = container.data('settings');
+
+			_animate(container, false, $s.openCloseDuration);
+
+			setTimeout(function(){
+				container.addClass('cb-lightbox-is-open');
+
+				container
+					.removeClass('cb-lightbox-is-loading')
+					.addClass('cb-lightbox-error-show');
+			});
 		}
 
 		function setTranslate(el, values){
@@ -514,6 +522,11 @@
 
 			//wait for imagesize;
 			var wait = setInterval(function() {
+				if(typeof slide === "undefined"){
+					clearInterval(wait);
+					return;
+				}
+
 		        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
 		            openStart();
 		            clearInterval(wait);

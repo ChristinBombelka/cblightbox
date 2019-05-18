@@ -494,7 +494,6 @@
 		}
 
 		function open(item, $s){
-
 			var source = item.attr('href'),
 				slide = getSlide(source, false, item, false, false),
 				container = $('.cb-lightbox');
@@ -514,6 +513,8 @@
 				}
 
 				_animate(container, false, $s.openCloseDuration);
+
+				container.addClass('cb-lightbox-is-opening');
 
 				if(slide && $s.openCloseEffect == 'zoom'){
 					var previewImage = item.find('img');
@@ -545,7 +546,6 @@
 						captionShow(slide);
 					}, $s.openCloseDuration + 30);
 
-
 				}else if(slide && $s.openCloseEffect == 'fade'){
 
 					var values = fitImage(slide);
@@ -570,8 +570,12 @@
 				}
 
 				setTimeout(function(){
-					container.addClass('cb-lightbox-is-open');
-				});
+					if(closing){
+						return;
+					}
+
+					container.removeClass('cb-lightbox-is-opening').addClass('cb-lightbox-is-open');
+				}, $s.openCloseDuration + 30);
 
 				setTimeout(function(){
 					if ($.isFunction($s.afterOpen)) {
@@ -601,7 +605,7 @@
 			_animate(container, false, $s.openCloseDuration);
 
 			container
-				.removeClass('cb-lightbox-is-open')
+				.removeClass('cb-lightbox-is-open cb-lightbox-is-opening')
 				.addClass('cb-lightbox-is-closing');
 
 			if($s.openCloseEffect == 'zoom' && el.is(':visible')){

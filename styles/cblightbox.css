@@ -133,10 +133,10 @@
 .cb-lightbox-hide-image .cb-lightbox-image {
   opacity: 0.01; }
 
-.cb-lightbox-animate-opening .cb-lightbox-close,
-.cb-lightbox-animate-opening .cb-lightbox-arrow,
-.cb-lightbox-animate-opening .cb-lightbox-info,
-.cb-lightbox-animate-opening .cb-lightbox-error,
+.cb-lightbox-is-opening .cb-lightbox-close,
+.cb-lightbox-is-opening .cb-lightbox-arrow,
+.cb-lightbox-is-opening .cb-lightbox-info,
+.cb-lightbox-is-opening .cb-lightbox-error,
 .cb-lightbox-is-closing .cb-lightbox-close,
 .cb-lightbox-is-closing .cb-lightbox-arrow,
 .cb-lightbox-is-closing .cb-lightbox-info,
@@ -265,6 +265,7 @@
   cursor: -webkit-zoom-in;
   cursor: zoom-in; }
 
+.cb-lightbox-is-opening .cb-lightbox-overlay,
 .cb-lightbox-is-open .cb-lightbox-overlay {
   opacity: 1; }
 

@@ -135,7 +135,7 @@
 	}
 }
 
-.cb-lightbox-animate-opening,
+.cb-lightbox-is-opening,
 .cb-lightbox-is-closing{
 	.cb-lightbox-close,
 	.cb-lightbox-arrow,
@@ -312,6 +312,7 @@
 }
 
 
+.cb-lightbox-is-opening,
 .cb-lightbox-is-open{
 	.cb-lightbox-overlay{
 		opacity: 1;

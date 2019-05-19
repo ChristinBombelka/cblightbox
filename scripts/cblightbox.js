@@ -816,7 +816,7 @@
 	    		group = container.data('group'),
 				images = $('a[data-group="'+ group +'"]');
 
-			if(container.hasClass('cb-lightbox-is-zoomed') || slideing){
+			if(container.hasClass('cb-lightbox-is-zoomed') || slideing || images.length <= 1){
 				return;
 			}
 
@@ -1128,6 +1128,10 @@
 				tpl.find(".cb-lightbox-info").append(counter);
 			}
 
+			if(grouplength <= 1){
+				tpl.addClass('cb-lightbox-is-single');
+			}
+
 			//lock background
 			if($("body").height() > $(window).height()){
 				$("html").addClass("cb-lightbox-lock cb-lightbox-margin");
@@ -1219,7 +1223,13 @@
 					clickTimer = false;
 				}, 200);
 
-				if(closing){
+				var container = $('.cb-lightbox'),
+					$s = container.data('settings'),
+					slide = $(this),
+					image = slide.find('.cb-lightbox-image'),
+					imageWidth = image.data('width');
+
+				if(closing || container.hasClass('cb-lightbox-is-single')){
 					return;
 				}
 
@@ -1232,10 +1242,6 @@
 					userYTouch = e.originalEvent.touches[0].clientY - $(this).offset().top;
 				}
 
-				var container = $('.cb-lightbox'),
-					slide = $(this),
-					image = slide.find('.cb-lightbox-image'),
-					imageWidth = image.data('width');
 
 				if(!container.hasClass('cb-lightbox-is-zoomed')){
 
@@ -1263,8 +1269,7 @@
 					return;
 				}
 
-			    var $s = slide.closest('.cb-lightbox').data('settings'),
-			    	lastOffset = slide.data('lastTransform'),
+			    var lastOffset = slide.data('lastTransform'),
 			    	lastOffsetX = lastOffset ? lastOffset.x : 0,
 			        lastOffsetY = lastOffset ? lastOffset.y : 0,
 			        windowWidth = $(window).width(),

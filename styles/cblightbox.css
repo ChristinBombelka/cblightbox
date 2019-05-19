@@ -47,10 +47,7 @@
   float: right;
   overflow: hidden;
   cursor: pointer;
-  opacity: 0.65;
-  z-index: 200;
-  -webkit-transition: opacity 250ms ease;
-  transition: opacity 250ms ease; }
+  z-index: 200; }
   .cb-lightbox-close:after {
     content: "";
     width: 100%;
@@ -139,10 +136,7 @@
   width: 60px;
   height: calc(100vh - 80px);
   cursor: pointer;
-  opacity: 0.65;
-  z-index: 8001;
-  -webkit-transition: opacity 250ms ease;
-  transition: opacity 250ms ease; }
+  z-index: 8001; }
   .cb-lightbox-arrow span {
     border: solid #fff;
     border-width: 0 3px 3px 0;
@@ -252,35 +246,52 @@
   cursor: -webkit-zoom-in;
   cursor: zoom-in; }
 
-.cb-lightbox-close,
-.cb-lightbox-arrow,
-.cb-lightbox-info,
-.cb-lightbox-error,
-.cb-lightbox-caption {
+.cb-lightbox-slide > .cb-lightbox-caption {
   display: none; }
+  .cb-lightbox-is-open .cb-lightbox-slide > .cb-lightbox-caption {
+    display: block; }
+
+.cb-lightbox-is-open .cb-lightbox-arrow,
+.cb-lightbox-is-open .cb-lightbox-close {
+  -webkit-transition: opacity 250ms ease;
+  transition: opacity 250ms ease; }
+  .cb-lightbox-is-open .cb-lightbox-arrow:hover,
+  .cb-lightbox-is-open .cb-lightbox-close:hover {
+    opacity: 0.6; }
+
+.cb-lightbox-error,
+.cb-lightbox-arrow,
+.cb-lightbox-close,
+.cb-lightbox-info {
+  -webkit-transition-timing-function: ease;
+          transition-timing-function: ease;
+  -webkit-transition-property: visibility, opacity;
+  transition-property: visibility, opacity;
+  -webkit-transition-duration: inherit;
+          transition-duration: inherit;
+  visibility: hidden;
+  opacity: 0; }
+
+.cb-lightbox-show-info .cb-lightbox-info {
+  visibility: visible;
+  opacity: 1; }
+
+.cb-lightbox-show-buttons .cb-lightbox-close,
+.cb-lightbox-show-buttons .cb-lightbox-arrow {
+  visibility: visible;
+  opacity: 1; }
 
 .cb-lightbox-is-opening .cb-lightbox-overlay,
 .cb-lightbox-is-open .cb-lightbox-overlay {
   opacity: 1; }
-.cb-lightbox-is-opening .cb-lightbox-info
-.cb-lightbox-caption,
-.cb-lightbox-is-open .cb-lightbox-info
-.cb-lightbox-caption {
-  display: block; }
-
-.cb-lightbox-is-open .cb-lightbox-close,
-.cb-lightbox-is-open .cb-lightbox-arrow,
-.cb-lightbox-is-open .cb-lightbox-info,
-.cb-lightbox-is-open .cb-lightbox-error,
-.cb-lightbox-is-open .cb-lightbox-caption {
-  display: block; }
+.cb-lightbox-is-opening .cb-lightbox-error,
+.cb-lightbox-is-open .cb-lightbox-error {
+  opacity: 1;
+  visibility: visible; }
 
 .cb-lightbox-is-zoomed .cb-lightbox-arrow,
 .cb-lightbox-is-zoomed .cb-lightbox-info,
-.cb-lightbox-is-zoomed .cb-lightbox-caption,
-.cb-lightbox-is-closing .cb-lightbox-arrow,
-.cb-lightbox-is-closing .cb-lightbox-info,
-.cb-lightbox-is-closing .cb-lightbox-caption {
+.cb-lightbox-is-zoomed .cb-lightbox-caption {
   display: none; }
 
 .cb-lightbox-iframe {

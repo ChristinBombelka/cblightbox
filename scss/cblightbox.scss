@@ -42,9 +42,9 @@
 	float: right;
 	overflow: hidden;
 	cursor: pointer;
-	opacity: 0.65;
+	//opacity: 0.65;
 	z-index: 200;
-    transition: opacity 250ms ease;
+    //transition: opacity 250ms ease;
 
     &:after{
     	content: "";
@@ -141,9 +141,9 @@
 	width: 60px;
 	height: calc(100vh - 80px);
 	cursor: pointer;
-	opacity: 0.65;
+	//opacity: 1;
     z-index: 8001;
-    transition: opacity 250ms ease;
+    //transition: opacity 250ms ease;
 
     span{
 	    border: solid #fff;
@@ -296,13 +296,53 @@
 	cursor: zoom-in;
 }
 
-.cb-lightbox-close,
-.cb-lightbox-arrow,
-.cb-lightbox-info,
-.cb-lightbox-error,
-.cb-lightbox-caption{
-	display: none;
+.cb-lightbox-slide{
+	& > .cb-lightbox-caption{
+		display: none;
+
+		.cb-lightbox-is-open & {
+			display: block;
+		}
+	}
 }
+
+.cb-lightbox-is-open{
+	.cb-lightbox-arrow,
+	.cb-lightbox-close{
+		transition: opacity 250ms ease;
+
+		&:hover{
+			opacity: 0.6;
+		}
+	}
+}
+
+.cb-lightbox-error,
+.cb-lightbox-arrow,
+.cb-lightbox-close,
+.cb-lightbox-info{
+	transition-timing-function: ease;
+	transition-property: visibility, opacity;
+	transition-duration: inherit;
+	visibility: hidden;
+	opacity: 0;
+}
+
+.cb-lightbox-show-info{
+	.cb-lightbox-info{
+		visibility: visible;
+		opacity: 1;
+	}
+}
+
+.cb-lightbox-show-buttons{
+	.cb-lightbox-close,
+	.cb-lightbox-arrow{
+		visibility: visible;
+		opacity: 1;
+	}
+}
+
 
 .cb-lightbox-is-opening,
 .cb-lightbox-is-open{
@@ -310,31 +350,19 @@
 		opacity: 1;
 	}
 
-	.cb-lightbox-info
-	.cb-lightbox-caption{
-		display: block;
+	.cb-lightbox-error{
+		opacity: 1;
+		visibility: visible;
 	}
 }
 
-.cb-lightbox-is-open{
-	.cb-lightbox-close,
-	.cb-lightbox-arrow,
-	.cb-lightbox-info,
-	.cb-lightbox-error,
-	.cb-lightbox-caption{
-		display: block;
-	}
-}
-
-.cb-lightbox-is-zoomed,
-.cb-lightbox-is-closing{
+.cb-lightbox-is-zoomed{
 	.cb-lightbox-arrow,
 	.cb-lightbox-info,
 	.cb-lightbox-caption{
 		display: none;
 	}
 }
-
 
 //.cb-lightbox-dragging-active,
 .cb-lightbox-iframe{

@@ -61,6 +61,7 @@
 			var $s = container.data('settings');
 
 			_animate(container, false, $s.openCloseDuration);
+			_animate(container.find('.cb-lightbox-content'), false, $s.openCloseDuration);
 
 			setTimeout(function(){
 				container.addClass('cb-lightbox-is-open');
@@ -540,8 +541,9 @@
 				}
 
 				_animate(container, false, $s.openCloseDuration);
+				_animate(container.find('.cb-lightbox-content'), false, $s.openCloseDuration);
 
-				container.addClass('cb-lightbox-is-opening');
+				container.addClass('cb-lightbox-is-opening cb-lightbox-show-info cb-lightbox-show-buttons');
 
 				if(slide && $s.openCloseEffect == 'zoom'){
 					var previewImage = item.find('img');
@@ -619,7 +621,7 @@
 				previewImage = el.find('img'),
 				container = $('.cb-lightbox'),
 				$s = container.data('settings'),
-				slide = container.find('.cb-lightbox-slide');
+				slide = container.find('.cb-lightbox-slide.cb-lightbox-slide-current');
 
 			if ($.isFunction($s.beforeClose)) {
 				$s.beforeClose.call(this, container);
@@ -630,9 +632,10 @@
 			}
 
 			_animate(container, false, $s.openCloseDuration);
+			_animate(container.find('.cb-lightbox-content'), false, $s.openCloseDuration);
 
 			container
-				.removeClass('cb-lightbox-is-open cb-lightbox-is-opening')
+				.removeClass('cb-lightbox-is-open cb-lightbox-is-opening cb-lightbox-show-info cb-lightbox-show-buttons')
 				.addClass('cb-lightbox-is-closing');
 
 			if($s.openCloseEffect == 'zoom' && el.is(':visible')){

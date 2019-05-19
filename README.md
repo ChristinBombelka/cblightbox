@@ -44,7 +44,7 @@ $(".js-cblightbox").cblightbox();
     zoom: false,
     /*  Values: true, false
      *  Zoom into image, the image must be bigger as the screen
-     */    
+     */
     zoomDuration: 300,
     /*  Values: number
      *  Animation speed to zoom into images
@@ -85,6 +85,10 @@ $(".js-cblightbox").cblightbox();
     /* Values: string
      * Set preview source for lazyloaded images - previewSource: 'data-original' - this value are display when the preview image is empty or a base64 image
      */
+    dragSlide: true,
+    /* Values: true, false
+     * Dragging image to slide prev/next
+     */
 }
 ```
 
@@ -105,7 +109,7 @@ Fired when lightbox is fit image
 
 ### afterSlide
 
-Fired after slide complete 
+Fired after slide complete
 
 `afterSlide: function(container, slide){}`
 

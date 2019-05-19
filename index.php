@@ -5,19 +5,19 @@ $images = array();
 $image = new stdClass();
 $image->preview = 'thumbs/Foto_154_s.jpg';
 $image->image = 'images/Foto_154.jpg';
-$image->caption = '';
+$image->caption = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. ';
 $images[] = $image;
 
 $image = new stdClass();
 $image->preview = 'thumbs/Foto_156_s.jpg';
 $image->image = 'images/Foto_156.jpg';
-$image->caption = '';
+$image->caption = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr';
 $images[] = $image;
 
 $image = new stdClass();
 $image->preview = 'thumbs/Foto_163_s.jpg';
 $image->image = 'images/Foto_163.jpg';
-$image->caption = '';
+$image->caption = 'tempor invidunt ut labore et';
 $images[] = $image;
 
 $images2 = array();
@@ -25,13 +25,13 @@ $images2 = array();
 $image = new stdClass();
 $image->preview = 'thumbs/Foto_161_s.jpg';
 $image->image = 'images/Foto_161.jpg';
-$image->caption = '';
+$image->caption = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr';
 $images2[] = $image;
 
 $image = new stdClass();
 $image->preview = 'thumbs/Foto_163_s.jpg';
 $image->image = 'images/Foto_163.jpg';
-$image->caption = '';
+$image->caption = 'tempor invidunt ut labore et';
 $images2[] = $image;
 
 ?>

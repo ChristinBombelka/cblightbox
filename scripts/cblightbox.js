@@ -1,5 +1,5 @@
 /*
- * CBLightbox 3.9.0 jQuery
+ * CBLightbox 3.9.1 jQuery
  * 2019-05-19
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
@@ -1248,11 +1248,23 @@
 						return;
 					}
 
+					if(e.type == "mousedown"){
+						var pageXStart = e.pageX;
+					}else{
+						var pageXStart = e.originalEvent.touches[0].pageX;
+					}
+
 					var dragWidth = slide.data('fitWidth'),
-						dragPosX = slide.data('fitLeft') + dragWidth - e.pageX;
+						dragPosX = slide.data('fitLeft') + dragWidth - pageXStart;
 
 					$(document).bind(is_touch_device() ? 'touchmove.cb-lightbox' : 'mousemove.cb-lightbox', function(e){
-						var dragLeft = e.pageX + dragPosX - dragWidth;
+						if(e.type == "mousemove"){
+							var pageXMove = e.pageX;
+						}else{
+							var pageXMove = e.originalEvent.touches[0].pageX;
+						}
+
+						var dragLeft = pageXMove + dragPosX - dragWidth;
 
 						setTranslate(slide, {
 				        	left: dragLeft,
@@ -1355,10 +1367,6 @@
 				if(e.type == 'mouseup' || e.type == 'touchend'){
 					var slide = $(".cb-lightbox-slide-current");
 
-					if($('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
-						return false
-					}
-
 					if(slide.hasClass('cb-lightbox-is-sliding')){
 						//handle slide
 						var tolerance = 40,
@@ -1391,36 +1399,42 @@
 							slide.removeClass('cb-lightbox-is-sliding');
 						}
 
-					}else if(clickTimer){
-						//handle after click
-						if(!slide.hasClass("cb-lightbox-is-dragging")){
-							if(!slide.hasClass('cb-lightbox-draggable')){
-								return;
-							}
-
-							//move to click position
-							if(e.type == "mouseup"){
-								var userX = e.offsetX,
-									userY = e.offsetY;
-							}else{
-								var userX = userXTouch,
-									userY = userYTouch;
-							}
-
-						   	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
-						   		detroyDraggable();
-						   	}else{
-								initDraggable(userX, userY);
-						   	}
-
-						}else{
-						    $(this).off("mousemove.cb-lightbox touchmove.cb-lightbox");
+					}else{
+						if($('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
+							return false
 						}
 
-					}else{
-						//handle all other
-						if($('.cb-lightbox-is-zoomed').length){
-						    initMoveMoment(slide);
+						if(clickTimer){
+							//handle after click
+							if(!slide.hasClass("cb-lightbox-is-dragging")){
+								if(!slide.hasClass('cb-lightbox-draggable')){
+									return;
+								}
+
+								//move to click position
+								if(e.type == "mouseup"){
+									var userX = e.offsetX,
+										userY = e.offsetY;
+								}else{
+									var userX = userXTouch,
+										userY = userYTouch;
+								}
+
+							   	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
+							   		detroyDraggable();
+							   	}else{
+									initDraggable(userX, userY);
+							   	}
+
+							}else{
+							    $(this).off("mousemove.cb-lightbox touchmove.cb-lightbox");
+							}
+
+						}else{
+							//handle all other
+							if($('.cb-lightbox-is-zoomed').length){
+							    initMoveMoment(slide);
+							}
 						}
 					}
 

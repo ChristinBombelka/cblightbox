@@ -1,6 +1,6 @@
 /*
  * CBLightbox 3.9.0 jQuery
- * 2019-05-16
+ * 2019-05-19
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -46,6 +46,7 @@
 			slideDuration: 250,
 			slideEffect: 'fade', //slide, fade
 			previewSource: false, //define preview image source on use lazyloading
+			dragSlide: true,
 			afterInit: $.noop,
 			afterFit: $.noop,
 			afterSlide: $.noop,
@@ -1242,8 +1243,10 @@
 					userYTouch = e.originalEvent.touches[0].clientY - $(this).offset().top;
 				}
 
-
 				if(!container.hasClass('cb-lightbox-is-zoomed')){
+					if(!$s.dragSlide){
+						return;
+					}
 
 					var dragWidth = slide.data('fitWidth'),
 						dragPosX = slide.data('fitLeft') + dragWidth - e.pageX;

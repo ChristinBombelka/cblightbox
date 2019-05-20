@@ -341,7 +341,10 @@
 			});
 		}
 
-		function getSlide(source, i, item, fitAndShow, direction, effect){
+		function getSlide(source, i, item, fitAndShow, direction, effect, remove){
+			if(typeof remove === "undefined"){
+	    		remove = false;
+	    	}
 
 			if(typeof effect === "undefined"){
 	    		effect = false;
@@ -382,8 +385,6 @@
 			slide.appendTo($('.cb-lightbox-slides'));
 			slide.data('type', type);
 			slide.addClass('cb-lightbox-hide-image');
-
-			updateCaption(item, slide, $s);
 
 			$('.cb-lightbox-error').remove();
 			$('.cb-lightbox-content').removeClass('cb-lightbox-error-show');
@@ -441,18 +442,47 @@
 				});
 			}
 
+			updateCaption(item, slide, $s);
+
 			if(fitAndShow){
 				//wait for imagesize;
 				var wait = setInterval(function() {
 			        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
-			            initFitAndShow();
+			            initFitAndShow(remove);
 			            clearInterval(wait);
 			        }
 			    }, 50);
 			}
 
-			function initFitAndShow(){
+			function initFitAndShow(remove){
 				var values = fitImage(slide);
+
+				var slideRemove = remove;
+				if(slideRemove.length){
+					if($s.slideEffect == 'slide' || effect == 'slide'){
+
+						var currentLeft = ($(window).width() - slideRemove.width()) / 2;
+
+						if(direction == 'previews'){
+							var slideOut = currentLeft + $(window).width();
+						}else{
+							var slideOut = -(slideRemove.width() + currentLeft);
+						}
+
+						_animate(slideRemove, {
+							left: slideOut,
+							opacity: 0,
+						}, $s.slideDuration);
+					}else{
+						_animate(slideRemove, {
+							opacity: 0,
+						}, $s.slideDuration);
+					}
+
+					setTimeout(function(){
+						slideRemove.remove();
+					}, $s.slideDuration);
+				}
 
 				setTranslate(slide, {
 					width: values.width,
@@ -839,39 +869,16 @@
 				}
 			}
 
-			var slide = $('.cb-lightbox-slide.cb-lightbox-slide-current');
-			slide.removeClass('cb-lightbox-slide-current').addClass('cb-lightbox-image-remove');
+			var slideRemove = $('.cb-lightbox-slide.cb-lightbox-slide-current');
 
-			if($s.slideEffect == 'slide' || effect == 'slide'){
-
-				var currentLeft = ($(window).width() - slide.width()) / 2;
-
-				if(direction == 'previews'){
-					var slideOut = currentLeft + $(window).width();
-				}else{
-					var slideOut = -(slide.width() + currentLeft);
-				}
-
-				_animate(slide, {
-					left: slideOut,
-					opacity: 0,
-				}, $s.slideDuration);
-			}else{
-				_animate(slide, {
-					opacity: 0,
-				}, $s.slideDuration);
-			}
-
-			setTimeout(function(){
-				slide.remove();
-			}, $s.slideDuration);
+			slideRemove.removeClass('cb-lightbox-slide-current').addClass('cb-lightbox-image-remove');
 
 			container.find('.cb-counter-current').text(_this_index + 1);
 
 			new_image = images.eq(_this_index);
 			source = new_image.attr('href');
 
-			getSlide(source, _this_index, new_image, true, direction, effect);
+			getSlide(source, _this_index, new_image, true, direction, effect, slideRemove);
 
 			setTimeout(function(){
 				slideing = false;

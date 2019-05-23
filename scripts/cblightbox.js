@@ -342,19 +342,7 @@
 			});
 		}
 
-		function getSlide(source, i, item, fitAndShow, direction, effect, remove){
-			if(typeof remove === "undefined"){
-	    		remove = false;
-	    	}
-
-			if(typeof effect === "undefined"){
-	    		effect = false;
-	    	}
-
-			if(typeof fitAndShow === "undefined"){
-				fitAndShow = false;
-			}
-
+		function setSlide(source, i, item){
 			if(typeof i != "undefined"){
 				$(".counter-current").text(i + 1);
 			}
@@ -364,8 +352,7 @@
 			}
 
 			var container = $('.cb-lightbox'),
-				$s = container.data('settings'),
-				placeholderImage;
+				$s = container.data('settings');
 
 			$(".cb-lightbox-is-selected").removeClass("cb-lightbox-is-selected");
 			item.addClass("cb-lightbox-is-selected");
@@ -445,116 +432,12 @@
 
 			updateCaption(item, slide, $s);
 
-			if(fitAndShow){
-				//wait for imagesize;
-				var wait = setInterval(function() {
-			        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
-			            initFitAndShow(remove);
-			            clearInterval(wait);
-			        }
-			    }, 50);
-			}
-
-			function initFitAndShow(remove){
-				var values = fitImage(slide);
-
-				var slideRemove = remove;
-				if(slideRemove.length){
-					if($s.slideEffect == 'slide' || effect == 'slide'){
-
-						var currentLeft = ($(window).width() - slideRemove.width()) / 2;
-
-						if(direction == 'previews'){
-							var slideOut = currentLeft + $(window).width();
-						}else{
-							var slideOut = -(slideRemove.width() + currentLeft);
-						}
-
-						_animate(slideRemove, {
-							left: slideOut,
-							opacity: 0,
-						}, $s.slideDuration);
-					}else{
-						_animate(slideRemove, {
-							opacity: 0,
-						}, $s.slideDuration);
-					}
-
-					setTimeout(function(){
-						slideRemove.remove();
-					}, $s.slideDuration);
-				}
-
-				setTranslate(slide, {
-					width: values.width,
-					height: values.height,
-				});
-
-				if(slide.hasClass('cb-lightbox-image-remove')){
-					_animateEnd(slide, false);
-
-					setTranslate(slide, {
-						top: values.top,
-						opacity: 0,
-					});
-
-					return;
-				}
-
-				if($s.slideEffect == 'slide' || effect == 'slide'){
-
-					var currentLeft = ($(window).width() - slide.width()) / 2;
-
-					if(direction == 'previews'){
-						var slideIn = -(slide.width() + currentLeft);
-					}else{
-						var slideIn = currentLeft + $(window).width();
-					}
-
-					setTranslate(slide, {
-						top: values.top,
-						left: slideIn,
-						opacity: 0,
-					});
-
-					setTimeout(function(){
-						_animate(slide, {
-							left: values.left,
-							opacity: 1,
-						},  $s.slideDuration);
-					}, 20);
-
-					captionShow(slide);
-
-				}else{
-					setTranslate(slide, {
-						top: values.top,
-						left: values.left,
-						opacity: 0
-					});
-
-					setTimeout(function(){
-						_animate(slide, {
-							opacity: 1,
-						},  $s.slideDuration);
-					}, 20);
-
-					captionShow(slide);
-				}
-
-				setTimeout(function(){
-					if ($.isFunction($s.afterSlide)) {
-				 	   $s.afterSlide.call(this, container, slide);
-					}
-				}, $s.slideDuration + 30);
-			}
-
 			return slide;
 		}
 
 		function open(item, $s){
 			var source = item.attr('href'),
-				slide = getSlide(source, false, item, false, false),
+				slide = setSlide(source, false, item),
 				container = $('.cb-lightbox');
 
 			//wait for imagesize;
@@ -852,6 +735,10 @@
 				return;
 			}
 
+			var slideRemove = $('.cb-lightbox-slide.cb-lightbox-slide-current')
+				.removeClass('cb-lightbox-slide-current')
+				.addClass('cb-lightbox-image-remove');
+
 			slideing = true;
 
 			if(direction == 'previews'){
@@ -870,20 +757,116 @@
 				}
 			}
 
-			var slideRemove = $('.cb-lightbox-slide.cb-lightbox-slide-current');
-
-			slideRemove.removeClass('cb-lightbox-slide-current').addClass('cb-lightbox-image-remove');
-
 			container.find('.cb-counter-current').text(_this_index + 1);
 
 			new_image = images.eq(_this_index);
 			source = new_image.attr('href');
 
-			getSlide(source, _this_index, new_image, true, direction, effect, slideRemove);
+			var slide = setSlide(source, _this_index, new_image);
+
+			if($s.slideEffect == 'slide' || effect == 'slide'){
+
+				var currentLeft = ($(window).width() - slideRemove.width()) / 2;
+
+				if(direction == 'previews'){
+					var slideOut = currentLeft + $(window).width();
+				}else{
+					var slideOut = -(slideRemove.width() + currentLeft);
+				}
+
+				_animate(slideRemove, {
+					left: slideOut,
+					opacity: 0,
+				}, $s.slideDuration);
+			}else{
+				_animate(slideRemove, {
+					opacity: 0,
+				}, $s.slideDuration);
+			}
+
+			setTimeout(function(){
+				slideRemove.remove();
+			}, $s.slideDuration);
+
+
+			//wait for imagesize;
+			var wait = setInterval(function() {
+		        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
+		            runSlide();
+		            clearInterval(wait);
+		        }
+		    }, 50);
+
+			function runSlide(){
+				var values = fitImage(slide);
+
+				setTranslate(slide, {
+					width: values.width,
+					height: values.height,
+				});
+
+				if(slide.hasClass('cb-lightbox-image-remove')){
+					_animateEnd(slide, false);
+
+					setTranslate(slide, {
+						top: values.top,
+						opacity: 0,
+					});
+
+					return;
+				}
+
+				if($s.slideEffect == 'slide' || effect == 'slide'){
+
+					var currentLeft = ($(window).width() - slide.width()) / 2;
+
+					if(direction == 'previews'){
+						var slideIn = -(slide.width() + currentLeft);
+					}else{
+						var slideIn = currentLeft + $(window).width();
+					}
+
+					setTranslate(slide, {
+						top: values.top,
+						left: slideIn,
+						opacity: 0,
+					});
+
+					setTimeout(function(){
+						_animate(slide, {
+							left: values.left,
+							opacity: 1,
+						},  $s.slideDuration);
+					}, 20);
+
+					captionShow(slide);
+
+				}else{
+					setTranslate(slide, {
+						top: values.top,
+						left: values.left,
+						opacity: 0
+					});
+
+					setTimeout(function(){
+						_animate(slide, {
+							opacity: 1,
+						},  $s.slideDuration);
+					}, 20);
+
+					captionShow(slide);
+				}
+
+				setTimeout(function(){
+					if ($.isFunction($s.afterSlide)) {
+				 	   $s.afterSlide.call(this, container, slide);
+					}
+				}, $s.slideDuration + 30);
+			}
 
 			setTimeout(function(){
 				slideing = false;
-			}, 200)
+			}, 200);
 	    }
 
 	    //global momentum variables
@@ -923,20 +906,20 @@
 			//log mouse positions
 	       	positionInterval = setTimeout(function(){
 
-		         	currentT = new Date().getTime();
-		         	timeDiff = currentT - lastT;
+	         	currentT = new Date().getTime();
+	         	timeDiff = currentT - lastT;
 
-		         	distance = {
-		         		x: (currentPoint.x - lastPoint.x) / 1.5,
-		         		y: (currentPoint.y - lastPoint.y) / 1.5
-		         	};
+	         	distance = {
+	         		x: (currentPoint.x - lastPoint.x) / 1.5,
+	         		y: (currentPoint.y - lastPoint.y) / 1.5
+	         	};
 
-		         	lastPoint = {
-		         		x: currentPoint.x,
-		         		y: currentPoint.y
-		         	};
+	         	lastPoint = {
+	         		x: currentPoint.x,
+	         		y: currentPoint.y
+	         	};
 
-					lastT = currentT;
+				lastT = currentT;
 
 				logMousePosition();
 	       	}, 20);
@@ -960,11 +943,13 @@
  				x: 1,
  				y: 1
  			};
+
  			//stow down
  			slowDownRatio = {
  				x: 0.95,
  				y: 0.95,
- 			},
+ 			};
+
  			slowDownRatioReverse = {
 				x: 1 - slowDownRatio.x,
 				y: 1 - slowDownRatio.y

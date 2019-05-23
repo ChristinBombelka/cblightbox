@@ -38,6 +38,7 @@
 			zoom : false,
 			zoomDuration : 300,
 			zoomOffset : 0,
+			disableOnMobile: false,
 			breakpoint : 800,
 			counter : true,
 			captionPosition : 'outside', //inside, outside
@@ -1478,6 +1479,10 @@
 			item.on("click", function(e){
 				e.stopPropagation();
 				e.preventDefault();
+
+				if(settings.disableOnMobile && $(window).width() < settings.breakpoint){
+					return;
+				}
 
 				init(item, settings);
 			});

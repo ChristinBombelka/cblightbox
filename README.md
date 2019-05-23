@@ -57,6 +57,10 @@ $(".js-cblightbox").cblightbox();
     /*  Values: number
      *  Mobile breakpoint to use mobile margins
      */
+    disableOnMobile: false,
+    /*  Values: true, false
+     *  Disable lightbox on "breakpoint"
+     */
     counter: true,
     /*  Values: true, false
      *  Display a counter with current and total slides

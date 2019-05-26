@@ -1127,9 +1127,7 @@
 						}, $s.openCloseDuration);
 					}, 20);
 
-					setTimeout(function(){
-						captionShow(slide);
-					});
+					captionShow(slide);
 				}
 
 				setTimeout(function(){

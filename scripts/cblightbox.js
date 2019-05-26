@@ -323,8 +323,16 @@
            	return el.css(css);
 		}
 
-		function _animateEnd(el, to){
+		function _animateDurationSet(el, duration){
+			el.css('transition-duration', duration + 'ms');
+		}
+
+		function _animateDurationRemove(el){
 			el.css('transition-duration', '');
+		}
+
+		function _animateEnd(el, to){
+			_animateDurationRemove(el);
 
 			if(el.closest('.cb-lightbox').hasClass('cb-lightbox-is-closing')){
 				return;
@@ -352,7 +360,7 @@
 		}
 
 		function _animate(el, to, duration){
-			el.css('transition-duration', duration + 'ms');
+			_animateDurationSet(el, duration)
 
 			setTranslate(el, to);
 
@@ -1040,6 +1048,9 @@
 				container = $('.cb-lightbox'),
 				cachedSlide = slides[i];
 
+			_animateDurationSet(container, $s.openCloseDuration);
+			_animateDurationSet(container.find('.cb-lightbox-content'), $s.openCloseDuration)
+
 			if(cachedSlide.type == 'error'){
 				error(container);
 			}if (slide.find('.cb-lightbox-image').data('height') === undefined) {
@@ -1065,9 +1076,6 @@
 				if ($.isFunction($s.beforeOpen)) {
 				 	$s.beforeOpen.call(this, container, slide);
 				}
-
-				_animate(container, false, $s.openCloseDuration);
-				_animate(container.find('.cb-lightbox-content'), false, $s.openCloseDuration);
 
 				container.addClass('cb-lightbox-is-opening cb-lightbox-show-info cb-lightbox-show-buttons');
 
@@ -1128,6 +1136,9 @@
 					if(closing){
 						return;
 					}
+
+					_animateDurationRemove(container);
+					_animateDurationRemove(container.find('.cb-lightbox-content'));
 
 					container.removeClass('cb-lightbox-is-opening').addClass('cb-lightbox-is-open');
 				}, $s.openCloseDuration);

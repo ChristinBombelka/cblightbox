@@ -454,7 +454,6 @@
 		    }, 50);
 
 			function openStart(){
-
 				if ($.isFunction($s.beforeOpen)) {
 				 	$s.beforeOpen.call(this, container, slide);
 				}
@@ -729,9 +728,9 @@
 	    	var container = $(".cb-lightbox"),
 				$s = container.data('settings'),
 	    		group = container.data('group'),
-				images = $('a[data-group="'+ group +'"]');
+				items = $('a[data-group="'+ group +'"]');
 
-			if(container.hasClass('cb-lightbox-is-zoomed') || slideing || images.length <= 1){
+			if(container.hasClass('cb-lightbox-is-zoomed') || slideing || items.length <= 1){
 				return;
 			}
 
@@ -745,21 +744,21 @@
 				_this_index = _this_index - 1;
 
 				if(_this_index < 0){
-					_this = images.length - 1;
+					_this = items.length - 1;
 					_this_index = _this;
 				}
 
 			}else if(direction == 'next'){
 				_this_index = _this_index + 1;
 
-				if(_this_index > images.length - 1){
+				if(_this_index > items.length - 1){
 					_this_index = 0;
 				}
 			}
 
 			container.find('.cb-counter-current').text(_this_index + 1);
 
-			new_image = images.eq(_this_index);
+			new_image = items.eq(_this_index);
 			source = new_image.attr('href');
 
 			var slide = setSlide(source, _this_index, new_image);

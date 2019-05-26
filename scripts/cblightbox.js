@@ -75,6 +75,220 @@
 			});
 		}
 
+		//global momentum variables
+	    var speed = {},
+	    	maxSpeedX = 10,
+			maxSpeedY = 10,
+	    	timeDiff,
+	    	distance = {},
+	    	lastPoint = {},
+			currentPoint = {},
+			lastTimeMouseMoved,
+			mouseUp = true,
+			positionInterval,
+			momentTimer,
+			slowDownRatio = {},
+			slowDownRatioReverse = {},
+ 			speedDecleration = {},
+ 			speedDecelerationRatioAbs = {};
+
+		function calculateAnimtionOffset(axis){
+			speedDecleration[axis] = speedDecleration[axis] * (slowDownRatio[axis] + slowDownRatioReverse[axis] - slowDownRatioReverse[axis] * timeDiff / 10);
+			speedDecelerationRatioAbs[axis] = Math.abs(speed[axis] * speedDecleration[axis]);
+			distanceOffset = speed[axis] * speedDecleration[axis] * timeDiff;
+
+			return distanceOffset;
+		}
+
+		function getNewBouncePosition(maxMin, current, time, duration){
+			return (maxMin - current) * time / duration + current;
+		}
+
+	    function logMousePosition(){
+			if(mouseUp){
+				return;
+			}
+
+			//log mouse positions
+	       	positionInterval = setTimeout(function(){
+
+	         	currentT = new Date().getTime();
+	         	timeDiff = currentT - lastT;
+
+	         	distance = {
+	         		x: (currentPoint.x - lastPoint.x) / 1.5,
+	         		y: (currentPoint.y - lastPoint.y) / 1.5
+	         	};
+
+	         	lastPoint = {
+	         		x: currentPoint.x,
+	         		y: currentPoint.y
+	         	};
+
+				lastT = currentT;
+
+				logMousePosition();
+	       	}, 20);
+		}
+
+		function initMoveMoment(item){
+			var $s = $('.cb-lightbox').data('settings'),
+				minX = $s.zoomOffset[3],
+				maxX = $(window).width() - item.width() -  $s.zoomOffset[1],
+				minY = $s.zoomOffset[0],
+				maxY = $(window).height() - item.height() -  $s.zoomOffset[2],
+				startTimeX = false,
+	 			startTimeY = false;
+	 			completeX = false,
+	 			completeY = false,
+	 			currentImage = $('.cb-lightbox-image'),
+	 			setCurrentPointX = false,
+	 			setCurrentPointY = false;
+
+ 			speedDecleration = {
+ 				x: 1,
+ 				y: 1
+ 			};
+
+ 			//stow down
+ 			slowDownRatio = {
+ 				x: 0.95,
+ 				y: 0.95,
+ 			};
+
+ 			slowDownRatioReverse = {
+				x: 1 - slowDownRatio.x,
+				y: 1 - slowDownRatio.y
+			};
+
+			// Speed in px/ms velocity
+			speed.x = Math.max(Math.min(distance.x / timeDiff, maxSpeedX), -maxSpeedX);
+			speed.y = Math.max(Math.min(distance.y / timeDiff, maxSpeedY), -maxSpeedY);
+
+	 		//min distence to move object
+	 		if(Math.abs(distance.x) > 1 || Math.abs(distance.y) > 1){
+
+				function moveMoment(){
+					momentTimer = setTimeout(function(){
+
+						if(startTimeX === false){
+							speedX = calculateAnimtionOffset('x');
+						}
+
+						if(startTimeY === false){
+							speedY = calculateAnimtionOffset('y');
+						}
+
+						if((Math.abs(speedX) > 0.04 || (currentPoint.x > minX || currentPoint.x < maxX)) && currentImage.data('width') > $(window).width()){
+							//In bouncing area left/right
+							if(currentPoint.x > minX || currentPoint.x < maxX){
+								if(Math.abs(speedX) < 0.06){
+									if(startTimeX === false){
+										startTimeX = new Date().getTime();
+									}
+
+									tX = new Date().getTime() - startTimeX;
+
+									if(tX >= 300){
+										//set to end position
+										if(currentPoint.x > minX){
+											setCurrentPointX = minX;
+										}else{
+											setCurrentPointX = maxX;
+										}
+
+										speedX = 0;
+										completeX = true;
+
+									}else{
+										if(currentPoint.x > minX){
+											setCurrentPointX = getNewBouncePosition(minX, currentPoint.x, tX, 300);
+										}else{
+											setCurrentPointX = getNewBouncePosition(maxX, currentPoint.x, tX, 300);
+										}
+									}
+								}
+
+								slowDownRatio.x = 0.7;
+							}
+
+						}else{
+							completeX = true;
+						}
+
+						if(!startTimeX){
+							setCurrentPointX = currentPoint.x + speedX;
+						}
+
+						if((Math.abs(speedY) > 0.04 || (currentPoint.y > minY || currentPoint.y < maxY)) && currentImage.data('height') > $(window).height()){
+							//In bouncing area top/bottom
+							if(currentPoint.y > minY || currentPoint.y < maxY){
+
+								if(Math.abs(speedY) < 0.06){
+									if(startTimeY === false){
+										startTimeY = new Date().getTime();
+									}
+
+									tY = new Date().getTime() - startTimeY;
+
+									if(tY >= 300){
+										//set to end position
+										if(currentPoint.y > minY){
+											setCurrentPointY = minY;
+										}else{
+											setCurrentPointY = maxY;
+										}
+
+										speedY = 0;
+										completeY = true;
+
+									}else{
+
+										if(currentPoint.y > minY){
+											setCurrentPointY = getNewBouncePosition(minY, currentPoint.y, tY, 300);
+										}else{
+											setCurrentPointY = getNewBouncePosition(maxY, currentPoint.y, tY, 300);
+										}
+									}
+								}
+
+								slowDownRatio.y = 0.7;
+							}
+						}else{
+							completeY = true;
+						}
+
+						if(!startTimeY){
+							setCurrentPointY = currentPoint.y + speedY;
+						}
+
+						//set points
+						currentPoint.x = setCurrentPointX ? setCurrentPointX : currentPoint.x;
+						currentPoint.y = setCurrentPointY ? setCurrentPointY : currentPoint.y;
+
+						//move to points
+						setTranslate(item, {
+							left: currentPoint.x,
+							top: currentPoint.y
+						});
+
+						if(completeX && completeY){
+							clearTimeout(momentTimer);
+							return;
+						}
+
+						moveMoment();
+
+					}, 10);
+				}
+
+				moveMoment();
+
+		    }else{
+		    	reposition();
+		    }
+		}
+
 		function setTranslate(el, values){
 			var str = '',
 				css = {};
@@ -237,6 +451,132 @@
 
     		container.removeClass("cb-lightbox-is-zoomed")
     		slide.removeClass("cb-lightbox-draggable-init");
+	    }
+
+	    function fitImage(slide){
+			var item = $(".cb-lightbox-is-selected"),
+				container = $('.cb-lightbox'),
+				$s = container.data('settings'),
+				img = slide.find('.cb-lightbox-image'),
+				type = slide.data('type');
+
+			if(item.find('img').length){
+				itemImage = item.find('img');
+			}else{
+				itemImage = item;
+			}
+
+			if(type == 'image'){
+				if(typeof img != 'undefined'){
+					imgWidth = img.data('width');
+					imgHeight = img.data('height');
+				}
+				else{
+					imgWidth = $(".cb-lightbox-image").width();
+					imgHeight = $(".cb-lightbox-image").height();
+				}
+			}else{
+
+				if(item.data('height') && item.data('width')){
+					imgHeight = container.height();
+					imgWidth = imgHeight / item.data("height") * item.data("width");
+				}else{
+					//Default 16/9
+					imgHeight = container.height();
+					imgWidth = imgHeight / 9 * 16;
+				}
+			}
+
+			var wrapperHeight = container.height() - ($s.margin[0] + $s.margin[2]),
+				wrapperWidth = container.width() - ($s.margin[1] + $s.margin[3]);
+
+			var captionHeight = 0;
+			if($(".cb-lightbox-info").length){
+				captionHeight = $(".cb-lightbox-info").outerHeight();
+			}
+
+			if(wrapperHeight - captionHeight < imgHeight || wrapperWidth < imgWidth ) {
+				var minRatio = Math.min(1, wrapperWidth / imgWidth, (wrapperHeight - captionHeight) / imgHeight);
+
+				newImgWidth = Math.floor(minRatio * imgWidth);
+				newImgHeight = Math.floor(minRatio * imgHeight);
+			}
+			else{
+				newImgWidth = imgWidth;
+				newImgHeight = imgHeight;
+			}
+
+			positionTop = Math.max(($(window).height() - newImgHeight - captionHeight) / 2, $s.margin[0]);
+			positionLeft = (container.width() - newImgWidth) / 2;
+
+			var	scaleWidth = newImgWidth / itemImage.width(),
+   				scaleHeight = newImgHeight / itemImage.height();
+
+			slide.data({
+	 			'fitHeight': newImgHeight,
+	 			'fitWidth': newImgWidth,
+	 			'fitLeft': positionLeft,
+	 			'fitTop': positionTop
+	 		});
+
+			if((imgWidth > $(window).width() || imgHeight > $(window).height()) && $s.zoom){
+				slide.addClass('cb-lightbox-draggable');
+			}else{
+				slide.removeClass('cb-lightbox-draggable');
+			}
+
+			if ($.isFunction($s.afterFit)) {
+				$s.afterFit.call(this, container, slide);
+			}
+
+	 		return {
+	 			width: newImgWidth,
+	 			height: newImgHeight,
+	 			top: positionTop,
+	 			left: positionLeft,
+	 			scaleX: scaleWidth,
+	 			scaleY: scaleHeight
+	 		};
+		};
+
+		function reposition(){
+	    	//reset dragging position
+		    var slide = $('.cb-lightbox-slide'),
+				$s = slide.closest('.cb-lightbox').data('settings'),
+		    	image = slide.find('.cb-lightbox-image'),
+		    	lastoffset = slide.data('lastTransform'),
+		    	windowWidth = $(window).width(),
+		    	windowHeight = $(window).height(),
+		    	imageWidth = image.data('width'),
+		    	imageHeight = image.data('height');
+
+		    if(!lastoffset){
+		    	return;
+		    }
+
+		    if(lastoffset.x > $s.zoomOffset[3] && imageWidth > windowWidth){
+		    	moveX = $s.zoomOffset[3];
+		    }else if(Math.abs(lastoffset.x) - $s.zoomOffset[1] > imageWidth - windowWidth && imageWidth > windowWidth){
+		    	moveX = windowWidth - imageWidth - $s.zoomOffset[1];
+		    }else{
+		    	moveX = lastoffset.x;
+		    }
+
+		    if(lastoffset.y > $s.zoomOffset[0] && imageHeight > windowHeight){
+		    	moveY = $s.zoomOffset[0];
+		    }else if(Math.abs(lastoffset.y) - $s.zoomOffset[2] > imageHeight - windowHeight && imageHeight > windowHeight){
+		    	moveY = windowHeight - imageHeight - $s.zoomOffset[2];
+		    }
+		    else{
+		    	moveY = lastoffset.y;
+		    }
+
+		    if(lastoffset.x != moveX || lastoffset.y != moveY){
+		    	_animate(slide, {
+		    		top: moveY,
+		    		left: moveX,
+		    	}, 250);
+		    }
 	    }
 
 	    function captionShow(slide){
@@ -482,6 +822,218 @@
 			return slide;
 		}
 
+	    function slideTo(direction, effect){
+	    	if(typeof effect === "undefined"){
+	    		effect = false;
+	    	}
+
+	    	var container = $(".cb-lightbox"),
+				$s = container.data('settings'),
+	    		group = container.data('group'),
+				items = $('a[data-group="'+ group +'"]');
+
+			if(container.hasClass('cb-lightbox-is-zoomed') || slideing || items.length <= 1){
+				return;
+			}
+
+			var slideRemove = $('.cb-lightbox-slide.cb-lightbox-slide-current')
+				.removeClass('cb-lightbox-slide-current')
+				.addClass('cb-lightbox-image-remove');
+
+			slideing = true;
+
+			if(direction == 'previews'){
+				_this_index = _this_index - 1;
+
+				if(_this_index < 0){
+					_this = items.length - 1;
+					_this_index = _this;
+				}
+
+			}else if(direction == 'next'){
+				_this_index = _this_index + 1;
+
+				if(_this_index > items.length - 1){
+					_this_index = 0;
+				}
+			}
+
+			container.find('.cb-counter-current').text(_this_index + 1);
+
+			new_image = items.eq(_this_index);
+			source = new_image.attr('href');
+
+			if($s.slideEffect == 'slide' || effect == 'slide'){
+
+				var currentLeft = ($(window).width() - slideRemove.width()) / 2;
+
+				if(direction == 'previews'){
+					var slideOut = currentLeft + $(window).width();
+				}else{
+					var slideOut = -(slideRemove.width() + currentLeft);
+				}
+
+				_animate(slideRemove, {
+					left: slideOut,
+					opacity: 0,
+				}, $s.slideDuration);
+			}else{
+				_animate(slideRemove, {
+					opacity: 0,
+				}, $s.slideDuration);
+			}
+
+			setTimeout(function(){
+				slideRemove.remove();
+			}, $s.slideDuration);
+
+			//get new slide
+			var slide = setSlide(source, _this_index, new_image),
+				cachedSlide = slides[_this_index];
+
+			setTranslate(slide, {
+				width: 500,
+				height: 500,
+				opacity: 0.001
+			});
+
+			setTimeout(function(){
+				if(cachedSlide.type == 'error'){
+					error(container);
+				}else if (slide.find('.cb-lightbox-image').data('height') === undefined) {
+					//wait for imagesize;
+					var wait = setInterval(function() {
+				        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
+				            clearInterval(wait);
+				            runSlide();
+				        }
+				    }, 100);
+				}else{
+					runSlide();
+				}
+			});
+
+			function runSlide(){
+				var values = fitImage(slide);
+
+				setTranslate(slide, {
+					width: values.width,
+					height: values.height,
+				});
+
+				if(slide.hasClass('cb-lightbox-image-remove')){
+					_animateEnd(slide, false);
+
+					setTranslate(slide, {
+						top: values.top,
+						opacity: 0,
+					});
+
+					return;
+				}
+
+				if($s.slideEffect == 'slide' || effect == 'slide'){
+
+					var currentLeft = ($(window).width() - slide.width()) / 2;
+
+					if(direction == 'previews'){
+						var slideIn = -(slide.width() + currentLeft);
+					}else{
+						var slideIn = currentLeft + $(window).width();
+					}
+
+					setTranslate(slide, {
+						top: values.top,
+						left: slideIn,
+						opacity: 0,
+					});
+
+					setTimeout(function(){
+						_animate(slide, {
+							left: values.left,
+							opacity: 1,
+						},  $s.slideDuration);
+					}, 20);
+
+					captionShow(slide);
+				}else{
+					setTranslate(slide, {
+						top: values.top,
+						left: values.left,
+						opacity: 0
+					});
+
+					setTimeout(function(){
+						_animate(slide, {
+							opacity: 1,
+						},  $s.slideDuration);
+					}, 20);
+
+					captionShow(slide);
+				}
+
+				setTimeout(function(){
+					if ($.isFunction($s.afterSlide)) {
+				 	   $s.afterSlide.call(this, container, slide);
+					}
+				}, $s.slideDuration + 30);
+			}
+
+			setTimeout(function(){
+				slideing = false;
+			}, 200);
+	    }
+
+		function cacheSlides(item, i){
+			var container = $('.cb-lightbox'),
+				$s = container.data('settings');
+
+			if(slides[i]){
+				return;
+			}
+
+			var source = item.attr('href'),
+				elementPlaceholder = false,
+				iframe = false,
+				type = false;
+
+			if(source.match(/(^data:image\/[a-z0-9+\/=]*,)|(\.(jp(e|g|eg)|gif|png|bmp|webp|svg|ico)((\?|#).*)?$)/i) ) {
+                type = 'image';
+            }else if(source){
+            	type = 'iframe';
+            }else{
+            	type = 'error';
+            }
+
+			if(type == "image"){
+				previewImage = item.find('img');
+
+				if(previewImage.length && previewImage.attr('src') && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64'){
+					placeholderImage = item.find('img').attr('src');
+				}else if($s.previewSource){
+					placeholderImage = item.find('img').attr( $s.previewSource );
+				}else{
+					placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
+				}
+
+				elementPlaceholder = $('<img />')
+					.addClass('cb-lightbox-image-placeholder')
+					.attr('src', placeholderImage);
+
+			}else if(type == "iframe"){
+				var iframe = $('<iframe src="" class="cb-lightbox-image cb-lightbox-iframe" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>');
+
+				iframe.attr("src", source);
+			}
+
+			slides[i] = {
+				type: type,
+				placeholder: elementPlaceholder,
+				image: false,
+				iframe: iframe,
+			};
+		}
+
 		function open(item, i, $s){
 			var source = item.attr('href'),
 				slide = setSlide(source, i, item),
@@ -648,558 +1200,6 @@
 				}
 
 			}, $s.openCloseDuration + 20);
-		}
-
-		function fitImage(slide){
-			var item = $(".cb-lightbox-is-selected"),
-				container = $('.cb-lightbox'),
-				$s = container.data('settings'),
-				img = slide.find('.cb-lightbox-image'),
-				type = slide.data('type');
-
-			if(item.find('img').length){
-				itemImage = item.find('img');
-			}else{
-				itemImage = item;
-			}
-
-			if(type == 'image'){
-				if(typeof img != 'undefined'){
-					imgWidth = img.data('width');
-					imgHeight = img.data('height');
-				}
-				else{
-					imgWidth = $(".cb-lightbox-image").width();
-					imgHeight = $(".cb-lightbox-image").height();
-				}
-			}else{
-
-				if(item.data('height') && item.data('width')){
-					imgHeight = container.height();
-					imgWidth = imgHeight / item.data("height") * item.data("width");
-				}else{
-					//Default 16/9
-					imgHeight = container.height();
-					imgWidth = imgHeight / 9 * 16;
-				}
-			}
-
-			var wrapperHeight = container.height() - ($s.margin[0] + $s.margin[2]),
-				wrapperWidth = container.width() - ($s.margin[1] + $s.margin[3]);
-
-			var captionHeight = 0;
-			if($(".cb-lightbox-info").length){
-				captionHeight = $(".cb-lightbox-info").outerHeight();
-			}
-
-			if(wrapperHeight - captionHeight < imgHeight || wrapperWidth < imgWidth ) {
-				var minRatio = Math.min(1, wrapperWidth / imgWidth, (wrapperHeight - captionHeight) / imgHeight);
-
-				newImgWidth = Math.floor(minRatio * imgWidth);
-				newImgHeight = Math.floor(minRatio * imgHeight);
-			}
-			else{
-				newImgWidth = imgWidth;
-				newImgHeight = imgHeight;
-			}
-
-			positionTop = Math.max(($(window).height() - newImgHeight - captionHeight) / 2, $s.margin[0]);
-			positionLeft = (container.width() - newImgWidth) / 2;
-
-			var	scaleWidth = newImgWidth / itemImage.width(),
-   				scaleHeight = newImgHeight / itemImage.height();
-
-			slide.data({
-	 			'fitHeight': newImgHeight,
-	 			'fitWidth': newImgWidth,
-	 			'fitLeft': positionLeft,
-	 			'fitTop': positionTop
-	 		});
-
-			if((imgWidth > $(window).width() || imgHeight > $(window).height()) && $s.zoom){
-				slide.addClass('cb-lightbox-draggable');
-			}else{
-				slide.removeClass('cb-lightbox-draggable');
-			}
-
-			if ($.isFunction($s.afterFit)) {
-				$s.afterFit.call(this, container, slide);
-			}
-
-	 		return {
-	 			width: newImgWidth,
-	 			height: newImgHeight,
-	 			top: positionTop,
-	 			left: positionLeft,
-	 			scaleX: scaleWidth,
-	 			scaleY: scaleHeight
-	 		};
-		};
-
-		function reposition(){
-	    	//reset dragging position
-		    var slide = $('.cb-lightbox-slide'),
-				$s = slide.closest('.cb-lightbox').data('settings'),
-		    	image = slide.find('.cb-lightbox-image'),
-		    	lastoffset = slide.data('lastTransform'),
-		    	windowWidth = $(window).width(),
-		    	windowHeight = $(window).height(),
-		    	imageWidth = image.data('width'),
-		    	imageHeight = image.data('height');
-
-		    if(!lastoffset){
-		    	return;
-		    }
-
-		    if(lastoffset.x > $s.zoomOffset[3] && imageWidth > windowWidth){
-		    	moveX = $s.zoomOffset[3];
-		    }else if(Math.abs(lastoffset.x) - $s.zoomOffset[1] > imageWidth - windowWidth && imageWidth > windowWidth){
-		    	moveX = windowWidth - imageWidth - $s.zoomOffset[1];
-		    }else{
-		    	moveX = lastoffset.x;
-		    }
-
-		    if(lastoffset.y > $s.zoomOffset[0] && imageHeight > windowHeight){
-		    	moveY = $s.zoomOffset[0];
-		    }else if(Math.abs(lastoffset.y) - $s.zoomOffset[2] > imageHeight - windowHeight && imageHeight > windowHeight){
-		    	moveY = windowHeight - imageHeight - $s.zoomOffset[2];
-		    }
-		    else{
-		    	moveY = lastoffset.y;
-		    }
-
-		    if(lastoffset.x != moveX || lastoffset.y != moveY){
-		    	_animate(slide, {
-		    		top: moveY,
-		    		left: moveX,
-		    	}, 250);
-		    }
-	    }
-
-	    function slideTo(direction, effect){
-	    	if(typeof effect === "undefined"){
-	    		effect = false;
-	    	}
-
-	    	var container = $(".cb-lightbox"),
-				$s = container.data('settings'),
-	    		group = container.data('group'),
-				items = $('a[data-group="'+ group +'"]');
-
-			if(container.hasClass('cb-lightbox-is-zoomed') || slideing || items.length <= 1){
-				return;
-			}
-
-			var slideRemove = $('.cb-lightbox-slide.cb-lightbox-slide-current')
-				.removeClass('cb-lightbox-slide-current')
-				.addClass('cb-lightbox-image-remove');
-
-			slideing = true;
-
-			if(direction == 'previews'){
-				_this_index = _this_index - 1;
-
-				if(_this_index < 0){
-					_this = items.length - 1;
-					_this_index = _this;
-				}
-
-			}else if(direction == 'next'){
-				_this_index = _this_index + 1;
-
-				if(_this_index > items.length - 1){
-					_this_index = 0;
-				}
-			}
-
-			container.find('.cb-counter-current').text(_this_index + 1);
-
-			new_image = items.eq(_this_index);
-			source = new_image.attr('href');
-
-			if($s.slideEffect == 'slide' || effect == 'slide'){
-
-				var currentLeft = ($(window).width() - slideRemove.width()) / 2;
-
-				if(direction == 'previews'){
-					var slideOut = currentLeft + $(window).width();
-				}else{
-					var slideOut = -(slideRemove.width() + currentLeft);
-				}
-
-				_animate(slideRemove, {
-					left: slideOut,
-					opacity: 0,
-				}, $s.slideDuration);
-			}else{
-				_animate(slideRemove, {
-					opacity: 0,
-				}, $s.slideDuration);
-			}
-
-			setTimeout(function(){
-				slideRemove.remove();
-			}, $s.slideDuration);
-
-			//get new slide
-			var slide = setSlide(source, _this_index, new_image),
-				cachedSlide = slides[_this_index];
-
-			setTranslate(slide, {
-				width: 500,
-				height: 500,
-				opacity: 0.001
-			});
-
-			setTimeout(function(){
-				if(cachedSlide.type == 'error'){
-					error(container);
-				}else if (slide.find('.cb-lightbox-image').data('height') === undefined) {
-					//wait for imagesize;
-					var wait = setInterval(function() {
-				        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
-				            clearInterval(wait);
-				            runSlide();
-				        }
-				    }, 100);
-				}else{
-					runSlide();
-				}
-			});
-
-			function runSlide(){
-				var values = fitImage(slide);
-
-				setTranslate(slide, {
-					width: values.width,
-					height: values.height,
-				});
-
-				if(slide.hasClass('cb-lightbox-image-remove')){
-					_animateEnd(slide, false);
-
-					setTranslate(slide, {
-						top: values.top,
-						opacity: 0,
-					});
-
-					return;
-				}
-
-				if($s.slideEffect == 'slide' || effect == 'slide'){
-
-					var currentLeft = ($(window).width() - slide.width()) / 2;
-
-					if(direction == 'previews'){
-						var slideIn = -(slide.width() + currentLeft);
-					}else{
-						var slideIn = currentLeft + $(window).width();
-					}
-
-					setTranslate(slide, {
-						top: values.top,
-						left: slideIn,
-						opacity: 0,
-					});
-
-					setTimeout(function(){
-						_animate(slide, {
-							left: values.left,
-							opacity: 1,
-						},  $s.slideDuration);
-					}, 20);
-
-					captionShow(slide);
-				}else{
-					setTranslate(slide, {
-						top: values.top,
-						left: values.left,
-						opacity: 0
-					});
-
-					setTimeout(function(){
-						_animate(slide, {
-							opacity: 1,
-						},  $s.slideDuration);
-					}, 20);
-
-					captionShow(slide);
-				}
-
-				setTimeout(function(){
-					if ($.isFunction($s.afterSlide)) {
-				 	   $s.afterSlide.call(this, container, slide);
-					}
-				}, $s.slideDuration + 30);
-			}
-
-			setTimeout(function(){
-				slideing = false;
-			}, 200);
-	    }
-
-		//global momentum variables
-	    var speed = {},
-	    	maxSpeedX = 10,
-			maxSpeedY = 10,
-	    	timeDiff,
-	    	distance = {},
-	    	lastPoint = {},
-			currentPoint = {},
-			lastTimeMouseMoved,
-			mouseUp = true,
-			positionInterval,
-			momentTimer,
-			slowDownRatio = {},
-			slowDownRatioReverse = {},
- 			speedDecleration = {},
- 			speedDecelerationRatioAbs = {};
-
-		function calculateAnimtionOffset(axis){
-			speedDecleration[axis] = speedDecleration[axis] * (slowDownRatio[axis] + slowDownRatioReverse[axis] - slowDownRatioReverse[axis] * timeDiff / 10);
-			speedDecelerationRatioAbs[axis] = Math.abs(speed[axis] * speedDecleration[axis]);
-			distanceOffset = speed[axis] * speedDecleration[axis] * timeDiff;
-
-			return distanceOffset;
-		}
-
-		function getNewBouncePosition(maxMin, current, time, duration){
-			return (maxMin - current) * time / duration + current;
-		}
-
-	    function logMousePosition(){
-			if(mouseUp){
-				return;
-			}
-
-			//log mouse positions
-	       	positionInterval = setTimeout(function(){
-
-	         	currentT = new Date().getTime();
-	         	timeDiff = currentT - lastT;
-
-	         	distance = {
-	         		x: (currentPoint.x - lastPoint.x) / 1.5,
-	         		y: (currentPoint.y - lastPoint.y) / 1.5
-	         	};
-
-	         	lastPoint = {
-	         		x: currentPoint.x,
-	         		y: currentPoint.y
-	         	};
-
-				lastT = currentT;
-
-				logMousePosition();
-	       	}, 20);
-		}
-
-		function initMoveMoment(item){
-			var $s = $('.cb-lightbox').data('settings'),
-				minX = $s.zoomOffset[3],
-				maxX = $(window).width() - item.width() -  $s.zoomOffset[1],
-				minY = $s.zoomOffset[0],
-				maxY = $(window).height() - item.height() -  $s.zoomOffset[2],
-				startTimeX = false,
-	 			startTimeY = false;
-	 			completeX = false,
-	 			completeY = false,
-	 			currentImage = $('.cb-lightbox-image'),
-	 			setCurrentPointX = false,
-	 			setCurrentPointY = false;
-
- 			speedDecleration = {
- 				x: 1,
- 				y: 1
- 			};
-
- 			//stow down
- 			slowDownRatio = {
- 				x: 0.95,
- 				y: 0.95,
- 			};
-
- 			slowDownRatioReverse = {
-				x: 1 - slowDownRatio.x,
-				y: 1 - slowDownRatio.y
-			};
-
-			// Speed in px/ms velocity
-			speed.x = Math.max(Math.min(distance.x / timeDiff, maxSpeedX), -maxSpeedX);
-			speed.y = Math.max(Math.min(distance.y / timeDiff, maxSpeedY), -maxSpeedY);
-
-	 		//min distence to move object
-	 		if(Math.abs(distance.x) > 1 || Math.abs(distance.y) > 1){
-
-				function moveMoment(){
-					momentTimer = setTimeout(function(){
-
-						if(startTimeX === false){
-							speedX = calculateAnimtionOffset('x');
-						}
-
-						if(startTimeY === false){
-							speedY = calculateAnimtionOffset('y');
-						}
-
-						if((Math.abs(speedX) > 0.04 || (currentPoint.x > minX || currentPoint.x < maxX)) && currentImage.data('width') > $(window).width()){
-							//In bouncing area left/right
-							if(currentPoint.x > minX || currentPoint.x < maxX){
-								if(Math.abs(speedX) < 0.06){
-									if(startTimeX === false){
-										startTimeX = new Date().getTime();
-									}
-
-									tX = new Date().getTime() - startTimeX;
-
-									if(tX >= 300){
-										//set to end position
-										if(currentPoint.x > minX){
-											setCurrentPointX = minX;
-										}else{
-											setCurrentPointX = maxX;
-										}
-
-										speedX = 0;
-										completeX = true;
-
-									}else{
-										if(currentPoint.x > minX){
-											setCurrentPointX = getNewBouncePosition(minX, currentPoint.x, tX, 300);
-										}else{
-											setCurrentPointX = getNewBouncePosition(maxX, currentPoint.x, tX, 300);
-										}
-									}
-								}
-
-								slowDownRatio.x = 0.7;
-							}
-
-						}else{
-							completeX = true;
-						}
-
-						if(!startTimeX){
-							setCurrentPointX = currentPoint.x + speedX;
-						}
-
-						if((Math.abs(speedY) > 0.04 || (currentPoint.y > minY || currentPoint.y < maxY)) && currentImage.data('height') > $(window).height()){
-							//In bouncing area top/bottom
-							if(currentPoint.y > minY || currentPoint.y < maxY){
-
-								if(Math.abs(speedY) < 0.06){
-									if(startTimeY === false){
-										startTimeY = new Date().getTime();
-									}
-
-									tY = new Date().getTime() - startTimeY;
-
-									if(tY >= 300){
-										//set to end position
-										if(currentPoint.y > minY){
-											setCurrentPointY = minY;
-										}else{
-											setCurrentPointY = maxY;
-										}
-
-										speedY = 0;
-										completeY = true;
-
-									}else{
-
-										if(currentPoint.y > minY){
-											setCurrentPointY = getNewBouncePosition(minY, currentPoint.y, tY, 300);
-										}else{
-											setCurrentPointY = getNewBouncePosition(maxY, currentPoint.y, tY, 300);
-										}
-									}
-								}
-
-								slowDownRatio.y = 0.7;
-							}
-						}else{
-							completeY = true;
-						}
-
-						if(!startTimeY){
-							setCurrentPointY = currentPoint.y + speedY;
-						}
-
-						//set points
-						currentPoint.x = setCurrentPointX ? setCurrentPointX : currentPoint.x;
-						currentPoint.y = setCurrentPointY ? setCurrentPointY : currentPoint.y;
-
-						//move to points
-						setTranslate(item, {
-							left: currentPoint.x,
-							top: currentPoint.y
-						});
-
-						if(completeX && completeY){
-							clearTimeout(momentTimer);
-							return;
-						}
-
-						moveMoment();
-
-					}, 10);
-				}
-
-				moveMoment();
-
-		    }else{
-		    	reposition();
-		    }
-		}
-
-		function cacheSlides(item, i){
-			var container = $('.cb-lightbox'),
-				$s = container.data('settings');
-
-			if(slides[i]){
-				return;
-			}
-
-			var source = item.attr('href'),
-				elementPlaceholder = false,
-				iframe = false,
-				type = false;
-
-			if(source.match(/(^data:image\/[a-z0-9+\/=]*,)|(\.(jp(e|g|eg)|gif|png|bmp|webp|svg|ico)((\?|#).*)?$)/i) ) {
-                type = 'image';
-            }else if(source){
-            	type = 'iframe';
-            }else{
-            	type = 'error';
-            }
-
-			if(type == "image"){
-				previewImage = item.find('img');
-
-				if(previewImage.length && previewImage.attr('src') && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64'){
-					placeholderImage = item.find('img').attr('src');
-				}else if($s.previewSource){
-					placeholderImage = item.find('img').attr( $s.previewSource );
-				}else{
-					placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
-				}
-
-				elementPlaceholder = $('<img />')
-					.addClass('cb-lightbox-image-placeholder')
-					.attr('src', placeholderImage);
-
-			}else if(type == "iframe"){
-				var iframe = $('<iframe src="" class="cb-lightbox-image cb-lightbox-iframe" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>');
-
-				iframe.attr("src", source);
-			}
-
-			slides[i] = {
-				type: type,
-				placeholder: elementPlaceholder,
-				image: false,
-				iframe: iframe,
-			};
 		}
 
 		function init(item, settings){

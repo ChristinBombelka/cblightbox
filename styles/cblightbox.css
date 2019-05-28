@@ -79,8 +79,8 @@
   transition-property: opacity, -webkit-transform;
   transition-property: transform, opacity;
   transition-property: transform, opacity, -webkit-transform;
-  -webkit-transition-timing-function: ease-in-out;
-          transition-timing-function: ease-in-out;
+  -webkit-transition-timing-function: ease;
+          transition-timing-function: ease;
   -webkit-transform-origin: top left;
           transform-origin: top left;
   -webkit-box-sizing: border-box;
@@ -121,8 +121,6 @@
   z-index: 1; }
 
 .cb-lightbox-image-placeholder {
-  -webkit-transform: translateZ(0);
-          transform: translateZ(0);
   position: absolute;
   top: 0;
   left: 0;

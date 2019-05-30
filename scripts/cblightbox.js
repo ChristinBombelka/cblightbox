@@ -1430,10 +1430,6 @@
 			    	e.preventDefault();
 			    }
 
-			    if(opening){
-			    	return;
-			    }
-
 				clickTimer = true;
 				setTimeout(function(){
 					clickTimer = false;
@@ -1459,7 +1455,7 @@
 				}
 
 				if(!container.hasClass('cb-lightbox-is-zoomed')){
-					if(!$s.dragSlide){
+					if(!$s.dragSlide || opening){
 						return;
 					}
 

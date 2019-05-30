@@ -143,7 +143,7 @@
 	 			startTimeY = false;
 	 			completeX = false,
 	 			completeY = false,
-	 			currentImage = $('.cb-lightbox-image'),
+	 			currentSlide = $('.cb-lightbox-slide-current'),
 	 			setCurrentPointX = false,
 	 			setCurrentPointY = false;
 
@@ -181,7 +181,7 @@
 							speedY = calculateAnimtionOffset('y');
 						}
 
-						if((Math.abs(speedX) > 0.04 || (currentPoint.x > minX || currentPoint.x < maxX)) && currentImage.data('width') > $(window).width()){
+						if((Math.abs(speedX) > 0.04 || (currentPoint.x > minX || currentPoint.x < maxX)) && currentSlide.data('fullWidth') > $(window).width()){
 							//In bouncing area left/right
 							if(currentPoint.x > minX || currentPoint.x < maxX){
 								if(Math.abs(speedX) < 0.06){
@@ -222,7 +222,7 @@
 							setCurrentPointX = currentPoint.x + speedX;
 						}
 
-						if((Math.abs(speedY) > 0.04 || (currentPoint.y > minY || currentPoint.y < maxY)) && currentImage.data('height') > $(window).height()){
+						if((Math.abs(speedY) > 0.04 || (currentPoint.y > minY || currentPoint.y < maxY)) && currentSlide.data('fullHeight') > $(window).height()){
 							//In bouncing area top/bottom
 							if(currentPoint.y > minY || currentPoint.y < maxY){
 
@@ -346,9 +346,9 @@
 				if(to.toWidth && to.toHeight){
 					to.width = to.toWidth;
 					to.height = to.toHeight
-				}else if($('.cb-lightbox-is-zoomed').length && image.data('width') && image.data('height')){
-					to.width = image.data('width');
-					to.height = image.data('height');
+				}else if($('.cb-lightbox-is-zoomed').length && el.data('fullWidth') && el.data('fullHeight')){
+					to.width = el.data('fullWidth');
+					to.height = el.data('fullHeight');
 				}else{
 					to.width = $('.cb-lightbox-slide-current').data('fitWidth');
 					to.height = $('.cb-lightbox-slide-current').data('fitHeight');
@@ -393,22 +393,22 @@
 
 			captionHide($s, slide.find('.cb-lightbox-caption'));
 
-			if(image.data('width') > $(window).width()){
-				var positionX = Math.max(image.data('width') * clickX - ($(window).width() / 2) - $s.zoomOffset[3], -$s.zoomOffset[3]);
-					positionX = -Math.min(image.data('width') - $(window).width() + $s.zoomOffset[1], positionX);
+			if(slide.data('fullWidth') > $(window).width()){
+				var positionX = Math.max(slide.data('fullWidth') * clickX - ($(window).width() / 2) - $s.zoomOffset[3], -$s.zoomOffset[3]);
+					positionX = -Math.min(slide.data('fullWidth') - $(window).width() + $s.zoomOffset[1], positionX);
 			}else{
-				var positionX = ($(window).width() - image.data('width')) / 2;
+				var positionX = ($(window).width() - slide.data('fullWidth')) / 2;
 			}
 
-			if(image.data('height') > $(window).height()){
-				var positionY = Math.max(image.data('height') * clickY - ($(window).height() / 2) - $s.zoomOffset[0], -$s.zoomOffset[0]),
-					positionY = -Math.min(image.data('height') - $(window).height() + $s.zoomOffset[2], positionY);
+			if(slide.data('fullHeight') > $(window).height()){
+				var positionY = Math.max(slide.data('fullHeight') * clickY - ($(window).height() / 2) - $s.zoomOffset[0], -$s.zoomOffset[0]),
+					positionY = -Math.min(slide.data('fullHeight') - $(window).height() + $s.zoomOffset[2], positionY);
 			}else{
-				var positionY = ($(window).height() - image.data('height')) / 2;
+				var positionY = ($(window).height() - slide.data('fullHeight')) / 2;
 			}
 
-			scaleWidth = image.data('width') / image.width();
-	        scaleHeight = image.data('height') / image.height();
+			scaleWidth = slide.data('fullWidth') / image.width();
+	        scaleHeight = slide.data('fullHeight') / image.height();
 
 			_animate(slide, {
 				top: positionY,
@@ -478,8 +478,8 @@
 
 			if(type == 'image'){
 				if(typeof img != 'undefined'){
-					imgWidth = img.data('width');
-					imgHeight = img.data('height');
+					imgWidth = slide.data('fullWidth');
+					imgHeight = slide.data('fullHeight');
 				}
 				else{
 					imgWidth = $(".cb-lightbox-image").width();
@@ -487,9 +487,9 @@
 				}
 			}else{
 
-				if(item.data('height') && item.data('width')){
+				if(slide.data('fullHeight') && slide.data('fullWidth')){
 					imgHeight = container.height();
-					imgWidth = imgHeight / item.data("height") * item.data("width");
+					imgWidth = imgHeight / slide.data("fullHeight") * slide.data("fullWidth");
 				}else{
 					//Default 16/9
 					imgHeight = container.height();
@@ -557,8 +557,8 @@
 		    	lastoffset = slide.data('lastTransform'),
 		    	windowWidth = $(window).width(),
 		    	windowHeight = $(window).height(),
-		    	imageWidth = image.data('width'),
-		    	imageHeight = image.data('height');
+		    	imageWidth = slide.data('fullWidth'),
+		    	imageHeight = slide.data('fullHeight');
 
 		    if(!lastoffset){
 		    	return;
@@ -704,9 +704,9 @@
 			}
 
 			getImageSize(item, $img, function(width, height){
-				$img.data({
-					'width': width,
-					'height': height,
+				slide.data({
+					'fullWidth': width,
+					'fullHeight': height,
 				});
 			});
 
@@ -794,8 +794,8 @@
 
 				iframe
 					.data({
-						'width': item.data('width') ? item.data('width') : 16,
-						'height': item.data('height') ? item.data('height') : 9,
+						'fullWidth': item.data('width') ? item.data('width') : 16,
+						'fullHeight': item.data('height') ? item.data('height') : 9,
 					});
 
 				iframe.on("load", function(){
@@ -904,15 +904,15 @@
 			setTimeout(function(){
 				if(cachedSlide.type == 'error'){
 					error(container);
-				}else if (slide.find('.cb-lightbox-image').data('height') === undefined) {
+				}else if (slide.data('fullHeight') === undefined) {
 					//wait for imagesize;
 					var wait = setInterval(function() {
-				        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
+				        if (slide.data('fullHeight') !== undefined) {
 				            clearInterval(wait);
 				            runSlide();
 				        }
 				    }, 100);
-				}else{
+				}else {
 					runSlide();
 				}
 			});
@@ -938,10 +938,10 @@
 
 				if($s.slideEffect == 'slide' || effect == 'slide'){
 
-					var currentLeft = ($(window).width() - slide.width()) / 2;
+					var currentLeft = ($(window).width() - slide.data('fitWidth')) / 2;
 
 					if(direction == 'previews'){
-						var slideIn = -(slide.width() + currentLeft);
+						var slideIn = -(slide.data('fitWidth') + currentLeft);
 					}else{
 						var slideIn = currentLeft + $(window).width();
 					}
@@ -1092,7 +1092,7 @@
 					placeholder: placeholder,
 					image: image,
 					status: status,
-					iframe: iframe
+					iframe: iframe,
 				};
 			}else{
 				if(slides[i].type == 'image' && slides[i].image){
@@ -1136,7 +1136,7 @@
 
 			if(cachedSlide.type == 'error'){
 				error(container);
-			}if (slide.find('.cb-lightbox-image').data('height') === undefined) {
+			}if (slide.data('fullHeight') === undefined) {
 				//wait for imagesize;
 				var wait = setInterval(function() {
 					if(typeof slide === "undefined"){
@@ -1144,7 +1144,7 @@
 						return;
 					}
 
-			        if (slide.find('.cb-lightbox-image').data('height') !== undefined) {
+			        if (slide.data('fullHeight') !== undefined) {
 			            openStart();
 			            clearInterval(wait);
 			        }
@@ -1443,7 +1443,7 @@
 					$s = container.data('settings'),
 					slide = $(this),
 					image = slide.find('.cb-lightbox-image'),
-					imageWidth = image.data('width');
+					imageWidth = slide.data('fullWidth');
 
 				if(closing || container.hasClass('cb-lightbox-is-single')){
 					return;
@@ -1504,7 +1504,7 @@
 			        lastOffsetY = lastOffset ? lastOffset.y : 0,
 			        windowWidth = $(window).width(),
 			    	windowHeight = $(window).height(),
-					imageHeight = image.data('height'),
+					imageHeight = slide.data('fullHeight'),
 			    	maxX = windowWidth - imageWidth,
 			    	maxY = windowHeight - imageHeight;
 

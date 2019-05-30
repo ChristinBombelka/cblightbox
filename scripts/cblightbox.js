@@ -694,8 +694,10 @@
 
 						container.removeClass('cb-lightbox-is-loading');
 
-						slides[slide.data('index')].image = $img;
-						slides[slide.data('index')].status = 'complete';
+						if(slides[slide.data('index')]){
+							slides[slide.data('index')].image = $img;
+							slides[slide.data('index')].status = 'complete';
+						}
 
 					}, Math.min( 300, Math.max( 1000, imageHeight / 1600 )));
 				});

@@ -676,9 +676,6 @@
 					error(container);
 
 				}).one('load', function(e){
-
-					clearTimeout(loadingTimeout);
-
 					imageHeight = $(this).data('height') || this.naturalHeight;
 
 					slide.removeClass('cb-lightbox-slide-hide');
@@ -688,6 +685,9 @@
 					}
 
 					setTimeout(function(){
+
+						clearTimeout(loadingTimeout);
+
 						elementPlaceholder.hide();
 
 						slide.removeClass('cb-lightbox-image-hide');

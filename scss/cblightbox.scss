@@ -395,6 +395,17 @@
 	}
 }
 
+.cb-lightbox-temp{
+	transform: translate(-100%, -100%);
+	position: absolute;
+	left: 0;
+	top: 0;
+	opacity: 0.1;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
 /*--Start Animation--*/
 .cb-lightbox-loading{
 	position: relative;

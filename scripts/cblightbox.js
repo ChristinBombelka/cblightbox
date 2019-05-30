@@ -1428,6 +1428,10 @@
 			    	e.preventDefault();
 			    }
 
+			    if(opening){
+			    	return;
+			    }
+
 				clickTimer = true;
 				setTimeout(function(){
 					clickTimer = false;

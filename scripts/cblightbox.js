@@ -656,7 +656,13 @@
 				loadingTimeout,
 				isLoading = false;
 
-			if(typeof slides !== "undefined" && slides[slide.data('index')].image && slides[slide.data('index')].status == 'complete'){
+			if(typeof slides !== "undefined"){
+				cachedSlide = false;
+			}else{
+				cachedSlide = slides[slide.data('index')];
+			}
+
+			if(cachedSlide.image && cachedSlide.status == 'complete'){
 				$img = slides[slide.data('index') ].image.appendTo(slide.find('.cb-lightbox-slide-image'));
 			}else{
 				var $img = $('<img />');

@@ -408,6 +408,7 @@
 
 /*--Start Animation--*/
 .cb-lightbox-loading{
+	pointer-events: none;
 	position: relative;
 	top: 100px;
 	width: 50px;

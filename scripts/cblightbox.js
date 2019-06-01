@@ -629,7 +629,7 @@
 		function watchLoading(slide){
 			if(slide.length){
 
-				if(slide.hasClass('cb-lightbox-slide-ready')){
+				if(slide.hasClass('cb-lightbox-slide-complete')){
 					$('.cb-lightbox').removeClass('cb-lightbox-is-loading');
 
 					clearTimeout($('.cb-lightbox').data('watch'));
@@ -721,7 +721,7 @@
 
 						slide
 							.removeClass('cb-lightbox-image-hide')
-							.addClass('cb-lightbox-slide-ready');
+							.addClass('cb-lightbox-slide-complete');
 
 						if(slides[slide.data('index')]){
 							slides[slide.data('index')].image = $img;
@@ -746,7 +746,7 @@
 
 				slide
 					.removeClass('cb-lightbox-slide-hide cb-lightbox-image-hide')
-					.addClass('cb-lightbox-slide-ready');
+					.addClass('cb-lightbox-slide-complete');
 
 				if(firstLoad){
 					initPreload(container);
@@ -833,7 +833,7 @@
 				iframe.on("load", function(){
 					slide
 						.removeClass('cb-lightbox-slide-hide cb-lightbox-image-hide')
-						.addClass('cb-lightbox-slide-ready');
+						.addClass('cb-lightbox-slide-complete');
 				});
 			}
 

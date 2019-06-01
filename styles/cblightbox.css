@@ -225,7 +225,7 @@
     overflow: hidden;
     height: 100%; }
 
-.cb-lightbox-is-zoomed .cb-lightbox-slide {
+.cb-lightbox-is-zoomed .cb-lightbox-slide.cb-lightbox-slide-current {
   top: 0;
   left: 0;
   -webkit-transform: none;

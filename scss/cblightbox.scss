@@ -395,15 +395,11 @@
 	}
 }
 
-.cb-lightbox-temp{
-	transform: translate(-100%, -100%);
-	position: absolute;
-	left: 0;
-	top: 0;
-	opacity: 0.1;
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
+.cb-lightbox-slide-previews,
+.cb-lightbox-slide-next{
+	//transform: translateY(-100%);
+	top: -100vh;
+	opacity: 1;
 }
 
 /*--Start Animation--*/

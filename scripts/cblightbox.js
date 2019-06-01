@@ -895,10 +895,6 @@
 
 			container.find('.cb-counter-current').text(_this_index + 1);
 
-			cachedSlide = slides[_this_index];
-
-			watchLoading(newCurrent);
-
 			$('.cb-lightbox-is-selected').removeClass('cb-lightbox-is-selected');
 			items.eq(_this_index).addClass('cb-lightbox-is-selected');
 
@@ -935,9 +931,17 @@
 				oldCurrent.addClass('cb-lightbox-slide-' + oldCurrentDirection);
 			}, $s.slideDuration);
 
+			//check new Current exist
+			if(!newCurrent.length){
+				newCurrent = setSlide(items.eq(_this_index), _this_index, 'current');
+			}
+
+			cachedSlide = slides[_this_index];
+
+			watchLoading(newCurrent);
+
 			//set new previews/next slide
-			var item = items.eq(_slideIndex);
-			setSlide(item, _slideIndex, direction);
+			setSlide(items.eq(_slideIndex), _slideIndex, direction);
 
 			setTimeout(function(){
 				if(cachedSlide.type == 'error'){

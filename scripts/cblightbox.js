@@ -790,6 +790,7 @@
 			}
 
 			if(p == 'current'){
+				clearTimeout($('.cb-lightbox').data('watch'));
 				watchLoading(slide);
 			}
 
@@ -945,6 +946,7 @@
 
 			cachedSlide = slides[_this_index];
 
+			clearTimeout($('.cb-lightbox').data('watch'));
 			watchLoading(newCurrent);
 
 			//set new previews/next slide

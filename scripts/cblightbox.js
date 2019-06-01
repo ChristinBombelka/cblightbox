@@ -11,7 +11,8 @@
 		closing,
 		slideing = false,
 		slides,
-		firstLoad;
+		firstLoad,
+		isDraggable = false;
 
 	$.fn.cblightbox = function(options){
 
@@ -418,10 +419,16 @@
 				scaleX: scaleWidth,
 				scaleY: scaleHeight
 			}, $s.zoomDuration);
+
+			setTimeout(function(){
+				isDraggable = true;
+			}, $s.zoomDuration);
 	    }
 
 	    function detroyDraggable(slide, disableAnimation){
 	    	var container = $(".cb-lightbox");
+
+	    	isDraggable = false;
 
 	    	if(!container.length || !slide.length){
 	    		return;
@@ -458,9 +465,9 @@
 
     		setTimeout(function(){
     			captionShow(slide);
+    			container.removeClass("cb-lightbox-is-zoomed");
     		}, duration + 30);
 
-    		container.removeClass("cb-lightbox-is-zoomed")
     		slide.removeClass("cb-lightbox-draggable-init");
 	    }
 
@@ -1450,7 +1457,7 @@
 					image = slide.find('.cb-lightbox-image'),
 					imageWidth = slide.data('fullWidth');
 
-				if(closing || container.hasClass('cb-lightbox-is-single')){
+				if(closing){
 					return;
 				}
 
@@ -1463,8 +1470,8 @@
 					userYTouch = e.originalEvent.touches[0].clientY - $(this).offset().top;
 				}
 
-				if(!container.hasClass('cb-lightbox-is-zoomed')){
-					if(!$s.dragSlide || opening){
+				if(!container.hasClass('cb-lightbox-is-zoomed') && !container.hasClass('cb-lightbox-is-single')){
+					if(!$s.dragSlide || opening || isDraggable){
 						return;
 					}
 
@@ -1540,6 +1547,10 @@
 			        if(Math.abs(lastOffsetX - newX) > 2 || Math.abs(lastOffsetY - newY) > 2){
 						slide.addClass("cb-lightbox-is-dragging");
 						clickTimer = false;
+			        }
+
+			        if(!isDraggable){
+			        	return;
 			        }
 
 			        if(imageWidth < windowWidth){
@@ -1652,7 +1663,7 @@
 
 						}else{
 							//handle all other
-							if($('.cb-lightbox-is-zoomed').length){
+							if($('.cb-lightbox-is-zoomed').length && isDraggable){
 							    initMoveMoment(slide);
 							}
 						}

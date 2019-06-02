@@ -853,6 +853,8 @@
 	    		effect = false;
 	    	}
 
+			$('.cb-lightbox-slide').removeClass('cb-lightbox-is-sliding');
+
 	    	firstLoad = false;
 
 	    	var container = $(".cb-lightbox"),

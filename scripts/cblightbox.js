@@ -1231,6 +1231,8 @@
 						return;
 					}
 
+					opening = false;
+
 					_animateDurationRemove(container);
 					_animateDurationRemove(container.find('.cb-lightbox-content'));
 
@@ -1241,8 +1243,6 @@
 					if ($.isFunction($s.afterOpen)) {
 				 	   $s.afterOpen.call(this, container, slide);
 					}
-
-					opening = false;
 
 				}, $s.openCloseDuration + 30);
 			}
@@ -1450,6 +1450,10 @@
 			    	e.preventDefault();
 			    }
 
+			    if(closing || opening){
+					return;
+				}
+
 				clickTimer = true;
 				setTimeout(function(){
 					clickTimer = false;
@@ -1460,10 +1464,6 @@
 					slide = $(this),
 					image = slide.find('.cb-lightbox-image'),
 					imageWidth = slide.data('fullWidth');
-
-				if(closing){
-					return;
-				}
 
 				if(e.type == "mousedown"){
 					if(e.which != 1){

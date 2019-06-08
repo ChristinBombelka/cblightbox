@@ -72,7 +72,9 @@
     opacity: 1; }
 
 .cb-lightbox-slides {
-  position: absolute; }
+  position: absolute;
+  width: 100%;
+  height: 100%; }
 
 .cb-lightbox-slide {
   -webkit-transition-property: opacity, -webkit-transform;
@@ -85,8 +87,8 @@
           transform-origin: top left;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
-  width: auto;
-  height: auto;
+  height: 100%;
+  width: 100%;
   left: 0;
   top: 0;
   overflow: hidden;
@@ -100,14 +102,24 @@
     opacity: 0.01; }
 
 .cb-lightbox-slide-image {
-  background-color: #000;
+  -webkit-transition-property: opacity, -webkit-transform;
+  transition-property: opacity, -webkit-transform;
+  transition-property: transform, opacity;
+  transition-property: transform, opacity, -webkit-transform;
+  -webkit-transition-timing-function: ease;
+          transition-timing-function: ease;
+  -webkit-transform-origin: top left;
+          transform-origin: top left;
+  background-color: transparent;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
-  width: 100%; }
+  width: auto;
+  height: auto; }
 
 .cb-lightbox-image {
   position: absolute;
@@ -277,6 +289,8 @@
   visibility: visible;
   opacity: 1; }
 
+.cb-lightbox-error-show .cb-lightbox-close,
+.cb-lightbox-error-show .cb-lightbox-arrow,
 .cb-lightbox-show-buttons .cb-lightbox-close,
 .cb-lightbox-show-buttons .cb-lightbox-arrow {
   visibility: visible;
@@ -310,9 +324,6 @@
   left: 50%;
   background: #fff;
   padding: 50px; }
-
-.cb-lightbox-error-show .cb-lightbox-slide {
-  display: none; }
 
 .cb-lightbox-slide-previews,
 .cb-lightbox-slide-next {

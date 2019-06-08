@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.9.3 jQuery
- * 2019-05-30
+ * CBLightbox 3.9.4 jQuery
+ * 2019-06-08
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -61,8 +61,11 @@
 			afterClose: $.noop,
 		}
 
-		function error(container){
-			$('<div class="cb-lightbox-error">Sorry, this image can\'t loaded!</div>').appendTo(container.find('.cb-lightbox-content'));
+		function error(container, slide){
+			$('<div class="cb-lightbox-error">Sorry, this image can\'t loaded!</div>').appendTo(slide);
+
+			slide.find('.cb-lightbox-slide-image').remove();
+			slide.removeClass('cb-lightbox-image-hide');
 
 			var $s = container.data('settings');
 
@@ -137,17 +140,16 @@
 	       	}, 20);
 		}
 
-		function initMoveMoment(item){
+		function initMoveMoment(slideImage){
 			var $s = $('.cb-lightbox').data('settings'),
 				minX = $s.zoomOffset[3],
-				maxX = $(window).width() - item.width() -  $s.zoomOffset[1],
+				maxX = $(window).width() - slideImage.width() -  $s.zoomOffset[1],
 				minY = $s.zoomOffset[0],
-				maxY = $(window).height() - item.height() -  $s.zoomOffset[2],
+				maxY = $(window).height() - slideImage.height() -  $s.zoomOffset[2],
 				startTimeX = false,
 	 			startTimeY = false;
 	 			completeX = false,
 	 			completeY = false,
-	 			currentSlide = $('.cb-lightbox-slide-current'),
 	 			setCurrentPointX = false,
 	 			setCurrentPointY = false;
 
@@ -185,7 +187,7 @@
 							speedY = calculateAnimtionOffset('y');
 						}
 
-						if((Math.abs(speedX) > 0.04 || (currentPoint.x > minX || currentPoint.x < maxX)) && currentSlide.data('fullWidth') > $(window).width()){
+						if((Math.abs(speedX) > 0.04 || (currentPoint.x > minX || currentPoint.x < maxX)) && slideImage.data('fullWidth') > $(window).width()){
 							//In bouncing area left/right
 							if(currentPoint.x > minX || currentPoint.x < maxX){
 								if(Math.abs(speedX) < 0.06){
@@ -226,7 +228,7 @@
 							setCurrentPointX = currentPoint.x + speedX;
 						}
 
-						if((Math.abs(speedY) > 0.04 || (currentPoint.y > minY || currentPoint.y < maxY)) && currentSlide.data('fullHeight') > $(window).height()){
+						if((Math.abs(speedY) > 0.04 || (currentPoint.y > minY || currentPoint.y < maxY)) && slideImage.data('fullHeight') > $(window).height()){
 							//In bouncing area top/bottom
 							if(currentPoint.y > minY || currentPoint.y < maxY){
 
@@ -273,7 +275,7 @@
 						currentPoint.y = setCurrentPointY ? setCurrentPointY : currentPoint.y;
 
 						//move to points
-						setTranslate(item, {
+						setTranslate(slideImage, {
 							left: currentPoint.x,
 							top: currentPoint.y
 						});
@@ -300,7 +302,7 @@
 				css = {};
 
 			if(values.top !== undefined || values.left !== undefined){
-				str = (values.left === undefined ? el.data('fitLeft') : values.left) + 'px, ' + (values.top === undefined ? el.data('fitTop') : values.top) + 'px';
+				str = (values.left === undefined ? el.position().left : values.left) + 'px, ' + (values.top === undefined ? el.position().top : values.top) + 'px';
 				str = 'translate3d(' + str + ', 0px)';
 
 				el.data('lastTransform', {x: values.left, y: values.top});
@@ -345,7 +347,7 @@
 			}
 
 			if(to.scaleX !== undefined && to.scaleY !== undefined){
-				image = el.find(".cb-lightbox-image");
+				var currentSlide = $('.cb-lightbox-slide-current').find(".cb-lightbox-slide-image");
 
 				if(to.toWidth && to.toHeight){
 					to.width = to.toWidth;
@@ -354,8 +356,8 @@
 					to.width = el.data('fullWidth');
 					to.height = el.data('fullHeight');
 				}else{
-					to.width = $('.cb-lightbox-slide-current').data('fitWidth');
-					to.height = $('.cb-lightbox-slide-current').data('fitHeight');
+					to.width = currentSlide.data('fitWidth');
+					to.height = currentSlide.data('fitHeight');
 				}
 
 				to.scaleX = 1;
@@ -377,7 +379,7 @@
 			}, duration + 20));
 		}
 
-		function initDraggable(slide, userX, userY){
+		function initDraggable(slideImage, userX, userY){
 	    	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed") || $('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
 	    		return;
 	    	}
@@ -387,33 +389,33 @@
 	    	}
 
 	    	$(".cb-lightbox").addClass("cb-lightbox-is-zoomed");
-	    	slide.addClass("cb-lightbox-draggable-init");
+	    	slideImage.addClass("cb-lightbox-draggable-init");
 
 	        var $s = $('.cb-lightbox').data('settings'),
-	        	image = slide.find(".cb-lightbox-image"),
-	        	clickX = userX / slide.width(),
-				clickY = userY / slide.height();
+	        	slide = slideImage.closest('.cb-lightbox-slide'),
+	        	clickX = userX / slideImage.width(),
+				clickY = userY / slideImage.height();
 
 			captionHide($s, slide.find('.cb-lightbox-caption'));
 
-			if(slide.data('fullWidth') > $(window).width()){
-				var positionX = Math.max(slide.data('fullWidth') * clickX - ($(window).width() / 2) - $s.zoomOffset[3], -$s.zoomOffset[3]);
-					positionX = -Math.min(slide.data('fullWidth') - $(window).width() + $s.zoomOffset[1], positionX);
+			if(slideImage.data('fullWidth') > $(window).width()){
+				var positionX = Math.max(slideImage.data('fullWidth') * clickX - ($(window).width() / 2) - $s.zoomOffset[3], -$s.zoomOffset[3]);
+					positionX = -Math.min(slideImage.data('fullWidth') - $(window).width() + $s.zoomOffset[1], positionX);
 			}else{
-				var positionX = ($(window).width() - slide.data('fullWidth')) / 2;
+				var positionX = ($(window).width() - slideImage.data('fullWidth')) / 2;
 			}
 
-			if(slide.data('fullHeight') > $(window).height()){
-				var positionY = Math.max(slide.data('fullHeight') * clickY - ($(window).height() / 2) - $s.zoomOffset[0], -$s.zoomOffset[0]),
-					positionY = -Math.min(slide.data('fullHeight') - $(window).height() + $s.zoomOffset[2], positionY);
+			if(slideImage.data('fullHeight') > $(window).height()){
+				var positionY = Math.max(slideImage.data('fullHeight') * clickY - ($(window).height() / 2) - $s.zoomOffset[0], -$s.zoomOffset[0]),
+					positionY = -Math.min(slideImage.data('fullHeight') - $(window).height() + $s.zoomOffset[2], positionY);
 			}else{
-				var positionY = ($(window).height() - slide.data('fullHeight')) / 2;
+				var positionY = ($(window).height() - slideImage.data('fullHeight')) / 2;
 			}
 
-			scaleWidth = slide.data('fullWidth') / image.width();
-	        scaleHeight = slide.data('fullHeight') / image.height();
+			scaleWidth = slideImage.data('fullWidth') / slideImage.width();
+	        scaleHeight = slideImage.data('fullHeight') / slideImage.height();
 
-			_animate(slide, {
+			_animate(slideImage, {
 				top: positionY,
 				left: positionX,
 				scaleX: scaleWidth,
@@ -425,62 +427,61 @@
 			}, $s.zoomDuration);
 	    }
 
-	    function detroyDraggable(slide, disableAnimation){
+	    function detroyDraggable(slideImage, disableAnimation){
 	    	var container = $(".cb-lightbox");
 
 	    	isDraggable = false;
 
-	    	if(!container.length || !slide.length){
+	    	if(!container.length || !slideImage.length){
 	    		return;
 	    	}
 
-			var $s = slide.closest('.cb-lightbox').data('settings'),
-				image = slide.find('.cb-lightbox-image'),
+			var $s = slideImage.closest('.cb-lightbox').data('settings'),
+				slide = slideImage.closest('.cb-lightbox-slide'),
 				duration = $s.zoomDuration;
 
 			if(!container.hasClass("cb-lightbox-is-zoomed")){
 				return;
 			}
 
-	    	if(!slide.hasClass("cb-lightbox-draggable-init")){
+	    	if(!slideImage.hasClass("cb-lightbox-draggable-init")){
 	    		return;
 	    	}
 
-	    	var	scaleWidth = slide.data('fitWidth') / image.width(),
-	       		scaleHeight = slide.data('fitHeight') / image.height();
+	    	var	scaleWidth = slideImage.data('fitWidth') / slideImage.width(),
+	       		scaleHeight = slideImage.data('fitHeight') / slideImage.height();
 
 	    	if(typeof disableAnimation !== 'undefined'){
 	    		duration = 0;
 	    		disableAnimation = false;
 	    	}
 
-    		_animate(slide, {
-    			toWidth: slide.data('fitWidth'),
-				toHeight: slide.data('fitHeight'),
-				top: slide.data('fitTop'),
-				left: slide.data('fitLeft'),
+    		_animate(slideImage, {
+    			toWidth: slideImage.data('fitWidth'),
+				toHeight: slideImage.data('fitHeight'),
+				top: slideImage.data('fitTop'),
+				left: slideImage.data('fitLeft'),
 				scaleX: scaleWidth,
 				scaleY: scaleHeight
 			}, duration);
 
     		setTimeout(function(){
-    			captionShow(slide);
     			container.removeClass("cb-lightbox-is-zoomed");
+    			captionShow(slide);
     		}, duration + 30);
 
-    		slide.removeClass("cb-lightbox-draggable-init");
+    		slideImage.removeClass("cb-lightbox-draggable-init");
 	    }
 
-	    function getImageFit(slide){
+	    function getImageFit(slideImage){
 			var container = $('.cb-lightbox'),
 				$s = container.data('settings'),
-				img = slide.find('.cb-lightbox-image'),
-				type = slide.data('type');
+				type = slideImage.data('type');
 
 			if(type == 'image'){
-				if(typeof img != 'undefined'){
-					imgWidth = slide.data('fullWidth');
-					imgHeight = slide.data('fullHeight');
+				if(typeof slideImage != 'undefined'){
+					imgWidth = slideImage.data('fullWidth');
+					imgHeight = slideImage.data('fullHeight');
 				}
 				else{
 					imgWidth = $(".cb-lightbox-image").width();
@@ -488,9 +489,9 @@
 				}
 			}else{
 
-				if(slide.data('fullHeight') && slide.data('fullWidth')){
+				if(slideImage.data('fullHeight') && slideImage.data('fullWidth')){
 					imgHeight = container.height();
-					imgWidth = imgHeight / slide.data("fullHeight") * slide.data("fullWidth");
+					imgWidth = imgHeight / slideImage.data("fullHeight") * slideImage.data("fullWidth");
 				}else{
 					//Default 16/9
 					imgHeight = container.height();
@@ -520,10 +521,10 @@
 			positionTop = Math.max(($(window).height() - newImgHeight - captionHeight) / 2, $s.margin[0]);
 			positionLeft = (container.width() - newImgWidth) / 2;
 
-			var	scaleWidth = newImgWidth / slide.data('holderWidth'),
-   				scaleHeight = newImgHeight / slide.data('holderHeight');
+			var	scaleWidth = newImgWidth / slideImage.data('holderWidth'),
+   				scaleHeight = newImgHeight / slideImage.data('holderHeight');
 
-			slide.data({
+			slideImage.data({
 	 			'fitHeight': newImgHeight,
 	 			'fitWidth': newImgWidth,
 	 			'fitLeft': positionLeft,
@@ -531,13 +532,13 @@
 	 		});
 
 			if((imgWidth > $(window).width() || imgHeight > $(window).height()) && $s.zoom){
-				slide.addClass('cb-lightbox-draggable');
+				slideImage.addClass('cb-lightbox-draggable');
 			}else{
-				slide.removeClass('cb-lightbox-draggable');
+				slideImage.removeClass('cb-lightbox-draggable');
 			}
 
 			if ($.isFunction($s.afterFit)) {
-				$s.afterFit.call(this, container, slide);
+				$s.afterFit.call(this, container, slideImage.closest('.cb-lightbox-slide'));
 			}
 
 	 		return {
@@ -552,14 +553,14 @@
 
 		function reposition(){
 	    	//reset dragging position
-		    var slide = $('.cb-lightbox-slide'),
+		    var slide = $('.cb-lightbox-slide.cb-lightbox-slide-current'),
 				$s = slide.closest('.cb-lightbox').data('settings'),
-		    	image = slide.find('.cb-lightbox-image'),
-		    	lastoffset = slide.data('lastTransform'),
+		    	slideImage = slide.find('.cb-lightbox-slide-image'),
+		    	lastoffset = slideImage.data('lastTransform'),
 		    	windowWidth = $(window).width(),
 		    	windowHeight = $(window).height(),
-		    	imageWidth = slide.data('fullWidth'),
-		    	imageHeight = slide.data('fullHeight');
+		    	imageWidth = slideImage.data('fullWidth'),
+		    	imageHeight = slideImage.data('fullHeight');
 
 		    if(!lastoffset){
 		    	return;
@@ -583,7 +584,7 @@
 		    }
 
 		    if(lastoffset.x != moveX || lastoffset.y != moveY){
-		    	_animate(slide, {
+		    	_animate(slideImage, {
 		    		top: moveY,
 		    		left: moveX,
 		    	}, 250);
@@ -606,6 +607,14 @@
 	    	}
 	    }
 
+	    function captionInsidePosition(caption, slideImage){
+	    	caption.css({
+				bottom: ($(window).height() - slideImage.data('fitHeight')) / 2,
+				left: slideImage.data('fitLeft'),
+				width: slideImage.data('fitWidth'),
+			});
+	    }
+
 	    function updateCaption(item, slide, $s){
 	    	var caption = item.data("caption"),
 				captionTpl = $("<div class='cb-lightbox-caption'>"+ caption +"</div>");
@@ -617,6 +626,12 @@
 				if(!slide){
 					var slide = $('.cb-lightbox-slide-current');
 				}
+
+				if(slide.find('.cb-lightbox-caption').length){
+					return;
+				}
+
+				captionInsidePosition(captionTpl, slide.find('.cb-lightbox-slide-image'));
 
 				var addTo = slide;
 
@@ -669,10 +684,10 @@
 			}
 		}
 
-		function setImageFit(slide){
-			var values = getImageFit(slide);
+		function setImageFit(slideImage){
+			var values = getImageFit(slideImage);
 
-			setTranslate(slide, {
+			setTranslate(slideImage, {
 				width: values.width,
 				height: values.height,
 			});
@@ -681,29 +696,34 @@
 		function setImage(slide, source, item, p){
 			var elementPlaceholder = slide.find('.cb-lightbox-image-placeholder'),
 				container = $('.cb-lightbox'),
+				slideImage = slide.find('.cb-lightbox-slide-image'),
 				$s = container.data('settings'),
 				loadingTimeout,
-				isLoading = false,
-				$img = $('<img />');
+				loadingImage = true;
 
 			if(typeof slides === "undefined"){
 				cachedSlide = false;
 			}else{
-				cachedSlide = slides[slide.data('index')];
+				cachedSlide = slides[slideImage.data('index')];
 			}
 
 			if(cachedSlide.image && cachedSlide.status == 'complete'){
-				$img = cachedSlide.image.clone().appendTo(slide.find('.cb-lightbox-slide-image'));
+				var $img = cachedSlide.image.clone().appendTo(slideImage);
+
+					if($img[0].complete){
+						loadingImage = false;
+					}
+
+				setTimeout(function(){
+				});
 			}
 
-			if(!$img[0].complete || !$img[0].readyState){
-				$img = $('<img />');
-
-				isLoading = true;
+			if(loadingImage){
+				var $img = $('<img />');
 
 				$img.addClass('cb-lightbox-image')
 					.attr('src', source)
-					.appendTo(slide.find('.cb-lightbox-slide-image'));
+					.appendTo(slideImage);
 
 				$img.one('error', function(){
 
@@ -711,7 +731,7 @@
 
 					$img.remove();
 					elementPlaceholder.remove();
-					error(container);
+					error(container, slide);
 
 				}).one('load', function(e){
 					imageHeight = $(this).data('height') || this.naturalHeight;
@@ -730,25 +750,34 @@
 							.removeClass('cb-lightbox-image-hide')
 							.addClass('cb-lightbox-slide-complete');
 
-						if(slides[slide.data('index')]){
-							slides[slide.data('index')].image = $img;
-							slides[slide.data('index')].status = 'complete';
+						if(slides[slideImage.data('index')]){
+							slides[slideImage.data('index')].image = $img;
+							slides[slideImage.data('index')].status = 'complete';
 						}
 
 					}, Math.min( 300, Math.max( 1000, imageHeight / 1600 )));
 				});
 			}
 
-			getImageSize(item, $img, slide,  function(width, height, slide){
-				slide.data({
+			getImageSize(item, $img, slideImage,  function(width, height, slideImage){
+				slideImage.data({
 					'fullWidth': width,
 					'fullHeight': height,
 				});
 
-				setImageFit(slide);
+				setImageFit(slideImage);
+
+				if(p != 'current'){
+					var values = getImageFit(slideImage);
+
+					setTranslate(slideImage, {
+						top: values.top,
+						left: values.left,
+					});
+				}
 			});
 
-			if(isLoading == false && ($img[0].complete || $img[0].readyState == 'complete') && $img[0].naturalWidth && $img[0].naturalHeight){
+			if(loadingImage == false && ($img[0].complete || $img[0].readyState == 'complete') && $img[0].naturalWidth && $img[0].naturalHeight){
 				elementPlaceholder.hide();
 
 				slide
@@ -794,7 +823,7 @@
 				watchLoading(slide);
 			}
 
-			slide.data({
+			wrapImage.data({
 				'type': cachedSlide.type,
 				'index': i,
 				'holderWidth': item.find('img').width(),
@@ -824,7 +853,7 @@
 
 						setImage(slide, source, item, p);
 
-						slides[slide.data('index')].placeholder = elementPlaceholder;
+						slides[wrapImage.data('index')].placeholder = elementPlaceholder;
 					});
 				}
 
@@ -832,7 +861,7 @@
 
 				var iframe = cachedSlide.iframe.clone().appendTo(wrapImage);
 
-				slide
+				wrapImage
 					.data({
 						'fullWidth': item.data('width') ? item.data('width') : 16,
 						'fullHeight': item.data('height') ? item.data('height') : 9,
@@ -919,12 +948,10 @@
 
 			if($s.slideEffect == 'slide' || effect == 'slide'){
 
-				var currentLeft = ($(window).width() - oldCurrent.width()) / 2;
-
 				if(direction == 'previews'){
-					var slideOut = currentLeft + $(window).width();
+					var slideOut = $(window).width();
 				}else{
-					var slideOut = -(oldCurrent.width() + currentLeft);
+					var slideOut = -$(window).width();
 				}
 
 				_animate(oldCurrent, {
@@ -946,6 +973,8 @@
 				newCurrent = setSlide(items.eq(_this_index), _this_index, 'current');
 			}
 
+			var newCurrentImage = newCurrent.find('.cb-lightbox-slide-image');
+
 			cachedSlide = slides[_this_index];
 
 			clearTimeout($('.cb-lightbox').data('watch'));
@@ -956,11 +985,11 @@
 
 			setTimeout(function(){
 				if(cachedSlide.type == 'error'){
-					error(container);
-				}else if (newCurrent.data('fullHeight') === undefined) {
+					error(container, newCurrent);
+				}else if (newCurrentImage.data('fullHeight') === undefined) {
 					//wait for imagesize;
 					var wait = setInterval(function() {
-				        if (newCurrent.data('fullHeight') !== undefined) {
+				        if (newCurrentImage.data('fullHeight') !== undefined) {
 				            clearInterval(wait);
 				            runSlide(newCurrent);
 				        }
@@ -971,9 +1000,7 @@
 			});
 
 			function runSlide(slide){
-				updateCaption(items.eq(_slideIndex), slide, $s);
-
-				var values = getImageFit(slide);
+				updateCaption(items.eq(_this_index), slide, $s);
 
 				slide
 					.removeClass('cb-lightbox-slide-previews cb-lightbox-slide-next')
@@ -981,23 +1008,20 @@
 
 				if($s.slideEffect == 'slide' || effect == 'slide'){
 
-					var currentLeft = ($(window).width() - slide.data('fitWidth')) / 2;
-
 					if(direction == 'previews'){
-						var slideIn = -(slide.data('fitWidth') + currentLeft);
+						var slideIn = -$(window).width();
 					}else{
-						var slideIn = currentLeft + $(window).width();
+						var slideIn = $(window).width();
 					}
 
 					setTranslate(slide, {
-						top: values.top,
 						left: slideIn,
 						opacity: 0,
 					});
 
 					setTimeout(function(){
 						_animate(slide, {
-							left: values.left,
+							left: 0,
 							opacity: 1,
 						},  $s.slideDuration);
 					}, 30);
@@ -1005,9 +1029,8 @@
 					captionShow(slide);
 				}else{
 					setTranslate(slide, {
-						top: values.top,
-						left: values.left,
-						opacity: 0
+						left: 0,
+						opacity: 0,
 					});
 
 					setTimeout(function(){
@@ -1136,21 +1159,20 @@
 		function open(item, i, $s){
 			var source = item.attr('href'),
 				slide = setSlide(item, i, 'current'),
+				slideImage = slide.find('.cb-lightbox-slide-image'),
 				container = $('.cb-lightbox'),
 				cachedSlide = slides[i];
 
-			setTranslate(slide, {
+			setTranslate(slideImage, {
 				opacity: 0,
 			});
 
 			_animateDurationSet(container, $s.openCloseDuration);
 			_animateDurationSet(container.find('.cb-lightbox-content'), $s.openCloseDuration);
 
-			updateCaption(item, slide, $s);
-
 			if(cachedSlide.type == 'error'){
-				error(container);
-			}if (slide.data('fullHeight') === undefined) {
+				error(container, slide);
+			}if (slideImage.data('fullHeight') === undefined) {
 				//wait for imagesize;
 				var wait = setInterval(function() {
 					if(typeof slide === "undefined"){
@@ -1158,7 +1180,7 @@
 						return;
 					}
 
-			        if (slide.data('fullHeight') !== undefined) {
+			        if (slideImage.data('fullHeight') !== undefined) {
 			            openStart();
 			            clearInterval(wait);
 			        }
@@ -1172,6 +1194,8 @@
 				 	$s.beforeOpen.call(this, container, slide);
 				}
 
+				updateCaption(item, slide, $s);
+
 				if(slide && $s.openCloseEffect == 'zoom'){
 					var previewImage = item.find('img');
 
@@ -1182,7 +1206,7 @@
 					var	offsetTop = previewImage.offset().top - $(window).scrollTop(),
 						offsetLeft = previewImage.offset().left;
 
-					setTranslate(slide, {
+					setTranslate(slideImage, {
 						width: previewImage.width(),
 						height: previewImage.height(),
 						top: offsetTop,
@@ -1190,9 +1214,9 @@
 						opacity: 1,
 					});
 
-					var values = getImageFit(slide);
+					var values = getImageFit(slideImage);
 
-					_animate(slide, {
+					_animate(slideImage, {
 						top: values.top,
 						left: values.left,
 						scaleX: values.scaleX,
@@ -1205,9 +1229,9 @@
 
 				}else if(slide && $s.openCloseEffect == 'fade'){
 
-					var values = getImageFit(slide);
+					var values = getImageFit(slideImage);
 
-					setTranslate(slide, {
+					setTranslate(slideImage, {
 						width: values.width,
 						height: values.height,
 						top: values.top,
@@ -1216,7 +1240,7 @@
 					});
 
 					setTimeout(function(){
-						_animate(slide, {
+						_animate(slideImage, {
 							opacity: 1,
 						}, $s.openCloseDuration);
 					}, 20);
@@ -1255,7 +1279,8 @@
 				previewImage = el.find('img'),
 				container = $('.cb-lightbox'),
 				$s = container.data('settings'),
-				slide = container.find('.cb-lightbox-slide.cb-lightbox-slide-current');
+				slide = container.find('.cb-lightbox-slide.cb-lightbox-slide-current'),
+				slideImage = slide.find('.cb-lightbox-slide-image');
 
 			clearTimeout(container.data('watch'));
 
@@ -1275,14 +1300,14 @@
 				.addClass('cb-lightbox-is-closing');
 
 			if($s.openCloseEffect == 'zoom' && el.is(':visible')){
-				var	scaleWidth =  previewImage.width() / slide.width(),
-					scaleHeight = previewImage.height() / slide.height(),
+				var	scaleWidth =  previewImage.width() / slideImage.width(),
+					scaleHeight = previewImage.height() / slideImage.height(),
 					offsetTop = previewImage.offset().top - $(window).scrollTop();
 					offsetLeft = previewImage.offset().left;
 
 				captionHide($s, container.find('.cb-lightbox-caption'));
 
-				_animate(slide, {
+				_animate(slideImage, {
 					top: offsetTop,
 					left: offsetLeft,
 					scaleX: scaleWidth,
@@ -1434,17 +1459,17 @@
 				}
 			});
 
-			$(document).on("click", ".cb-lightbox-content, .cb-lightbox-close", function(e){
+			$(document).on("click", ".cb-lightbox-slide, .cb-lightbox-close", function(e){
 				if($('.cb-lightbox').hasClass('cb-lightbox-is-closing')){
 					return;
 				}
 
-				if(($(e.target).hasClass("cb-lightbox-slide") && $(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")) || ($(e.target).hasClass("cb-lightbox-close") || $(e.target).hasClass("cb-lightbox-content")) && !$(e.target).hasClass("cb-lightbox-arrow")){
+				if(($(e.target).hasClass("cb-lightbox-slide") || $(e.target).hasClass("cb-lightbox-close")) && !$(e.target).hasClass("cb-lightbox-arrow")){
 					close();
 				}
 			});
 
-			$(document).on(is_touch_device() ? 'touchstart' : 'mousedown', '.cb-lightbox-slide-current', function(e){
+			$(document).on(is_touch_device() ? 'touchstart' : 'mousedown', '.cb-lightbox-slide-current .cb-lightbox-slide-image', function(e){
 
 				if(!is_touch_device()){
 			    	e.preventDefault();
@@ -1461,9 +1486,10 @@
 
 				var container = $('.cb-lightbox'),
 					$s = container.data('settings'),
-					slide = $(this),
-					image = slide.find('.cb-lightbox-image'),
-					imageWidth = slide.data('fullWidth');
+					slideImage = $(this),
+					slide = slideImage.closest('.cb-lightbox-slide'),
+					imageWidth = slide.data('fullWidth'),
+					windowWidth = $(window).width();
 
 				if(e.type == "mousedown"){
 					if(e.which != 1){
@@ -1485,8 +1511,8 @@
 						var pageXStart = e.originalEvent.touches[0].pageX;
 					}
 
-					var dragWidth = slide.data('fitWidth'),
-						dragPosX = slide.data('fitLeft') + dragWidth - pageXStart;
+					var dragWidth = windowWidth,
+						dragPosX = dragWidth - pageXStart;
 
 					$(document).bind(is_touch_device() ? 'touchmove.cb-lightbox' : 'mousemove.cb-lightbox', function(e){
 						if(e.type == "mousemove"){
@@ -1511,16 +1537,16 @@
 
 				container.addClass('cb-lightbox-is-grabbing');
 
-				if(!slide.hasClass('cb-lightbox-draggable')){
+				if(!slideImage.hasClass('cb-lightbox-draggable')){
 					return;
 				}
 
-			    var lastOffset = slide.data('lastTransform'),
+			    var lastOffset = slideImage.data('lastTransform'),
 			    	lastOffsetX = lastOffset ? lastOffset.x : 0,
 			        lastOffsetY = lastOffset ? lastOffset.y : 0,
 			        windowWidth = $(window).width(),
 			    	windowHeight = $(window).height(),
-					imageHeight = slide.data('fullHeight'),
+					imageHeight = slideImage.data('fullHeight'),
 			    	maxX = windowWidth - imageWidth,
 			    	maxY = windowHeight - imageHeight;
 
@@ -1549,7 +1575,7 @@
 
 			        //check element is dragging
 			        if(Math.abs(lastOffsetX - newX) > 2 || Math.abs(lastOffsetY - newY) > 2){
-						slide.addClass("cb-lightbox-is-dragging");
+						slideImage.addClass("cb-lightbox-is-dragging");
 						clickTimer = false;
 			        }
 
@@ -1575,7 +1601,7 @@
 
 			        currentPoint = {x: newX, y: newY};
 
-			        setTranslate(slide, {
+			        setTranslate(slideImage, {
 			        	top: newY,
 			        	left: newX
 			        });
@@ -1600,15 +1626,16 @@
 				}
 
 				if(e.type == 'mouseup' || e.type == 'touchend'){
-					var slide = $(".cb-lightbox-slide-current");
+					var slide = $(".cb-lightbox-slide-current"),
+						slideImage = slide.find('.cb-lightbox-slide-image');
 
 					if(slide.hasClass('cb-lightbox-is-sliding')){
 						//handle slide
 						var tolerance = 40,
 							resetSlide = false;
 
-						if(slide.data('slideX') > slide.data('fitLeft')){
-							if(slide.data('slideX') > slide.data('fitLeft') + tolerance){
+						if(slide.data('slideX') > 0){
+							if(slide.data('slideX') > 0 + tolerance){
 								slideTo('previews', 'slide');
 								return;
 
@@ -1617,7 +1644,7 @@
 							}
 
 						}else{
-							if(slide.data('slideX') < slide.data('fitLeft') - tolerance){
+							if(slide.data('slideX') < 0 - tolerance){
 								slideTo('next', 'slide');
 								return;
 
@@ -1628,7 +1655,7 @@
 
 						if(resetSlide){
 							_animate(slide, {
-								left: slide.data('fitLeft'),
+								left: 0,
 							}, 250);
 
 							slide.removeClass('cb-lightbox-is-sliding');
@@ -1641,8 +1668,8 @@
 
 						if(clickTimer){
 							//handle after click
-							if(!slide.hasClass("cb-lightbox-is-dragging")){
-								if(!slide.hasClass('cb-lightbox-draggable')){
+							if(!slideImage.hasClass("cb-lightbox-is-dragging")){
+								if(!slideImage.hasClass('cb-lightbox-draggable')){
 									return;
 								}
 
@@ -1656,9 +1683,9 @@
 								}
 
 							   	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
-							   		detroyDraggable(slide);
+							   		detroyDraggable(slideImage);
 							   	}else{
-									initDraggable(slide, userX, userY);
+									initDraggable(slideImage, userX, userY);
 							   	}
 
 							}else{
@@ -1668,33 +1695,39 @@
 						}else{
 							//handle all other
 							if($('.cb-lightbox-is-zoomed').length && isDraggable){
-							    initMoveMoment(slide);
+							    initMoveMoment(slideImage);
 							}
 						}
 					}
 
-					slide.removeClass("cb-lightbox-is-dragging");
+					slideImage.removeClass("cb-lightbox-is-dragging");
 				}
 			});
 
 			$(window).on("resize", function(){
-				if(!$("html").hasClass("cb-lightbox-touch")){
-					detroyDraggable($('.cb-lightbox-slide-current'), true);
+				if(!$("html").hasClass("cb-lightbox-touch") && $('.cb-lightbox').hasClass('cb-lightbox-is-zoomed')){
+					detroyDraggable($('.cb-lightbox-slide-current .cb-lightbox-slide-image'), true);
 				}
 
 				if($('.cb-lightbox').length){
 
 					$('.cb-lightbox-slide').each(function(){
-						var thisSlide = $(this);
+						var slide = $(this),
+							slideImage = slide.find('.cb-lightbox-slide-image'),
+							caption = slide.find('.cb-lightbox-caption');
 
-						values = getImageFit(thisSlide);
+						values = getImageFit(slideImage);
 
-						setTranslate(thisSlide, {
+						setTranslate(slideImage, {
 							width: values.width,
 							height: values.height,
 							top: values.top,
 							left: values.left,
 						});
+
+						if(caption.length){
+							captionInsidePosition(caption, slideImage);
+						}
 					});
 				}
 			});

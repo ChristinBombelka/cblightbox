@@ -710,15 +710,16 @@
 			if(cachedSlide.image && cachedSlide.status == 'complete'){
 				var $img = cachedSlide.image.clone().appendTo(slideImage);
 
-					if($img[0].complete){
-						loadingImage = false;
-					}
-
-				setTimeout(function(){
-				});
+				if($img[0].complete){
+					loadingImage = false;
+				}
 			}
 
 			if(loadingImage){
+				if(typeof $img !== "undefined" && $img.length){
+					$img.remove();
+				}
+
 				var $img = $('<img />');
 
 				$img.addClass('cb-lightbox-image')

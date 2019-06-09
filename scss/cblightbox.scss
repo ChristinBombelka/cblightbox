@@ -1,6 +1,7 @@
 .cb-lightbox{
-	transition-timing-function: ease;
-	transition-property: opacity;
+	//transition-timing-function: ease;
+	//transition-property: opacity;
+	backface-visibility: visible;
 	transform: translateZ(0px);
 	position: fixed;
 	font: 14px/1.2 arial;
@@ -10,12 +11,13 @@
 	width: 100%;
 	z-index: 9999;
 	user-select: none;
-	backface-visibility: visible;
 }
 
 .cb-lightbox-overlay {
 	background: rgba(0,0,0,0.85);
+	transition-timing-function: ease;
 	transition-duration: inherit;
+	transition-property: opacity;
 	width:100%;
 	height:100%;
 	position: absolute;
@@ -24,12 +26,11 @@
 
 .cb-lightbox-content{
 	width: 100%;
-    height: 100vh;
-    margin: 0px auto;
+    height: 100%;
     position: absolute;
     left: 0;
     right: 0;
-    z-index: 1;
+    //z-index: 1;
 }
 
 .cb-lightbox-close{
@@ -77,12 +78,14 @@
 	position: absolute;
 	width: 100%;
     height: 100%;
+    overflow: hidden;
+    z-index: 10000;
 }
 
 .cb-lightbox-slide{
 	transition-property: transform, opacity;
 	transition-timing-function: ease;
-	transform-origin: top left;
+	//transform-origin: top left;
 	box-sizing: border-box;
     height: 100%;
 	width: 100%;
@@ -91,13 +94,8 @@
     overflow: hidden;
 	position: absolute;
 	backface-visibility: hidden;
-	z-index: 99;
-
-	&.cb-lightbox-slide-hide{
-		.cb-lightbox-slide-image{
-			visibility: hidden;
-		}
-	}
+	user-select: none;
+	z-index: 10001;
 
 	&.cb-lightbox-image-hide{
 		.cb-lightbox-image{
@@ -107,12 +105,11 @@
 }
 
 .cb-lightbox-slide-image{
-	transition-property: transform, opacity;
-	transition-timing-function: ease;
+	//transition-property: transform;
+	//transition-timing-function: ease;
 	transform-origin: top left;
-	background-color: transparent;
 	box-sizing: border-box;
-	//background-color: #000;
+	background-color: #000; //optimize gpu rendering
 	backface-visibility: hidden; //optimize gpu rendering
 	position: absolute;
 	top: 0;
@@ -122,24 +119,26 @@
 }
 
 .cb-lightbox-image{
-	position: absolute;
-	top: 0;
-	left: 0;
     display: block;
     max-width: 100%;
     max-height: 100%;
-    width: 100%;
-    height: 100%;
     z-index: 1;
 }
 
 .cb-lightbox-image-placeholder{
+	z-index: 2;
+}
+
+.cb-lightbox-image-placeholder,
+.cb-lightbox-image{
+	border: 0;
+	padding: 0;
+	margin: 0;
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 100%;
-	z-index: 2;
+    height: 100%;
 }
 
 .cb-lightbox-is-loading{
@@ -155,7 +154,7 @@
 	height: calc(100vh - 80px);
 	cursor: pointer;
 	//opacity: 1;
-    z-index: 8001;
+    z-index: 10002;
     //transition: opacity 250ms ease;
 
     span{
@@ -219,7 +218,7 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	z-index: 8000;
+	z-index: 10002;
 
 	.cb-lightbox-slide &{
 		transform: translateY(100%);
@@ -237,7 +236,7 @@
 }
 
 .cb-lightbox-slide-with-caption{
-	overflow: visible;
+	//overflow: visible;
 
 	.cb-lightbox-caption{
 		color: #fff;
@@ -273,15 +272,6 @@
 }
 
 .cb-lightbox-is-zoomed{
-	.cb-lightbox-slide.cb-lightbox-slide-current {
-		//width: 100% !important;
-		//height: 100% !important;
-		top: 0;
-		left: 0;
-		transform: none;
-		overflow: hidden;
-	}
-
 	.cb-lightbox-draggable{
 		cursor: grab;
 	    cursor: -moz-grab;
@@ -418,7 +408,7 @@
 	top: 50%;
 	left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 100;
+    z-index: 10002;
 }
 
 .cb-lightbox-loading-animation{

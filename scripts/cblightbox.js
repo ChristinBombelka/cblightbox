@@ -301,6 +301,10 @@
 			var str = '',
 				css = {};
 
+			if(!el.length){
+				return;
+			}
+
 			if(values.top !== undefined || values.left !== undefined){
 				str = (values.left === undefined ? el.position().left : values.left) + 'px, ' + (values.top === undefined ? el.position().top : values.top) + 'px';
 				str = 'translate3d(' + str + ', 0px)';
@@ -768,14 +772,11 @@
 
 				setImageFit(slideImage);
 
-				if(p != 'current'){
-					var values = getImageFit(slideImage);
-
-					setTranslate(slideImage, {
-						top: values.top,
-						left: values.left,
-					});
-				}
+				var values = getImageFit(slideImage);
+				setTranslate(slideImage, {
+					top: values.top,
+					left: values.left,
+				});
 			});
 
 			if(loadingImage == false && ($img[0].complete || $img[0].readyState == 'complete') && $img[0].naturalWidth && $img[0].naturalHeight){
@@ -887,10 +888,11 @@
 
 	    	firstLoad = false;
 
-	    	var container = $(".cb-lightbox"),
+		   	var container = $(".cb-lightbox"),
 				$s = container.data('settings'),
 	    		group = container.data('group'),
-				items = $('a[data-group="'+ group +'"]');
+				items = $('a[data-group="'+ group +'"]'),
+				oldCurrent = $('.cb-lightbox-slide.cb-lightbox-slide-current');
 
 			if(container.hasClass('cb-lightbox-is-zoomed') || slideing || items.length <= 1){
 				return;
@@ -906,7 +908,7 @@
 					_this_index = _this;
 				}
 
-				var newCurrent = $('.cb-lightbox-slide.cb-lightbox-slide-previews');
+				var newCurrent = oldCurrent.prev();
 
 				//cache prev slide
 				var _slideIndex = _this_index - 1;
@@ -916,6 +918,9 @@
 					_slideIndex = _this;
 				}
 
+				//change current slide
+				var oldCurrentDirection = 'next';
+
 			}else if(direction == 'next'){
 				_this_index = _this_index + 1;
 
@@ -923,7 +928,7 @@
 					_this_index = 0;
 				}
 
-				var newCurrent = $('.cb-lightbox-slide.cb-lightbox-slide-next');
+				var newCurrent = oldCurrent.next();
 
 				//cache next slide
 				var _slideIndex = _this_index + 1;
@@ -931,6 +936,9 @@
 				if(_slideIndex > items.length - 1){
 					_slideIndex = 0;
 				}
+
+				//change current slide
+				var oldCurrentDirection = 'previews';
 			}
 
 			container.find('.cb-counter-current').text(_this_index + 1);
@@ -938,14 +946,12 @@
 			$('.cb-lightbox-is-selected').removeClass('cb-lightbox-is-selected');
 			items.eq(_this_index).addClass('cb-lightbox-is-selected');
 
-			//change current slide
-			var oldCurrentDirection = direction == 'previews' ? 'next' : 'previews';
-
 			//remove previews slide
 			$('.cb-lightbox-slide.cb-lightbox-slide-' + oldCurrentDirection).remove();
 
-			var oldCurrent = $('.cb-lightbox-slide.cb-lightbox-slide-current')
-				.removeClass('cb-lightbox-slide-current');
+			oldCurrent
+				.removeClass('cb-lightbox-slide-current')
+				.addClass('cb-lightbox-slide-' + oldCurrentDirection);
 
 			if($s.slideEffect == 'slide' || effect == 'slide'){
 
@@ -965,18 +971,37 @@
 				}, $s.slideDuration);
 			}
 
-			setTimeout(function(){
-				oldCurrent.addClass('cb-lightbox-slide-' + oldCurrentDirection);
-			}, $s.slideDuration);
-
 			//check new Current exist
 			if(!newCurrent.length){
 				newCurrent = setSlide(items.eq(_this_index), _this_index, 'current');
 			}
 
+			cachedSlide = slides[_this_index];
+
 			var newCurrentImage = newCurrent.find('.cb-lightbox-slide-image');
 
-			cachedSlide = slides[_this_index];
+			newCurrent
+				.removeClass('cb-lightbox-slide-previews cb-lightbox-slide-next')
+				.addClass('cb-lightbox-slide-current');
+
+			//ser current slide start position
+			if($s.slideEffect == 'slide' || effect == 'slide'){
+				if(direction == 'previews'){
+					var slideIn = -$(window).width();
+				}else{
+					var slideIn = $(window).width();
+				}
+
+				setTranslate(newCurrent, {
+					left: slideIn,
+					opacity: 0,
+				});
+			}else{
+				setTranslate(newCurrent, {
+					left: 0,
+					opacity: 0,
+				});
+			}
 
 			clearTimeout($('.cb-lightbox').data('watch'));
 			watchLoading(newCurrent);
@@ -1003,25 +1028,10 @@
 			function runSlide(slide){
 				updateCaption(items.eq(_this_index), slide, $s);
 
-				slide
-					.removeClass('cb-lightbox-slide-previews cb-lightbox-slide-next')
-					.addClass('cb-lightbox-slide-current');
-
 				if($s.slideEffect == 'slide' || effect == 'slide'){
-
-					if(direction == 'previews'){
-						var slideIn = -$(window).width();
-					}else{
-						var slideIn = $(window).width();
-					}
-
-					setTranslate(slide, {
-						left: slideIn,
-						opacity: 0,
-					});
-
 					setTimeout(function(){
 						_animate(slide, {
+							top: 0,
 							left: 0,
 							opacity: 1,
 						},  $s.slideDuration);
@@ -1029,11 +1039,6 @@
 
 					captionShow(slide);
 				}else{
-					setTranslate(slide, {
-						left: 0,
-						opacity: 0,
-					});
-
 					setTimeout(function(){
 						_animate(slide, {
 							opacity: 1,
@@ -1163,6 +1168,11 @@
 				slideImage = slide.find('.cb-lightbox-slide-image'),
 				container = $('.cb-lightbox'),
 				cachedSlide = slides[i];
+
+			setTranslate(slide, {
+				top: 0,
+				left: 0,
+			});
 
 			setTranslate(slideImage, {
 				opacity: 0,

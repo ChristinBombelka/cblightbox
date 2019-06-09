@@ -83,8 +83,9 @@
 }
 
 .cb-lightbox-slide{
+	transform: translate3d(0, 0, 0);
 	transition-property: transform, opacity;
-	transition-timing-function: ease;
+	transition-timing-function: cubic-bezier(1,0.5,0.5,1);
 	//transform-origin: top left;
 	box-sizing: border-box;
     height: 100%;
@@ -388,9 +389,7 @@
 
 .cb-lightbox-slide-previews,
 .cb-lightbox-slide-next{
-	//transform: translateY(-100%);
-	top: -100vh;
-	opacity: 1;
+	transform: translateY(-100%);
 }
 
 /*--Start Animation--*/

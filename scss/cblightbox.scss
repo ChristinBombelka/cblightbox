@@ -395,22 +395,6 @@
 	transform: translateY(-100%);
 }
 
-.cb-lightbox-loadingbar{
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 2px;
-	z-index: 1;
-
-	span{
-		position: absolute;
-		left: 0;
-		height: 100%;
-		background: #22f50b;
-	}
-}
-
 /*--Start Animation--*/
 .cb-lightbox-loading{
 	pointer-events: none;

@@ -697,6 +697,75 @@
 			});
 		}
 
+		function loadImage(imageUrl, onprogress) {
+			return new Promise((resolve, reject) => {
+				var xhr = new XMLHttpRequest();
+				var notifiedNotComputable = false;
+
+				xhr.open('GET', imageUrl, true);
+				xhr.responseType = 'arraybuffer';
+
+				xhr.onprogress = function(ev) {
+					if (ev.lengthComputable) {
+						onprogress(parseInt((ev.loaded / ev.total) * 100));
+						} else {
+							if (!notifiedNotComputable) {
+							  	notifiedNotComputable = true;
+							  	onprogress(-1);
+						}
+					}
+				}
+
+				xhr.onloadend = function() {
+				  if (!xhr.status.toString().match(/^2/)) {
+				    	reject(xhr);
+				  } else {
+				    if (!notifiedNotComputable) {
+				      	onprogress(100);
+				    }
+
+				    var options = {}
+				    var headers = xhr.getAllResponseHeaders();
+				    var m = headers.match(/^Content-Type\:\s*(.*?)$/mi);
+
+				    if (m && m[1]) {
+				      	options.type = m[1];
+				    }
+
+				    var blob = new Blob([this.response], options);
+
+				    resolve(window.URL.createObjectURL(blob));
+				  }
+				}
+
+				xhr.send();
+			});
+		}
+
+		function initLoadImage(source){
+
+			$('.cb-lightbox-loadingbar').remove();
+
+			var bar = $('<div class="cb-lightbox-loadingbar"><span></span></div>').prependTo($('.cb-lightbox'));
+
+			loadImage(source, (ratio) => {
+				if (ratio == -1) {
+				    // Ratio not computable. Let's make this bar an undefined one.
+				    // Remember that since ratio isn't computable, calling this function
+				    // makes no further sense, so it won't be called again.
+				    //progressBar.removeAttribute('value');
+			  	} else {
+			   		// We have progress ratio; update the bar.
+			    	bar.find('span').css('width', ratio + '%');
+			  	}
+			}).then(imgSrc => {
+			  	// Loading successfuly complete;
+			  	bar.remove();
+				}, xhr => {
+			  		// An error occured. We have the XHR object to see what happened.
+			});
+		}
+
 		function setImage(slide, source, item, p){
 			var elementPlaceholder = slide.find('.cb-lightbox-image-placeholder'),
 				container = $('.cb-lightbox'),
@@ -823,6 +892,7 @@
 			if(p == 'current'){
 				clearTimeout($('.cb-lightbox').data('watch'));
 				watchLoading(slide);
+				initLoadImage(source);
 			}
 
 			wrapImage.data({

@@ -307,7 +307,7 @@
 
 			if(values.top !== undefined || values.left !== undefined){
 				str = (values.left === undefined ? el.position().left : values.left) + 'px, ' + (values.top === undefined ? el.position().top : values.top) + 'px';
-				str = 'translate3d(' + str + ', 0px)';
+				str = 'translate(' + str + ')';
 
 				el.data('lastTransform', {x: values.left, y: values.top});
 			}

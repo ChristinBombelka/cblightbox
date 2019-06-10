@@ -978,13 +978,11 @@
 
 			cachedSlide = slides[_this_index];
 
-			var newCurrentImage = newCurrent.find('.cb-lightbox-slide-image');
-
 			newCurrent
 				.removeClass('cb-lightbox-slide-previews cb-lightbox-slide-next')
 				.addClass('cb-lightbox-slide-current');
 
-			//ser current slide start position
+			//set current slide start position
 			if($s.slideEffect == 'slide' || effect == 'slide'){
 				if(direction == 'previews'){
 					var slideIn = -$(window).width();
@@ -1005,59 +1003,40 @@
 
 			clearTimeout($('.cb-lightbox').data('watch'));
 			watchLoading(newCurrent);
+			initLoadImage(newCurrent.find('.cb-lightbox-image').attr('src'));
 
-			//set new previews/next slide
-			setSlide(items.eq(_slideIndex), _slideIndex, direction);
+			updateCaption(items.eq(_this_index), newCurrent, $s);
+
+			if($s.slideEffect == 'slide' || effect == 'slide'){
+				setTimeout(function(){
+					_animate(newCurrent, {
+						top: 0,
+						left: 0,
+						opacity: 1,
+					},  $s.slideDuration);
+				});
+			}else{
+				setTimeout(function(){
+					_animate(newCurrent, {
+						opacity: 1,
+					},  $s.slideDuration);
+				});
+			}
+
+			captionShow(newCurrent);
 
 			setTimeout(function(){
-				if(cachedSlide.type == 'error'){
-					error(container, newCurrent);
-				}else if (newCurrentImage.data('fullHeight') === undefined) {
-					//wait for imagesize;
-					var wait = setInterval(function() {
-				        if (newCurrentImage.data('fullHeight') !== undefined) {
-				            clearInterval(wait);
-				            runSlide(newCurrent);
-				        }
-				    }, 100);
-				}else {
-					runSlide(newCurrent);
+				if ($.isFunction($s.afterSlide)) {
+			 	   $s.afterSlide.call(this, container, newCurrent);
 				}
-			});
-
-			function runSlide(slide){
-				updateCaption(items.eq(_this_index), slide, $s);
-
-				if($s.slideEffect == 'slide' || effect == 'slide'){
-					setTimeout(function(){
-						_animate(slide, {
-							top: 0,
-							left: 0,
-							opacity: 1,
-						},  $s.slideDuration);
-					}, 30);
-
-					captionShow(slide);
-				}else{
-					setTimeout(function(){
-						_animate(slide, {
-							opacity: 1,
-						},  $s.slideDuration);
-					}, 30);
-
-					captionShow(slide);
-				}
-
-				setTimeout(function(){
-					if ($.isFunction($s.afterSlide)) {
-				 	   $s.afterSlide.call(this, container, slide);
-					}
-				}, $s.slideDuration + 30);
-			}
+			}, $s.slideDuration + 10);
 
 			setTimeout(function(){
 				slideing = false;
 			}, 200);
+
+			//set new previews/next slide
+			setSlide(items.eq(_slideIndex), _slideIndex, direction);
 	    }
 
 	    function initPreload(container){

@@ -1477,7 +1477,7 @@
 					$s = container.data('settings'),
 					slideImage = $(this),
 					slide = slideImage.closest('.cb-lightbox-slide'),
-					imageWidth = slide.data('fullWidth'),
+					imageWidth = slideImage.data('fullWidth'),
 					windowWidth = $(window).width();
 
 				if(e.type == "mousedown"){
@@ -1533,7 +1533,6 @@
 			    var lastOffset = slideImage.data('lastTransform'),
 			    	lastOffsetX = lastOffset ? lastOffset.x : 0,
 			        lastOffsetY = lastOffset ? lastOffset.y : 0,
-			        windowWidth = $(window).width(),
 			    	windowHeight = $(window).height(),
 					imageHeight = slideImage.data('fullHeight'),
 			    	maxX = windowWidth - imageWidth,

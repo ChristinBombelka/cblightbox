@@ -30,7 +30,7 @@
 
 		//calc screenBorderWidth
 		if(!$(".cb-lightbox-margin").length){
-			var scrollWidth = window.innerWidth - $(window).outerWidth();
+			var scrollWidth = $(window).outerWidth() - $(window).innerWidth();
 			$("<style type='text/css'>.cb-lightbox-margin{margin-right:"+scrollWidth+"px;}</style>").appendTo($("head"));
 		}
 

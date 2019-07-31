@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.9.4 jQuery
- * 2019-06-08
+ * CBLightbox 3.10.0 jQuery
+ * 2019-07-31
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -52,6 +52,8 @@
 			slideEffect: 'fade', //slide, fade
 			previewSource: false, //define preview image source on use lazyloading
 			dragSlide: true,
+			alignHorizontal: 'center', //center, left, right
+			alignVertical: 'center', //center, top, bottom
 			afterInit: $.noop,
 			afterFit: $.noop,
 			afterSlide: $.noop,
@@ -523,8 +525,21 @@
 				newImgHeight = imgHeight;
 			}
 
-			positionTop = Math.max(($(window).height() - newImgHeight - captionHeight) / 2, $s.margin[0]);
-			positionLeft = (container.width() - newImgWidth) / 2;
+			if($s.alignVertical == 'top'){
+				positionTop = $s.margin[0];
+			}else if($s.alignVertical == 'bottom'){
+				positionTop = $(window).height() - newImgHeight - $s.margin[2];
+			}else{
+				positionTop = Math.max(($(window).height() - newImgHeight - captionHeight) / 2, $s.margin[0]);
+			}
+
+			if($s.alignHorizontal == 'left'){
+				positionLeft = $s.margin[3];
+			}else if($s.alignHorizontal == 'right'){
+				positionLeft = container.width() - newImgWidth - $s.margin[1];
+			}else{
+				positionLeft = (container.width() - newImgWidth) / 2;
+			}
 
 			var	scaleWidth = newImgWidth / slideImage.data('holderWidth'),
    				scaleHeight = newImgHeight / slideImage.data('holderHeight');

@@ -59,6 +59,7 @@
 			afterOpen: $.noop,
 			beforeClose: $.noop,
 			afterClose: $.noop,
+			onResize: $.noop,
 		}
 
 		function error(container, slide){
@@ -1698,6 +1699,7 @@
 				}
 
 				if($('.cb-lightbox').length){
+					var $s = $('.cb-lightbox').data('settings');
 
 					$('.cb-lightbox-slide').each(function(){
 						var slide = $(this),
@@ -1715,6 +1717,12 @@
 
 						if(caption.length){
 							captionInsidePosition(caption, slideImage);
+						}
+
+						if(slide.hasClass('cb-lightbox-slide-current')){
+							if ($.isFunction($s.onResize)) {
+								$s.onResize.call(this, $('.cb-lightbox'), slide);
+							}
 						}
 					});
 				}

@@ -1275,7 +1275,7 @@
 			clearTimeout(container.data('watch'));
 
 			if ($.isFunction($s.beforeClose)) {
-				$s.beforeClose.call(this, container);
+				$s.beforeClose.call(this, container, slide);
 			}
 
 			if(!previewImage.length){

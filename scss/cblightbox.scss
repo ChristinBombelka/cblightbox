@@ -98,6 +98,10 @@
 	user-select: none;
 	z-index: 10001;
 
+	&.cb-lightbox-slide-current{
+		z-index: 10002;
+	}
+
 	&.cb-lightbox-image-hide{
 		.cb-lightbox-image{
 			opacity: 0.01;

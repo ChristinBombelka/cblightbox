@@ -1377,7 +1377,7 @@
 			if(grouplength > 1 && $s.counter){
 				var counter = $('<div class="cb-lightbox-counter"></div>');
 
-				$('<span class="cb-counter-current"></span> / <span class="cb-counter-total"></span>').appendTo(counter);
+				$('<span class="cb-counter-current"></span><span class="cb-counter-seperator">/</span><span class="cb-counter-total"></span>').appendTo(counter);
 
 				counter.find(".cb-counter-total").text($('a[data-group="'+ group +'"]').length);
 				counter.find(".cb-counter-current").text(_this_index + 1);

@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.10.0 jQuery
- * 2019-07-31
+ * CBLightbox 3.10.1 jQuery
+ * 2019-08-20
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -998,6 +998,19 @@
 				.removeClass('cb-lightbox-slide-previews cb-lightbox-slide-next')
 				.addClass('cb-lightbox-slide-current');
 
+			//set new caption befor calc slide height
+			updateCaption(items.eq(_this_index), newCurrent, $s);
+
+			var newCurrentImage = newCurrent.find('.cb-lightbox-slide-image');
+
+			values = getImageFit(newCurrentImage);
+
+			setTranslate(newCurrentImage, {
+				width: values.width,
+				height: values.height,
+				left: values.left,
+			});
+
 			//set current slide start position
 			if($s.slideEffect == 'slide' || effect == 'slide'){
 				if(direction == 'previews'){
@@ -1019,8 +1032,6 @@
 
 			clearTimeout($('.cb-lightbox').data('watch'));
 			watchLoading(newCurrent);
-
-			updateCaption(items.eq(_this_index), newCurrent, $s);
 
 			if($s.slideEffect == 'slide' || effect == 'slide'){
 				setTimeout(function(){

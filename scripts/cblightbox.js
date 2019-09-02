@@ -509,7 +509,8 @@
 			}
 
 			var wrapperHeight = container.height() - ($s.margin[0] + $s.margin[2]),
-				wrapperWidth = container.width() - ($s.margin[1] + $s.margin[3]);
+				wrapperWidth = container.width() - ($s.margin[1] + $s.margin[3]),
+				windowHeight = window.innerHeight ? window.innerHeight : $(window).height();
 
 			var captionHeight = 0;
 			if($(".cb-lightbox-info").length){
@@ -530,9 +531,9 @@
 			if($s.alignVertical == 'top'){
 				positionTop = $s.margin[0];
 			}else if($s.alignVertical == 'bottom'){
-				positionTop = $(window).height() - newImgHeight - $s.margin[2];
+				positionTop = windowHeight - newImgHeight - $s.margin[2];
 			}else{
-				positionTop = Math.max(($(window).height() - newImgHeight - captionHeight) / 2, $s.margin[0]);
+				positionTop = Math.max((windowHeight - newImgHeight - captionHeight) / 2, $s.margin[0]);
 			}
 
 			if($s.alignHorizontal == 'left'){
@@ -553,7 +554,7 @@
 	 			'fitTop': positionTop
 	 		});
 
-			if((imgWidth > $(window).width() || imgHeight > $(window).height()) && $s.zoom){
+			if((imgWidth > $(window).width() || imgHeight > windowHeight) && $s.zoom){
 				slideImage.addClass('cb-lightbox-draggable');
 			}else{
 				slideImage.removeClass('cb-lightbox-draggable');
@@ -580,7 +581,7 @@
 		    	slideImage = slide.find('.cb-lightbox-slide-image'),
 		    	lastoffset = slideImage.data('lastTransform'),
 		    	windowWidth = $(window).width(),
-		    	windowHeight = $(window).height(),
+		    	windowHeight = window.innerHeight ? window.innerHeight : $(window).height(),
 		    	imageWidth = slideImage.data('fullWidth'),
 		    	imageHeight = slideImage.data('fullHeight');
 

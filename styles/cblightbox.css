@@ -66,7 +66,7 @@
     left: 50%;
     -webkit-transform: translate(-50%, -50%) rotate(45deg);
             transform: translate(-50%, -50%) rotate(45deg); }
-  .cb-lightbox-close:hover {
+  .cb-lightbox-no-touch .cb-lightbox-close:hover {
     opacity: 1; }
 
 .cb-lightbox-slides {
@@ -167,7 +167,7 @@
     top: 50%;
     -webkit-transition: all 250ms ease;
     transition: all 250ms ease; }
-  .cb-lightbox-arrow:hover {
+  .cb-lightbox-no-touch .cb-lightbox-arrow:hover {
     opacity: 1.0; }
 
 .cb-lightbox-arrow-prev {
@@ -176,7 +176,7 @@
     left: 25px;
     -webkit-transform: rotate(135deg);
             transform: rotate(135deg); }
-  .cb-lightbox-arrow-prev:hover span {
+  .cb-lightbox-no-touch .cb-lightbox-arrow-prev:hover span {
     margin-left: -5px; }
 
 .cb-lightbox-arrow-next {
@@ -185,7 +185,7 @@
     right: 25px;
     -webkit-transform: rotate(-45deg);
             transform: rotate(-45deg); }
-  .cb-lightbox-arrow-next:hover span {
+  .cb-lightbox-no-touch .cb-lightbox-arrow-next:hover span {
     margin-right: -5px; }
 
 #cb-loading-image {
@@ -264,8 +264,8 @@
 .cb-lightbox-is-open .cb-lightbox-close {
   -webkit-transition: opacity 250ms ease;
   transition: opacity 250ms ease; }
-  .cb-lightbox-is-open .cb-lightbox-arrow:hover,
-  .cb-lightbox-is-open .cb-lightbox-close:hover {
+  .cb-lightbox-no-touch .cb-lightbox-is-open .cb-lightbox-arrow:hover,
+  .cb-lightbox-no-touch .cb-lightbox-is-open .cb-lightbox-close:hover {
     opacity: 0.6; }
 
 .cb-lightbox-error,

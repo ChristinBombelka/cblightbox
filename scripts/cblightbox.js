@@ -26,6 +26,8 @@
 
 		if(is_touch_device()){
 			$("html").addClass("cb-lightbox-touch");
+		}else{
+			$("html").addClass("cb-lightbox-no-touch");
 		}
 
 		//calc screenBorderWidth

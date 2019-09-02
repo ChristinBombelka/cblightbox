@@ -69,7 +69,7 @@
     	transform: translate(-50%, -50%) rotate(45deg);
     }
 
-    &:hover{
+   	.cb-lightbox-no-touch &:hover{
 		opacity: 1;
 	}
 }
@@ -180,7 +180,7 @@
 	    transition: all 250ms ease;
 	}
 
-	&:hover{
+	.cb-lightbox-no-touch &:hover{
 		opacity: 1.0;
 	}
 }
@@ -193,7 +193,7 @@
 		transform: rotate(135deg);
 	}
 
-	&:hover{
+	.cb-lightbox-no-touch &:hover{
 		span{
 	    	margin-left: -5px;
 		}
@@ -208,7 +208,7 @@
 	    transform: rotate(-45deg);
 	}
 
-	&:hover{
+	.cb-lightbox-no-touch &:hover{
 		span{
 	    	margin-right: -5px;
 	    }
@@ -322,7 +322,7 @@
 	.cb-lightbox-close{
 		transition: opacity 250ms ease;
 
-		&:hover{
+		.cb-lightbox-no-touch &:hover{
 			opacity: 0.6;
 		}
 	}

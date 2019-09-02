@@ -1155,7 +1155,7 @@
 					});
 
 				}else if(type == "iframe"){
-					var iframe = $('<iframe src="" class="cb-lightbox-image cb-lightbox-iframe" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>');
+					var iframe = $('<iframe src="" class="cb-lightbox-image cb-lightbox-iframe" allow="autoplay, fullscreen" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>');
 
 					iframe.attr("src", source);
 				}

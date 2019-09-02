@@ -1011,6 +1011,7 @@
 				width: values.width,
 				height: values.height,
 				left: values.left,
+				top: values.top,
 			});
 
 			//set current slide start position

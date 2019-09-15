@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.10.2 jQuery
- * 2019-09-02
+ * CBLightbox 3.10.3 jQuery
+ * 2019-09-15
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1556,16 +1556,18 @@
 
 						var dragLeft = pageXMove + dragPosX - dragWidth;
 
-						setTranslate(slide, {
-				        	left: dragLeft,
-				        });
+						if(dragLeft >= 2 || dragLeft <= -2){
+							setTranslate(slide, {
+					        	left: dragLeft,
+					        });
 
-				        slide
-				        	.addClass('cb-lightbox-is-sliding')
-				        	.data('slideX', dragLeft);
+					        slide
+					        	.addClass('cb-lightbox-is-sliding')
+					        	.data('slideX', dragLeft);
+
+					        return;
+						}
 					});
-
-					return;
 				}
 
 				container.addClass('cb-lightbox-is-grabbing');

@@ -1311,6 +1311,10 @@
 			}
 		}
 
+		function onScroll(event){
+			event.preventDefault();
+		}
+
 		function close(){
 			closing = true;
 
@@ -1374,6 +1378,10 @@
 				}
 
 			}, $s.openCloseDuration + 20);
+
+			//block scroll events
+			window.removeEventListener ("mousewheel", onScroll, {passive: true});
+			window.removeEventListener ("touchmove", onScroll, {passive: true});
 		}
 
 		function init(item, settings){
@@ -1473,6 +1481,10 @@
 
 			//cache current slide
 			cacheSlides(item, _this_index, 'current');
+
+			//block scroll events
+			window.addEventListener ("mousewheel", onScroll, {passive: false});
+			window.addEventListener ("touchmove", onScroll, {passive: false});
 
 			open(item, _this_index, $s);
 		}

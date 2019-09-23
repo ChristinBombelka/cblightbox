@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.10.3 jQuery
- * 2019-09-15
+ * CBLightbox 3.10.4 jQuery
+ * 2019-09-23
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1520,27 +1520,23 @@
 				}
 			});
 
-			$(document).on(is_touch_device() ? 'touchstart' : 'mousedown', '.cb-lightbox-slide-current .cb-lightbox-slide-image', function(e){
-
-				if(!is_touch_device()){
-			    	e.preventDefault();
-			    }
-
-			    if(closing || opening){
+			$(document).on(is_touch_device() ? 'touchstart' : 'mousedown', '.cb-lightbox-slide-current', function(e){
+				if(closing || opening){
 					return;
 				}
-
-				clickTimer = true;
-				setTimeout(function(){
-					clickTimer = false;
-				}, 200);
 
 				var container = $('.cb-lightbox'),
 					$s = container.data('settings'),
 					slideImage = $(this),
 					slide = slideImage.closest('.cb-lightbox-slide'),
 					imageWidth = slideImage.data('fullWidth'),
-					windowWidth = $(window).width();
+					windowWidth = $(window).width(),
+					windowHeight = $(window).height(),
+					moveDirection = false;
+
+				if(slideImage.hasClass('cb-lightbox-draggable')){
+					return;
+				}
 
 				if(e.type == "mousedown"){
 					if(e.which != 1){
@@ -1557,35 +1553,88 @@
 					}
 
 					if(e.type == "mousedown"){
-						var pageXStart = e.pageX;
+						var pageXStart = e.pageX,
+							pageYStart = e.pageY;
 					}else{
-						var pageXStart = e.originalEvent.touches[0].pageX;
+						var pageXStart = e.originalEvent.touches[0].pageX,
+							pageYStart = e.originalEvent.touches[0].pageY;
 					}
 
 					var dragWidth = windowWidth,
-						dragPosX = dragWidth - pageXStart;
+						dragPosX = dragWidth - pageXStart,
+						dragHeight = windowHeight,
+						dragPosY = dragHeight - pageYStart;
 
 					$(document).bind(is_touch_device() ? 'touchmove.cb-lightbox' : 'mousemove.cb-lightbox', function(e){
 						if(e.type == "mousemove"){
-							var pageXMove = e.pageX;
+							var pageXMove = e.pageX,
+								pageYMove = e.pageY;
 						}else{
-							var pageXMove = e.originalEvent.touches[0].pageX;
+							var pageXMove = e.originalEvent.touches[0].pageX,
+								pageYMove = e.originalEvent.touches[0].pageY;
 						}
 
-						var dragLeft = pageXMove + dragPosX - dragWidth;
+						var dragLeft = pageXMove + dragPosX - dragWidth,
+							dragTop = pageYMove + dragPosY - dragHeight;
 
-						if(dragLeft >= 2 || dragLeft <= -2){
+						var angle = Math.abs((Math.atan2(dragTop, dragLeft) * 180) / Math.PI),
+							direction = angle > 45 && angle < 135 ? "y" : "x";
+
+						if(!moveDirection){
+							moveDirection = direction;
+						}
+
+
+						if(moveDirection == 'y'){
+							setTranslate(slide, {
+					        	top: dragTop,
+					        });
+
+							slide
+				        		.addClass('cb-lightbox-is-sliding')
+				        		.data('slideY', dragTop);
+
+						}else{
 							setTranslate(slide, {
 					        	left: dragLeft,
 					        });
 
 					        slide
-					        	.addClass('cb-lightbox-is-sliding')
-					        	.data('slideX', dragLeft);
-
-					        return;
+				        		.addClass('cb-lightbox-is-sliding')
+				        		.data('slideX', dragLeft);
 						}
 					});
+
+					return;
+				}
+			});
+
+			$(document).on(is_touch_device() ? 'touchstart' : 'mousedown', '.cb-lightbox-slide-current .cb-lightbox-slide-image', function(e){
+				if(!is_touch_device()){
+			    	e.preventDefault();
+			    }
+
+			    if(closing || opening){
+					return;
+				}
+
+				clickTimer = true;
+				setTimeout(function(){
+					clickTimer = false;
+				}, 200);
+
+				var container = $('.cb-lightbox'),
+					$s = container.data('settings'),
+					slideImage = $(this),
+					slide = slideImage.closest('.cb-lightbox-slide');
+
+				if(e.type == "mousedown"){
+					if(e.which != 1){
+						return false;
+					}
+				}else{
+					userXTouch = e.originalEvent.touches[0].clientX - $(this).offset().left;
+					userYTouch = e.originalEvent.touches[0].clientY - $(this).offset().top;
 				}
 
 				container.addClass('cb-lightbox-is-grabbing');
@@ -1594,10 +1643,12 @@
 					return;
 				}
 
-			    var lastOffset = slideImage.data('lastTransform'),
+			    var imageWidth = slideImage.data('fullWidth'),
+					windowWidth = $(window).width(),
+					windowHeight = $(window).height(),
+			    	lastOffset = slideImage.data('lastTransform'),
 			    	lastOffsetX = lastOffset ? lastOffset.x : 0,
 			        lastOffsetY = lastOffset ? lastOffset.y : 0,
-			    	windowHeight = $(window).height(),
 					imageHeight = slideImage.data('fullHeight'),
 			    	maxX = windowWidth - imageWidth,
 			    	maxY = windowHeight - imageHeight;
@@ -1686,20 +1737,34 @@
 						var tolerance = 40,
 							resetSlide = false;
 
-						if(slide.data('slideX') > 0){
-							if(slide.data('slideX') > 0 + tolerance){
-								slideTo('previews', 'slide');
-								return;
+						if(slide.data('slideX')){
+							if(slide.data('slideX') > 0){
+								if(slide.data('slideX') > 0 + tolerance){
+									slideTo('previews', 'slide');
+									slide.data('slideX', false);
+									return;
+
+								}else{
+									resetSlide = true;
+								}
 
 							}else{
-								resetSlide = true;
+								if(slide.data('slideX') < 0 - tolerance){
+									slideTo('next', 'slide');
+									slide.data('slideX', false);
+									return;
+
+								}else{
+									resetSlide = true;
+								}
 							}
+						}else if(slide.data('slideY')){
+							if(Math.abs(slide.data('slideY')) > tolerance){
 
-						}else{
-							if(slide.data('slideX') < 0 - tolerance){
-								slideTo('next', 'slide');
+								slide.data('slideY', false);
+
+								close();
 								return;
-
 							}else{
 								resetSlide = true;
 							}
@@ -1708,6 +1773,7 @@
 						if(resetSlide){
 							_animate(slide, {
 								left: 0,
+								top: 0,
 							}, 250);
 
 							slide.removeClass('cb-lightbox-is-sliding');

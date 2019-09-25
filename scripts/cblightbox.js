@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.10.4 jQuery
- * 2019-09-23
+ * CBLightbox 3.10.5 jQuery
+ * 2019-09-25
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1527,16 +1527,12 @@
 
 				var container = $('.cb-lightbox'),
 					$s = container.data('settings'),
-					slideImage = $(this),
+					slideImage = $(this).find('.cb-lightbox-slide-image'),
 					slide = slideImage.closest('.cb-lightbox-slide'),
 					imageWidth = slideImage.data('fullWidth'),
 					windowWidth = $(window).width(),
 					windowHeight = $(window).height(),
 					moveDirection = false;
-
-				if(slideImage.hasClass('cb-lightbox-draggable')){
-					return;
-				}
 
 				if(e.type == "mousedown"){
 					if(e.which != 1){
@@ -1584,10 +1580,9 @@
 							moveDirection = direction;
 						}
 
-
 						if(moveDirection == 'y'){
-							setTranslate(slide, {
-					        	top: dragTop,
+							setTranslate(slideImage, {
+					        	top: slideImage.data('fitTop') + dragTop,
 					        });
 
 							slide
@@ -1741,9 +1736,6 @@
 							if(slide.data('slideX') > 0){
 								if(slide.data('slideX') > 0 + tolerance){
 									slideTo('previews', 'slide');
-									slide.data('slideX', false);
-									return;
-
 								}else{
 									resetSlide = true;
 								}
@@ -1751,34 +1743,34 @@
 							}else{
 								if(slide.data('slideX') < 0 - tolerance){
 									slideTo('next', 'slide');
-									slide.data('slideX', false);
-									return;
-
 								}else{
 									resetSlide = true;
 								}
 							}
+
+							slide.data('slideX', false);
+
+							if(resetSlide){
+								_animate(slide, {
+									left: 0,
+								}, 250);
+
+								slide.removeClass('cb-lightbox-is-sliding');
+							}
+
 						}else if(slide.data('slideY')){
 							if(Math.abs(slide.data('slideY')) > tolerance){
-
-								slide.data('slideY', false);
-
 								close();
-								return;
 							}else{
-								resetSlide = true;
+								_animate(slideImage, {
+									'top': slideImage.data('fitTop')
+								}, 250);
+
+								slide.removeClass('cb-lightbox-is-sliding');
 							}
+
+							slide.data('slideY', false);
 						}
-
-						if(resetSlide){
-							_animate(slide, {
-								left: 0,
-								top: 0,
-							}, 250);
-
-							slide.removeClass('cb-lightbox-is-sliding');
-						}
-
 					}else{
 						if($('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
 							return false

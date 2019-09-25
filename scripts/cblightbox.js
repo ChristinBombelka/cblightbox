@@ -1379,9 +1379,9 @@
 
 			}, $s.openCloseDuration + 20);
 
-			//block scroll events
-			window.removeEventListener ("mousewheel", onScroll, {passive: true});
-			window.removeEventListener ("touchmove", onScroll, {passive: true});
+			//disable scroll events
+			$('.cb-lightbox')[0].removeEventListener ('mousewheel', onScroll, false);
+			$('.cb-lightbox')[0].removeEventListener ('touchmove', onScroll, false);
 		}
 
 		function init(item, settings){
@@ -1483,8 +1483,8 @@
 			cacheSlides(item, _this_index, 'current');
 
 			//block scroll events
-			window.addEventListener ("mousewheel", onScroll, {passive: false});
-			window.addEventListener ("touchmove", onScroll, {passive: false});
+			$('.cb-lightbox')[0].addEventListener ('mousewheel', onScroll, {passive: false});
+			$('.cb-lightbox')[0].addEventListener ('touchmove', onScroll, {passive: false});
 
 			open(item, _this_index, $s);
 		}

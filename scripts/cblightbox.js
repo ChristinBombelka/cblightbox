@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.10.5 jQuery
- * 2019-09-25
+ * CBLightbox 3.10.6 jQuery
+ * 2019-12-09
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1573,6 +1573,10 @@
 						var dragLeft = pageXMove + dragPosX - dragWidth,
 							dragTop = pageYMove + dragPosY - dragHeight;
 
+						if(dragLeft == 0 && dragTop == 0){
+							return;
+						}
+
 						var angle = Math.abs((Math.atan2(dragTop, dragLeft) * 180) / Math.PI),
 							direction = angle > 45 && angle < 135 ? "y" : "x";
 
@@ -1589,7 +1593,7 @@
 				        		.addClass('cb-lightbox-is-sliding')
 				        		.data('slideY', dragTop);
 
-						}else{
+						}else if(moveDirection == 'x'){
 							setTranslate(slide, {
 					        	left: dragLeft,
 					        });

@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.10.6 jQuery
- * 2019-12-09
+ * CBLightbox 3.11.0 jQuery
+ * 2020-07-28
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -63,6 +63,8 @@
 			zoom : false,
 			zoomDuration : 300,
 			zoomOffset : 0,
+            zoomControlls: false,
+            zoomMap: false,
 			disableOnMobile: false,
 			breakpoint : 800,
 			counter : true,
@@ -164,6 +166,64 @@
 	       	}, 20);
 		}
 
+        function getImageSizes(currentImage){
+             
+            return {
+                width: currentImage.data('fullWidth') * (currentImage.data('currentPercentage') / 100),
+                height: currentImage.data('fullHeight') * (currentImage.data('currentPercentage') / 100),
+            };
+        }
+
+        function zoomMapPosition(x,y){
+            var $s = $('.cb-lightbox').data('settings');
+
+            if(!$s.zoomMap){
+                return;
+            }
+
+            var currentImage = $('.cb-lightbox-slide-current .cb-lightbox-slide-image'),
+                imageWidth = currentImage.data('fullWidth') * (currentImage.data('currentPercentage') / 100),
+                imageHeight = currentImage.data('fullHeight') * (currentImage.data('currentPercentage') / 100),
+                windowHeight = $(window).height(),
+                windowWidth = $(window).width();
+
+            //set limits
+            if(y >= 0){
+                y = 0
+            }else if(Math.abs(y) > imageHeight - windowHeight && imageHeight > windowHeight){
+                y = windowHeight - imageHeight;
+            }
+
+            if(x >= 0){
+                x = 0
+            }else if(Math.abs(x) > imageWidth - windowWidth && imageWidth > windowWidth){
+                x = windowWidth - imageWidth;
+            }
+
+            var zoomMapContainer = $('.cb-lightbox__zoomMap'),
+                zoomMapWidthRatio = windowWidth / imageWidth,
+                zoomMapHeightRatio = windowHeight / imageHeight,
+                zoomMapTop = (Math.max(Math.abs(y), 1) / imageHeight),
+                zoomMapLeft = (Math.max(Math.abs(x), 1) / imageWidth);
+
+            var zoomMapWidth = zoomMapWidthRatio * zoomMapContainer.width();
+            if(zoomMapWidth >= zoomMapContainer.width()){
+                zoomMapWidth = zoomMapContainer.width();
+            }
+
+            var zoomMapHeight = zoomMapHeightRatio * zoomMapContainer.height();
+            if(zoomMapHeight >= zoomMapContainer.height()){
+                zoomMapHeight = zoomMapContainer.height();
+            }
+
+            zoomMapContainer.find('.cb-lightbox__zoomMap-handle').css({
+                'width': zoomMapWidth,
+                'height': zoomMapHeight,
+                'top': zoomMapTop * zoomMapContainer.height(),
+                'left': zoomMapLeft * zoomMapContainer.width()
+            });
+        }
+
 		function initMoveMoment(slideImage){
 			var $s = $('.cb-lightbox').data('settings'),
 				minX = $s.zoomOffset[3],
@@ -171,7 +231,7 @@
 				minY = $s.zoomOffset[0],
 				maxY = $(window).height() - slideImage.height() -  $s.zoomOffset[2],
 				startTimeX = false,
-	 			startTimeY = false;
+	 			startTimeY = false,
 	 			completeX = false,
 	 			completeY = false,
 	 			setCurrentPointX = false,
@@ -211,10 +271,10 @@
 							speedY = calculateAnimtionOffset('y');
 						}
 
-						if((Math.abs(speedX) > 0.04 || (currentPoint.x > minX || currentPoint.x < maxX)) && slideImage.data('fullWidth') > $(window).width()){
+						if((Math.abs(speedX) > 0.1 || (currentPoint.x > minX || currentPoint.x < maxX)) && getImageSizes(slideImage).width > $(window).width()){
 							//In bouncing area left/right
 							if(currentPoint.x > minX || currentPoint.x < maxX){
-								if(Math.abs(speedX) < 0.06){
+								if(Math.abs(speedX) < 0.08){
 									if(startTimeX === false){
 										startTimeX = new Date().getTime();
 									}
@@ -252,11 +312,11 @@
 							setCurrentPointX = currentPoint.x + speedX;
 						}
 
-						if((Math.abs(speedY) > 0.04 || (currentPoint.y > minY || currentPoint.y < maxY)) && slideImage.data('fullHeight') > $(window).height()){
+						if((Math.abs(speedY) > 0.1 || (currentPoint.y > minY || currentPoint.y < maxY)) && getImageSizes(slideImage).height > $(window).height()){
 							//In bouncing area top/bottom
 							if(currentPoint.y > minY || currentPoint.y < maxY){
 
-								if(Math.abs(speedY) < 0.06){
+								if(Math.abs(speedY) < 0.08){
 									if(startTimeY === false){
 										startTimeY = new Date().getTime();
 									}
@@ -303,6 +363,8 @@
 							left: currentPoint.x,
 							top: currentPoint.y
 						});
+
+                        zoomMapPosition(currentPoint.x, currentPoint.y);
 
 						if(completeX && completeY){
 							clearTimeout(momentTimer);
@@ -416,7 +478,7 @@
 	    		return;
 	    	}
 
-	    	$(".cb-lightbox").addClass("cb-lightbox-is-zoomed");
+	    	$('.cb-lightbox').addClass('cb-lightbox-is-zoomed cb-lightbox-run-zoom');
 	    	slideImage.addClass("cb-lightbox-draggable-init");
 
 	        var $s = $('.cb-lightbox').data('settings'),
@@ -452,7 +514,13 @@
 
 			setTimeout(function(){
 				isDraggable = true;
+
+                $('.cb-lightbox').removeClass('cb-lightbox-run-zoom');
+
 			}, $s.zoomDuration);
+
+            slideImage.data('currentPercentage', 100);
+            zoomMapPosition(positionX, positionY);
 	    }
 
 	    function detroyDraggable(slideImage, disableAnimation){
@@ -476,6 +544,8 @@
 	    		return;
 	    	}
 
+            container.addClass('cb-lightbox-run-zoom');
+
 	    	var	scaleWidth = slideImage.data('fitWidth') / slideImage.width(),
 	       		scaleHeight = slideImage.data('fitHeight') / slideImage.height();
 
@@ -494,9 +564,13 @@
 			}, duration);
 
     		setTimeout(function(){
-    			container.removeClass("cb-lightbox-is-zoomed");
+    			container.removeClass('cb-lightbox-is-zoomed cb-lightbox-run-zoom');
     			captionShow(slide);
     		}, duration + 30);
+
+            slideImage.data('currentPercentage', slideImage.data('fitPercentage'));
+
+            zoomMapPosition(slideImage.data('fitLeft'), slideImage.data('fitTop'));
 
     		slideImage.removeClass("cb-lightbox-draggable-init");
 	    }
@@ -570,7 +644,9 @@
 	 			'fitHeight': newImgHeight,
 	 			'fitWidth': newImgWidth,
 	 			'fitLeft': positionLeft,
-	 			'fitTop': positionTop
+	 			'fitTop': positionTop,
+                'fitPercentage': minRatio ? (minRatio * 100) : false,
+                'currentPercentage': minRatio ? (minRatio * 100) : false
 	 		});
 
 			if((imgWidth > $(window).width() || imgHeight > windowHeight) && $s.zoom){
@@ -601,8 +677,8 @@
 		    	lastoffset = slideImage.data('lastTransform'),
 		    	windowWidth = $(window).width(),
 		    	windowHeight = window.innerHeight ? window.innerHeight : $(window).height(),
-		    	imageWidth = slideImage.data('fullWidth'),
-		    	imageHeight = slideImage.data('fullHeight');
+		    	imageWidth = getImageSizes(slideImage).width,
+		    	imageHeight = getImageSizes(slideImage).height;
 
 		    if(!lastoffset){
 		    	return;
@@ -897,6 +973,10 @@
 					});
 				}
 
+                if(p == 'current'){
+                    container.find('.cb-lightbox__zoomMap-image').append('<img src="'+elementPlaceholder.attr('src')+'">');
+                }
+
 			}else if(cachedSlide.type == "iframe"){
 
 				var iframe = cachedSlide.iframe.clone().appendTo(wrapImage);
@@ -1083,6 +1163,28 @@
 			setTimeout(function(){
 				slideing = false;
 			}, 200);
+
+			if(container.find('.cb-lightbox__zoomMap-image').length){
+				var previewElement = items.eq(_this_index);
+
+				if($s.previewSource){
+					if(previewElement.attr($s.previewSource)){
+	                    placeholderImage = previewElement.attr($s.previewSource);
+	                }else if(previewElement.find('img')){
+	                    placeholderImage = previewElement.find('img').attr( $s.previewSource );
+	                }
+	            }else{
+	            	placeholderImage = previewElement.find('img').attr('src');
+	            }
+
+                container.find('.cb-lightbox__zoomMap-image')
+                	.empty()
+                	.append('<img src="' + placeholderImage + '">');
+
+                setTimeout(function(){
+                	zoomMapPosition(0, 0);
+                });
+            }
 
 			//set new previews/next slide
 			setSlide(items.eq(_slideIndex), _slideIndex, direction);
@@ -1410,8 +1512,21 @@
 				_this_index = item.index(item, settings);
 			}
 
-			tpl = $('<div class="cb-lightbox"></div>').append('<div class="cb-lightbox-overlay"></div><div class="cb-lightbox-content"><div class="cb-lightbox-close"></div><div class="cb-lightbox-loading"></div><div class="cb-lightbox-slides"></div></div>');
-			tpl.find(".cb-lightbox-loading").append('<div class="cb-lightbox-loading-animation"></div>');
+			var tpl = $('<div class="cb-lightbox"></div>').append('<div class="cb-lightbox-overlay"></div>');
+			
+            var tplContent = $('<div class="cb-lightbox-content"></div>');
+
+            tplContent.append('<div class="cb-lightbox-close"></div><div class="cb-lightbox-loading"><div class="cb-lightbox-loading-animation"></div></div><div class="cb-lightbox-slides"></div>')
+
+            if($s.zoomMap && $s.zoom){
+                tplContent.append('<div class="cb-lightbox__zoomMap"><div class="cb-lightbox__zoomMap-image"></div><div class="cb-lightbox__zoomMap-handle"></div></div>')
+            }
+
+            if($s.zoomControlls && $s.zoom){ 
+                tplContent.append('<div class="cb-lightbox__zoomButtons"><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--in"></div><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--out"></div></div>')
+            }
+
+            tpl.append(tplContent);
 
 			if(grouplength > 1){
 				var arrows = $('<div class="cb-lightbox-arrow-prev cb-lightbox-arrow"><span></span></div><div class="cb-lightbox-arrow-next cb-lightbox-arrow"><span></span></div>');
@@ -1477,7 +1592,7 @@
 				'settings': $s
 			});
 
-			tpl.appendTo("body");
+			tpl.appendTo($('body'));
 
 			if ($.isFunction($s.afterInit)) {
 		 	   $s.afterInit.call(this, tpl);
@@ -1648,13 +1763,13 @@
 					return;
 				}
 
-			    var imageWidth = slideImage.data('fullWidth'),
+			    var imageWidth = getImageSizes(slideImage).width,
 					windowWidth = $(window).width(),
 					windowHeight = $(window).height(),
 			    	lastOffset = slideImage.data('lastTransform'),
 			    	lastOffsetX = lastOffset ? lastOffset.x : 0,
 			        lastOffsetY = lastOffset ? lastOffset.y : 0,
-					imageHeight = slideImage.data('fullHeight'),
+					imageHeight = getImageSizes(slideImage).height,
 			    	maxX = windowWidth - imageWidth,
 			    	maxY = windowHeight - imageHeight;
 
@@ -1703,11 +1818,13 @@
 			        	newY = (windowHeight - imageHeight) / 2;
 			        }else if(newY > $s.zoomOffset[0]){
 			        	newY = ((newY - $s.zoomOffset[0]) / 3) + $s.zoomOffset[0];
-			        }else  if(Math.abs(newY) - $s.zoomOffset[2] > imageHeight - windowHeight && imageHeight > windowHeight){
+			        }else if(Math.abs(newY) - $s.zoomOffset[2] > imageHeight - windowHeight && imageHeight > windowHeight){
 			        	newY = ((-Math.abs(newY + $s.zoomOffset[2]) - maxY) / 3) + maxY - $s.zoomOffset[2];
 			        }
 
 			        currentPoint = {x: newX, y: newY};
+
+                    zoomMapPosition(newX, newY);
 
 			        setTranslate(slideImage, {
 			        	top: newY,
@@ -1725,7 +1842,7 @@
 				$('.cb-lightbox').removeClass('cb-lightbox-is-grabbing');
 				$(this).unbind("mousemove.cb-lightbox touchmove.cb-lightbox");
 
-				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || closing){
+				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || closing || $(e.target).hasClass('cb-lightbox__zoomButton')){
 					return;
 				}
 
@@ -1823,6 +1940,80 @@
 					slideImage.removeClass("cb-lightbox-is-dragging");
 				}
 			});
+
+            $(document).on('click', '.cb-lightbox__zoomButton', function(){
+                var container = $('.cb-lightbox'),
+                    $s = container.data('settings'),
+                    button = $(this),
+                    currentSlide = $('.cb-lightbox-slide-current');
+                    slideImage = currentSlide.find('.cb-lightbox-slide-image').addClass('cb-lightbox-draggable-init');
+
+                var currentScale = slideImage.data('currentPercentage');
+
+                if(button.hasClass('cb-lightbox__zoomButton--in')){
+                    isDraggable = true;
+                    container.addClass('cb-lightbox-is-zoomed');
+
+                    var newScale = currentScale + 20;
+
+                    if(newScale > 100){
+                        newScale = 100;
+                    }
+
+                }else if(button.hasClass('cb-lightbox__zoomButton--out')){
+
+                    var newScale = currentScale - 20;
+
+                    if(newScale <= slideImage.data('fitPercentage')){
+                        newScale = slideImage.data('fitPercentage');
+
+                        isDraggable = false;
+                        container.removeClass('cb-lightbox-is-zoomed');
+                    }
+                }
+
+                slideImage.data('currentPercentage', newScale);
+
+                var newWidth = getImageSizes(slideImage).width,
+                    newHeight = getImageSizes(slideImage).height,
+                    diffWidth = newWidth - (slideImage.data('fullWidth') * (currentScale / 100)),
+                    diffHeight = newHeight - (slideImage.data('fullHeight') * (currentScale / 100)),
+                    lastTransform = slideImage.data('lastTransform'),
+                    newY = lastTransform.y - (diffHeight / 2),
+                    newX = lastTransform.x - (diffWidth / 2);
+
+                //set limits
+                if(newWidth <= $(window).width()){
+                    newX = ($(window).width() - newWidth) / 2;
+                }else if(newX > 0 && newWidth > $(window).width()){
+                    newX = 0;
+                }else if(newX < $(window).width() - newWidth){
+                    newX = $(window).width() - newWidth;
+                }
+
+                if(newHeight <= $(window).height()){
+                    newY = ($(window).height() - newHeight) / 2;
+                }else if(newY > 0 && newHeight > $(window).height()){
+                    newY = 0;
+                }else if(newY < $(window).height() - newHeight){
+                    newY = $(window).height() - newHeight;
+                }
+
+                zoomMapPosition(newX, newY);
+
+                container.addClass('cb-lightbox-run-zoom');
+
+                _animate(slideImage, {
+                    width: newWidth,
+                    height: newHeight,
+                    top: newY,
+                    left: newX
+                }, $s.zoomDuration);
+
+                setTimeout(function(){
+                    container.removeClass('cb-lightbox-run-zoom');
+                }, $s.zoomDuration);
+            });
 
 			$(window).on("resize", function(){
 				if(!$("html").hasClass("cb-lightbox-touch") && $('.cb-lightbox').hasClass('cb-lightbox-is-zoomed')){

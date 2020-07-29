@@ -44,7 +44,7 @@
 	overflow: hidden;
 	cursor: pointer;
 	//opacity: 0.65;
-	z-index: 10001;
+	z-index: 10;
     //transition: opacity 250ms ease;
 
     &:after{
@@ -79,7 +79,7 @@
 	width: 100%;
     height: 100%;
     overflow: hidden;
-    z-index: 10000;
+    z-index: 1;
 }
 
 .cb-lightbox-slide{
@@ -96,10 +96,10 @@
 	position: absolute;
 	backface-visibility: hidden;
 	user-select: none;
-	z-index: 10001;
+	z-index: 1;
 
 	&.cb-lightbox-slide-current{
-		z-index: 10002;
+		z-index: 2;
 	}
 
 	&.cb-lightbox-image-hide{
@@ -110,7 +110,7 @@
 }
 
 .cb-lightbox-slide-image{
-	transition-property: transform, opacity;
+	transition-property: transform, opacity, width, height;
 	//transition-timing-function: ease;
 	transform-origin: top left;
 	box-sizing: border-box;
@@ -162,7 +162,7 @@
 	height: calc(100vh - 80px);
 	cursor: pointer;
 	//opacity: 1;
-    z-index: 10002;
+    z-index: 10;
     //transition: opacity 250ms ease;
 
     span{
@@ -226,7 +226,7 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	z-index: 10002;
+	z-index: 10;
 
 	.cb-lightbox-slide &{
 		transform: translateY(100%);
@@ -326,12 +326,19 @@
 			opacity: 0.6;
 		}
 	}
+
+    .cb-lightbox__zoomButtons,
+    .cb-lightbox__zoomMap{
+        transition: opacity 250ms ease;
+    }
 }
 
 .cb-lightbox-error,
 .cb-lightbox-arrow,
 .cb-lightbox-close,
-.cb-lightbox-info{
+.cb-lightbox-info,
+.cb-lightbox__zoomButtons,
+.cb-lightbox__zoomMap{
 	transition-timing-function: ease;
 	transition-property: visibility, opacity;
 	transition-duration: inherit;
@@ -349,7 +356,9 @@
 .cb-lightbox-error-show,
 .cb-lightbox-show-buttons{
 	.cb-lightbox-close,
-	.cb-lightbox-arrow{
+	.cb-lightbox-arrow,
+    .cb-lightbox__zoomButtons,
+    .cb-lightbox__zoomMap{
 		visibility: visible;
 		opacity: 1;
 	}
@@ -414,7 +423,7 @@
 	top: 50%;
 	left: 50%;
     transform: translate3d(-50%, -50%, 0);
-    z-index: 10002;
+    z-index: 10;
 }
 
 .cb-lightbox-loading-animation{
@@ -461,6 +470,74 @@
   }
 }
 
+.cb-lightbox__zoomMap{
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+
+    img{
+        max-width: 200px;
+        max-height: 200px;
+    }
+}
+
+.cb-lightbox__zoomMap-handle{
+    border: 1px solid rgba(255,255,255,.7);
+    outline: 300px solid rgba(0,0,0,0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    .cb-lightbox-run-zoom &{
+        transition: width 250ms ease, height 250ms ease, top 250ms ease, left 250ms ease;
+    }
+}
+
+.cb-lightbox__zoomButtons{
+    position: absolute;
+    right: 0;
+    top: 100px;
+    z-index: 20;
+}
+
+.cb-lightbox__zoomButton{
+    background-color: rgba(0,0,0,.7);
+    width: 50px;
+    height: 50px;
+    color: #fff;
+}
+
+.cb-lightbox__zoomButton--in,
+.cb-lightbox__zoomButton--out{
+    position: relative;
+    cursor: pointer;
+
+    &:after{
+        font-size: 24px;
+        transform: translate(-50%, -50%);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+    }
+}
+
+.cb-lightbox__zoomButton--in{
+    &:after{
+        content: "+";
+        display: block;
+    }
+}
+
+.cb-lightbox__zoomButton--out{
+    &:after{
+        content: "–";
+        display: block;
+    }
+}
 
 @media screen and (max-width: 768px) {
 	.cb-lightbox-lock{

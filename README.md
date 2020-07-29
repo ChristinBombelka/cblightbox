@@ -1,6 +1,12 @@
 # cblightbox
 
-Open image in a overlayer lightbox. The Lightbox have a zoom function, to zoom into a large image.
+Simple and fast image lightbox. 
+Features: 
+- Responsive
+- Image Zoom
+- Image Zoom Map
+- Iframe ready
+- Nice open/close/slide effects
 
 ## Get Started
 
@@ -53,13 +59,21 @@ $(".js-cblightbox").cblightbox();
     /*  Value: number
      *   Offset Position on zoomed
      */
-    breakpoint: 800,
-    /*  Values: number
-     *  Mobile breakpoint to use mobile margins
+    zoomControlls: false,
+    /* Value: true, false
+     * Show zoom Buttons
+     */
+    zoomMap: false,
+    /* Value: true, false
+     * Show small image with zoom area
      */
     disableOnMobile: false,
     /*  Values: true, false
      *  Disable lightbox on "breakpoint"
+     */
+    breakpoint: 800,
+    /*  Values: number
+     *  Mobile breakpoint to use mobile margins
      */
     counter: true,
     /*  Values: true, false
@@ -140,3 +154,9 @@ Fired before close
 Fired after close
 
 `afterClose: function(container){}`
+
+### onResize
+
+Fired on resize window
+
+`onResize: function(container, slide){}`

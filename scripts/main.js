@@ -1,20 +1,25 @@
 $(function() {
-    $(".js-lightbox-fade").cblightbox({
-        margin: [60, 60],
-        openCloseEffect: 'fade',
-        openCloseDuration: 1000,
-        slideDuration: 500,
-        zoom: false,
-    });
-
     $(".js-lightbox").cblightbox({
         margin: [60, 100],
         openCloseEffect: 'zoom',
         openCloseDuration: 750,
         slideEffect: 'slide',
-        slideDuration: 500,
+        slideDuration: 300,
         zoom: true,
         zoomOffset : 0,
         previewSource : 'data-original',
+        captionPosition: 'inside',
+        zoomControlls: true,
+        zoomMap: true
      });
+
+    $(".js-lightbox-fade").cblightbox({
+        margin: [60, 60],
+        openCloseEffect: 'fade',
+        openCloseDuration: 1000,
+        slideDuration: 500,
+        zoom: true,
+        zoomControlls: true,
+        zoomMap: true
+    });
 });

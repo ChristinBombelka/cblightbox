@@ -1154,7 +1154,13 @@
 					if(previewImage.length && previewImage.attr('src') && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64'){
 						placeholderImage = item.find('img').attr('src');
 					}else if($s.previewSource){
-						placeholderImage = item.find('img').attr( $s.previewSource );
+
+                        if(item.attr($s.previewSource)){
+                            placeholderImage = item.attr($s.previewSource);
+                        }else if(item.find('img')){
+                            placeholderImage = item.find('img').attr( $s.previewSource );
+                        }
+						
 					}else{
 						placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
 					}

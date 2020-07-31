@@ -1999,16 +1999,16 @@
                     newY = $(window).height() - newHeight;
                 }
 
-                zoomMapPosition(newX, newY);
-
                 container.addClass('cb-lightbox-run-zoom');
-
+                
                 _animate(slideImage, {
                     width: newWidth,
                     height: newHeight,
                     top: newY,
                     left: newX
                 }, $s.zoomDuration);
+                    
+                zoomMapPosition(newX, newY);
 
                 setTimeout(function(){
                     container.removeClass('cb-lightbox-run-zoom');

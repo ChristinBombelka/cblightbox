@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.11.0 jQuery
- * 2020-07-28
+ * CBLightbox 3.11.1 jQuery
+ * 2020-08-06
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -442,9 +442,9 @@
 				if(to.toWidth && to.toHeight){
 					to.width = to.toWidth;
 					to.height = to.toHeight
-				}else if($('.cb-lightbox-is-zoomed').length && el.data('fullWidth') && el.data('fullHeight')){
-					to.width = el.data('fullWidth');
-					to.height = el.data('fullHeight');
+				}else if($('.cb-lightbox-is-zoomed').length){
+                    to.width = getImageSizes(el).width;
+					to.height = getImageSizes(el).height;
 				}else{
 					to.width = currentSlide.data('fitWidth');
 					to.height = currentSlide.data('fitHeight');
@@ -1980,7 +1980,9 @@
                     diffHeight = newHeight - (slideImage.data('fullHeight') * (currentScale / 100)),
                     lastTransform = slideImage.data('lastTransform'),
                     newY = lastTransform.y - (diffHeight / 2),
-                    newX = lastTransform.x - (diffWidth / 2);
+                    newX = lastTransform.x - (diffWidth / 2),
+                    scaleWidth = newWidth / slideImage.width(),
+                    scaleHeight = newHeight / slideImage.height();
 
                 //set limits
                 if(newWidth <= $(window).width()){
@@ -2000,12 +2002,12 @@
                 }
 
                 container.addClass('cb-lightbox-run-zoom');
-                
+
                 _animate(slideImage, {
-                    width: newWidth,
-                    height: newHeight,
                     top: newY,
-                    left: newX
+                    left: newX,
+                    scaleX: scaleWidth,
+                    scaleY: scaleHeight,
                 }, $s.zoomDuration);
                     
                 zoomMapPosition(newX, newY);

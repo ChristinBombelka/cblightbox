@@ -110,7 +110,7 @@
 }
 
 .cb-lightbox-slide-image{
-	transition-property: transform, opacity, width, height;
+	transition-property: transform, opacity;
 	//transition-timing-function: ease;
 	transform-origin: top left;
 	box-sizing: border-box;
@@ -478,7 +478,6 @@
     z-index: 10;
 
     img{
-    	display: block;
         max-width: 200px;
         max-height: 200px;
     }

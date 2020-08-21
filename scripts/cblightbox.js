@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.11.1 jQuery
- * 2020-08-06
+ * CBLightbox 3.12.0 jQuery
+ * 2020-08-21
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1835,6 +1835,110 @@
 			    });
 			});
 
+            $(document).on(is_touch_device() ? 'touchstart' : 'mousedown', '.cb-lightbox__zoomMap', function(e){
+                if(!is_touch_device()){
+                    e.preventDefault();
+                }
+
+                if(closing || opening || !isDraggable){
+                    return;
+                }
+
+                var container = $('.cb-lightbox'),
+                    $s = container.data('settings'),
+                    slide = $('.cb-lightbox-slide-current'),
+                    slideImage = slide.find('.cb-lightbox-slide-image');
+
+                if(e.type == "mousedown"){
+                    if(e.which != 1){
+                        return false;
+                    }
+                }else{
+                    userXTouch = e.originalEvent.touches[0].clientX - $(this).offset().left;
+                    userYTouch = e.originalEvent.touches[0].clientY - $(this).offset().top;
+                }
+
+                container.addClass('cb-lightbox-is-grabbing');
+                slideImage.addClass('cb-lightbox-slide-dragging-zoommap');
+
+                if(!slideImage.hasClass('cb-lightbox-slide-draggable')){
+                    return;
+                }
+
+                var area = $(this),
+                    handel = area.find('.cb-lightbox__zoomMap-handle'),
+                    handelWidth = handel.outerWidth(),
+                    handelHeight = handel.outerHeight(),
+                    areaWidth = area.width(),
+                    areaHeight = area.height(),
+                    lastOffsetX = parseInt(handel.css('left')),
+                    lastOffsetY = parseInt(handel.css('top')),
+                    startX,
+                    startY,
+                    imageWidth = slideImage.data('fullWidth') * (slideImage.data('currentPercentage') / 100),
+                    imageHeight = slideImage.data('fullHeight') * (slideImage.data('currentPercentage') / 100);
+
+                if(e.type == "touchstart"){
+                    startX = e.originalEvent.touches[0].pageX - lastOffsetX;
+                    startY = e.originalEvent.touches[0].pageY - lastOffsetY;
+                }else{
+                    startX = e.pageX - lastOffsetX;
+                    startY = e.pageY - lastOffsetY;
+                }
+
+                $(document).bind(is_touch_device() ? 'touchmove.cb-lightbox' : 'mousemove.cb-lightbox', function(e){
+                    if(e.type == "touchmove"){
+                        var newX = e.originalEvent.touches[0].pageX - startX,
+                            newY = e.originalEvent.touches[0].pageY - startY;
+                    }else{
+                        var newX = e.pageX - startX,
+                            newY = e.pageY - startY;
+                    }        
+            
+                    if(newY < 0){
+                        newY = 0;
+                    }else if((newY / areaHeight * imageHeight) > imageHeight - $(window).height()){
+                        
+                        if(imageHeight > $(window).height()){
+                            newY = (Math.abs(imageHeight - $(window).height()) / imageHeight) * areaHeight;
+                        }else{
+                            newY = 0;
+                        }
+                    }
+
+                    if(newX < 0){
+                        newX = 0;
+                    }else if((newX / areaWidth * imageWidth) > imageWidth - $(window).width()){
+                            
+                        if(imageWidth > $(window).width()){
+                            newX = (Math.abs(imageWidth - $(window).width()) / imageWidth) * areaWidth;
+                        }else{
+                            newX = 0;
+                        }
+                    }
+
+                    handel.css({
+                        top: newY,
+                        left: newX
+                    });
+
+                    var imageLeft = (newX / areaWidth * imageWidth);
+                    if(imageLeft > imageWidth - $(window).width()){
+                        imageLeft = (imageWidth - $(window).width()) / 2;
+                    }
+
+                    var imageTop = (newY / areaHeight * imageHeight);
+                    if(imageTop > imageHeight - $(window).height()){
+                        imageTop = (imageHeight - $(window).height()) / 2;
+                    }
+                    
+                    setTranslate(slideImage, {
+                        top: -imageTop,
+                        left: -imageLeft,
+                    }); 
+                });
+            });
+
 			$(document).on(is_touch_device() ? 'touchend' : 'mouseup', function(e){
 
 				mouseUp = true;
@@ -1931,15 +2035,19 @@
 							    $(this).off("mousemove.cb-lightbox touchmove.cb-lightbox");
 							}
 
-						}else{
-							//handle all other
-							if($('.cb-lightbox-is-zoomed').length && isDraggable){
-							    initMoveMoment(slideImage);
-							}
+						}else if(slideImage.hasClass('cb-lightbox-slide-dragging-zoommap')){
+
+                        }else{
+
+                            if($('.cb-lightbox-is-zoomed').length && isDraggable){
+                                initMoveMoment(slideImage);
+                            }
+
 						}
 					}
 
 					slideImage.removeClass("cb-lightbox-slide-dragging");
+                    slideImage.removeClass('cb-lightbox-slide-dragging-zoommap');
 				}
 			});
 

@@ -1771,13 +1771,15 @@
 			        lastOffsetY = lastOffset ? lastOffset.y : 0,
 					imageHeight = getImageSizes(slideImage).height,
 			    	maxX = windowWidth - imageWidth,
-			    	maxY = windowHeight - imageHeight;
+			    	maxY = windowHeight - imageHeight,
+                    startX, 
+                    startY;
 
 			    if(e.type == "touchstart"){
 			    	startX = e.originalEvent.touches[0].pageX - lastOffsetX;
 					startY = e.originalEvent.touches[0].pageY - lastOffsetY;
 			    }else{
-			    	startX = e.pageX - lastOffsetX,
+			    	startX = e.pageX - lastOffsetX;
 			    	startY = e.pageY - lastOffsetY;
 			    }
 

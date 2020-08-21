@@ -54,8 +54,8 @@
 .cb-lightbox-lock { overflow: visible !important; }
 .cb-lightbox-lock body { overflow: hidden; height: 100%; }
 
-.cb-lightbox-is-zoomed .cb-lightbox-draggable { cursor: grab; cursor: -webkit-grab; }
-.cb-lightbox-is-zoomed.cb-lightbox-is-grabbing .cb-lightbox-draggable { cursor: grabbing; cursor: -webkit-grabbing; }
+.cb-lightbox-is-zoomed .cb-lightbox-slide-draggable { cursor: grab; cursor: -webkit-grab; }
+.cb-lightbox-is-zoomed.cb-lightbox-is-grabbing .cb-lightbox-slide-draggable { cursor: grabbing; cursor: -webkit-grabbing; }
 
 .dragarea { position: fixed; width: 100%; height: 100%; }
 
@@ -113,5 +113,7 @@
 .cb-lightbox__zoomButton--in:after { content: "+"; display: block; }
 
 .cb-lightbox__zoomButton--out:after { content: "–"; display: block; }
+
+.cb-lightbox-slide-dragging-zoommap { -webkit-transition: -webkit-transform 75ms; transition: -webkit-transform 75ms; transition: transform 75ms; transition: transform 75ms, -webkit-transform 75ms; }
 
 @media screen and (max-width: 768px) { .cb-lightbox-lock { padding-right: 0; } }

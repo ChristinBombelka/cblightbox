@@ -280,14 +280,14 @@
 }
 
 .cb-lightbox-is-zoomed{
-	.cb-lightbox-draggable{
+	.cb-lightbox-slide-draggable{
 		cursor: grab;
 	    cursor: -moz-grab;
 	    cursor: -webkit-grab;
 	}
 
 	&.cb-lightbox-is-grabbing{
-		.cb-lightbox-draggable{
+		.cb-lightbox-slide-draggable{
 			cursor: grabbing;
 		    cursor: -moz-grabbing;
 		    cursor: -webkit-grabbing;
@@ -537,6 +537,10 @@
         content: "–";
         display: block;
     }
+}
+
+.cb-lightbox-slide-dragging-zoommap{
+    transition: transform 75ms;
 }
 
 @media screen and (max-width: 768px) {

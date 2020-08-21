@@ -479,7 +479,7 @@
 	    	}
 
 	    	$('.cb-lightbox').addClass('cb-lightbox-is-zoomed cb-lightbox-run-zoom');
-	    	slideImage.addClass("cb-lightbox-draggable-init");
+	    	slideImage.addClass("cb-lightbox-slide-draggable-init");
 
 	        var $s = $('.cb-lightbox').data('settings'),
 	        	slide = slideImage.closest('.cb-lightbox-slide'),
@@ -540,7 +540,7 @@
 				return;
 			}
 
-	    	if(!slideImage.hasClass("cb-lightbox-draggable-init")){
+	    	if(!slideImage.hasClass("cb-lightbox-slide-draggable-init")){
 	    		return;
 	    	}
 
@@ -572,7 +572,7 @@
 
             zoomMapPosition(slideImage.data('fitLeft'), slideImage.data('fitTop'));
 
-    		slideImage.removeClass("cb-lightbox-draggable-init");
+    		slideImage.removeClass("cb-lightbox-slide-draggable-init");
 	    }
 
 	    function getImageFit(slideImage){
@@ -650,9 +650,9 @@
 	 		});
 
 			if((imgWidth > $(window).width() || imgHeight > windowHeight) && $s.zoom){
-				slideImage.addClass('cb-lightbox-draggable');
+				slideImage.addClass('cb-lightbox-slide-draggable');
 			}else{
-				slideImage.removeClass('cb-lightbox-draggable');
+				slideImage.removeClass('cb-lightbox-slide-draggable');
 			}
 
 			if ($.isFunction($s.afterFit)) {
@@ -1759,7 +1759,7 @@
 
 				container.addClass('cb-lightbox-is-grabbing');
 
-				if(!slideImage.hasClass('cb-lightbox-draggable')){
+				if(!slideImage.hasClass('cb-lightbox-slide-draggable')){
 					return;
 				}
 
@@ -1798,7 +1798,7 @@
 
 			        //check element is dragging
 			        if(Math.abs(lastOffsetX - newX) > 2 || Math.abs(lastOffsetY - newY) > 2){
-						slideImage.addClass("cb-lightbox-is-dragging");
+						slideImage.addClass("cb-lightbox-slide-dragging");
 						clickTimer = false;
 			        }
 
@@ -1905,8 +1905,8 @@
 
 						if(clickTimer){
 							//handle after click
-							if(!slideImage.hasClass("cb-lightbox-is-dragging")){
-								if(!slideImage.hasClass('cb-lightbox-draggable')){
+							if(!slideImage.hasClass("cb-lightbox-slide-dragging")){
+								if(!slideImage.hasClass('cb-lightbox-slide-draggable')){
 									return;
 								}
 
@@ -1937,7 +1937,7 @@
 						}
 					}
 
-					slideImage.removeClass("cb-lightbox-is-dragging");
+					slideImage.removeClass("cb-lightbox-slide-dragging");
 				}
 			});
 
@@ -1946,7 +1946,7 @@
                     $s = container.data('settings'),
                     button = $(this),
                     currentSlide = $('.cb-lightbox-slide-current');
-                    slideImage = currentSlide.find('.cb-lightbox-slide-image').addClass('cb-lightbox-draggable-init');
+                    slideImage = currentSlide.find('.cb-lightbox-slide-image').addClass('cb-lightbox-slide-draggable-init');
 
                 var currentScale = slideImage.data('currentPercentage');
 

@@ -1964,7 +1964,8 @@
 
                     var newScale = currentScale - 20;
 
-                    if(newScale <= slideImage.data('fitPercentage')){
+                    //round number 
+                    if(newScale.toFixed(6) <= slideImage.data('fitPercentage').toFixed(6)){
                         newScale = slideImage.data('fitPercentage');
 
                         isDraggable = false;

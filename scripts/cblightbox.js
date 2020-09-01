@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.12.0 jQuery
- * 2020-08-21
+ * CBLightbox 3.12.1 jQuery
+ * 2020-09-01
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1923,19 +1923,19 @@
                     });
 
                     var imageLeft = (newX / areaWidth * imageWidth);
-                    if(imageLeft > imageWidth - $(window).width()){
+                    if(imageLeft.toFixed(1) > imageWidth - $(window).width()){
                         imageLeft = (imageWidth - $(window).width()) / 2;
                     }
 
                     var imageTop = (newY / areaHeight * imageHeight);
-                    if(imageTop > imageHeight - $(window).height()){
+                    if(imageTop.toFixed(1) > imageHeight - $(window).height()){
                         imageTop = (imageHeight - $(window).height()) / 2;
                     }
-                    
+
                     setTranslate(slideImage, {
                         top: -imageTop,
                         left: -imageLeft,
-                    }); 
+                    });
                 });
             });
 

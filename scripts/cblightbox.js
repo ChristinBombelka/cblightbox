@@ -1,5 +1,5 @@
 /*
- * CBLightbox 3.13.0 jQuery
+ * CBLightbox 3.13.1 jQuery
  * 2020-09-03
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
@@ -250,6 +250,25 @@
 
             return value;
         }
+
+        function getLastTransform(slideImage){
+    		var lastOffset = slideImage.data('lastTransform'),
+    			x,
+    			y;
+
+    		if(lastOffset){
+    			x = lastOffset.x ? lastOffset.x : 0;
+    			y = lastOffset.y ? lastOffset.y : 0;
+    		}else{
+				x = 0;
+				y = 0;
+    		}
+    		
+    		return {
+    			x: x,
+    			y: y
+    		};
+    	}
 
 		function initMoveMoment(slideImage){
 			var $s = $('.cb-lightbox').data('settings'),
@@ -1686,7 +1705,7 @@
                     var currentScale = slideImage.data('currentPercentage'),
                         touchStart1 = e.originalEvent.touches[0],
                         touchStart2 = e.originalEvent.touches[1],
-                        lastTransform = slideImage.data('lastTransform'),
+                        lastTransform = getLastTransform(slideImage),
                         imageWidth = imageSizes.width;
                         imageHeight = imageSizes.height;
 
@@ -1831,9 +1850,9 @@
     			    var imageWidth = imageSizes.width,
     					windowWidth = $(window).width(),
     					windowHeight = $(window).height(),
-    			    	lastOffset = slideImage.data('lastTransform'),
-    			    	lastOffsetX = lastOffset ? lastOffset.x : 0,
-    			        lastOffsetY = lastOffset ? lastOffset.y : 0,
+    			    	lastTransform = getLastTransform(slideImage),
+    			    	lastTransformX = lastTransform.x,
+    			        lastTransformY = lastTransform.y,
     					imageHeight = imageSizes.height,
     			    	maxX = windowWidth - imageWidth,
     			    	maxY = windowHeight - imageHeight,
@@ -1841,11 +1860,11 @@
                         startY;
 
     			    if(e.type == "touchstart"){
-    			    	startX = e.originalEvent.touches[0].pageX - lastOffsetX;
-    					startY = e.originalEvent.touches[0].pageY - lastOffsetY;
+    			    	startX = e.originalEvent.touches[0].pageX - lastTransformX;
+    					startY = e.originalEvent.touches[0].pageY - lastTransformY;
     			    }else{
-    			    	startX = e.pageX - lastOffsetX;
-    			    	startY = e.pageY - lastOffsetY;
+    			    	startX = e.pageX - lastTransformX;
+    			    	startY = e.pageY - lastTransformY;
     			    }
 
     			    clearTimeout(momentTimer);
@@ -1864,7 +1883,7 @@
     			        }
 
     			        //check element is dragging
-    			        if(Math.abs(lastOffsetX - newX) > 2 || Math.abs(lastOffsetY - newY) > 2){
+    			        if(Math.abs(lastTransformX - newX) > 2 || Math.abs(lastTransformY - newY) > 2){
     						slideImage.addClass("cb-lightbox-slide-dragging");
     						clickTimer = false;
     			        }
@@ -2154,7 +2173,7 @@
                     newHeight = getImageSizes(slideImage).height,
                     diffWidth = newWidth - (slideImage.data('fullWidth') * (currentScale / 100)),
                     diffHeight = newHeight - (slideImage.data('fullHeight') * (currentScale / 100)),
-                    lastTransform = slideImage.data('lastTransform'),
+                    lastTransform = getLastTransform(slideImage),
                     newY = lastTransform.y - (diffHeight / 2),
                     newX = lastTransform.x - (diffWidth / 2),
                     scaleWidth = newWidth / slideImage.width(),

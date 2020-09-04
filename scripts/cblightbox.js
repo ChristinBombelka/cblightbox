@@ -511,7 +511,6 @@
 	    	}
 
 	    	$('.cb-lightbox').addClass('cb-lightbox-is-zoomed cb-lightbox-run-zoom');
-	    	slideImage.addClass("cb-lightbox-slide-draggable-init");
 
 	        var $s = $('.cb-lightbox').data('settings'),
 	        	slide = slideImage.closest('.cb-lightbox-slide'),
@@ -566,7 +565,7 @@
 				slide = slideImage.closest('.cb-lightbox-slide'),
 				duration = $s.zoomDuration;
 
-			if(!container.hasClass("cb-lightbox-is-zoomed") || !slideImage.hasClass("cb-lightbox-slide-draggable-init")){
+			if(!container.hasClass("cb-lightbox-is-zoomed")){
 				return;
 			}
 
@@ -599,8 +598,6 @@
             slideImage.data('currentPercentage', slideImage.data('fitPercentage'));
 
             zoomMapPosition(slideImage.data('fitLeft'), slideImage.data('fitTop'));
-
-    		slideImage.removeClass("cb-lightbox-slide-draggable-init");
 	    }
 
 	    function getImageFit(slideImage){
@@ -1737,8 +1734,6 @@
                         isDraggable = true;
                         container.addClass('cb-lightbox-is-zoomed');
 
-                        slideImage.addClass("cb-lightbox-slide-draggable-init");
-
                         var touchEnd1 = e.originalEvent.touches[0],
                             touchEnd2 = e.originalEvent.touches[1],
                             currentPinch = getZoomDistance(touchEnd1, touchEnd2),
@@ -1752,7 +1747,6 @@
 
                             isDraggable = false;
                             container.removeClass('cb-lightbox-is-zoomed');
-                            slideImage.removeClass('cb-lightbox-slide-draggable-init');
                         }    
 
                         //set new scale percentage
@@ -2164,7 +2158,7 @@
                     $s = container.data('settings'),
                     button = $(this),
                     currentSlide = $('.cb-lightbox-slide-current');
-                    slideImage = currentSlide.find('.cb-lightbox-slide-image').addClass('cb-lightbox-slide-draggable-init');
+                    slideImage = currentSlide.find('.cb-lightbox-slide-image');
 
                 var currentScale = slideImage.data('currentPercentage');
 
@@ -2187,7 +2181,6 @@
 
                         isDraggable = false;
                         container.removeClass('cb-lightbox-is-zoomed');
-                        slideImage.removeClass('cb-lightbox-slide-draggable-init');
                     }
                 }
 

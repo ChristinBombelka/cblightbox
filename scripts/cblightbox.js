@@ -1900,12 +1900,9 @@
     						clickTimer = false;
     			        }
 
-    			        console.log('xx', isDraggable);
-
     			        if(!isDraggable || pinching){
     			        	return;
     			        }
-
 
     			        if(imageWidth < windowWidth){
     			        	newX = (windowWidth - imageWidth) / 2;
@@ -2018,7 +2015,6 @@
                         top: newY,
                         left: newX
                     });
-
 
                     var imageLeft = (newX / areaWidth * imageWidth);
                     if(imageLeft > imageWidth - $(window).width()){

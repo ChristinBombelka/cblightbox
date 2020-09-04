@@ -257,11 +257,6 @@
 	}
 }
 
-.cb-lightbox-caption-hide{
-	position: fixed;
-	visibility: hidden;
-}
-
 .cb-lightbox-counter{
 	color: #fff;
 	padding: 15px 20px;
@@ -279,6 +274,16 @@
 	}
 }
 
+.cb-lightbox-slide{
+	& > .cb-lightbox-caption{
+		display: none;
+
+		.cb-lightbox-is-open:not(.cb-lightbox-is-zoomed) & {
+			display: block;
+		}
+	}
+}
+
 .cb-lightbox-is-zoomed{
 	.cb-lightbox-slide-draggable{
 		cursor: grab;
@@ -292,6 +297,10 @@
 		    cursor: -moz-grabbing;
 		    cursor: -webkit-grabbing;
 		}
+	}
+
+	.cb-lightbox-slide > .cb-lightbox-caption{
+		display: none;
 	}
 }
 
@@ -307,15 +316,7 @@
 	cursor: zoom-in;
 }
 
-.cb-lightbox-slide{
-	& > .cb-lightbox-caption{
-		display: none;
 
-		.cb-lightbox-is-open & {
-			display: block;
-		}
-	}
-}
 
 .cb-lightbox-is-open{
 	.cb-lightbox-arrow,

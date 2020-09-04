@@ -517,8 +517,6 @@
 	        	clickX = userX / slideImage.width(),
 				clickY = userY / slideImage.height();
 
-			captionHide($s, slide.find('.cb-lightbox-caption'));
-
 			if(slideImage.data('fullWidth') > $(window).width()){
 				var positionX = Math.max(slideImage.data('fullWidth') * clickX - ($(window).width() / 2) - $s.zoomOffset[3], -$s.zoomOffset[3]);
 					positionX = -Math.min(slideImage.data('fullWidth') - $(window).width() + $s.zoomOffset[1], positionX);
@@ -592,7 +590,6 @@
 
     		setTimeout(function(){
     			container.removeClass('cb-lightbox-is-zoomed cb-lightbox-run-zoom');
-    			captionShow(slide);
     		}, duration + 30);
 
             slideImage.data('currentPercentage', slideImage.data('fitPercentage'));
@@ -734,25 +731,9 @@
 		    }
 	    }
 
-	    function captionShow(slide){
-	    	if(!$(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
-	    		if(typeof slide === "undefined" && !slide){
-	    			var slide = $('.cb-lightbox-slide-current');
-	    		}
-
-	    		slide.find('.cb-lightbox-caption').removeClass('cb-lightbox-caption-hide');
-	    	}
-	    }
-
-	    function captionHide($s, slideCaption){
-	    	if($s.captionPosition == 'inside'){
-	    		slideCaption.addClass('cb-lightbox-caption-hide');
-	    	}
-	    }
-
 	    function captionInsidePosition(caption, slideImage){
 	    	caption.css({
-				bottom: ($(window).height() - slideImage.data('fitHeight')) / 2,
+				bottom: (window.innerHeight - slideImage.data('fitHeight')) / 2,
 				left: slideImage.data('fitLeft'),
 				width: slideImage.data('fitWidth'),
 			});
@@ -786,8 +767,6 @@
 
 			if(caption){
 				var slideCaption = captionTpl.appendTo(addTo);
-
-				captionHide($s, slideCaption);
 			}
 		}
 
@@ -1177,8 +1156,6 @@
 				});
 			}
 
-			captionShow(newCurrent);
-
 			setTimeout(function(){
 				if ($.isFunction($s.afterSlide)) {
 			 	   $s.afterSlide.call(this, container, newCurrent);
@@ -1395,10 +1372,6 @@
 						scaleY: values.scaleY
 					}, $s.openCloseDuration);
 
-					setTimeout(function(){
-						captionShow(slide);
-					}, $s.openCloseDuration + 30);
-
 				}else if(slide && $s.openCloseEffect == 'fade'){
 
 					var values = getImageFit(slideImage);
@@ -1416,8 +1389,6 @@
 							opacity: 1,
 						}, $s.openCloseDuration);
 					}, 20);
-
-					captionShow(slide);
 				}
 
 				container.addClass('cb-lightbox-is-opening cb-lightbox-show-info cb-lightbox-show-buttons');
@@ -1480,8 +1451,6 @@
 					scaleHeight = previewImage.height() / slideImage.height(),
 					offsetTop = previewImage.offset().top - $(window).scrollTop();
 					offsetLeft = previewImage.offset().left;
-
-				captionHide($s, container.find('.cb-lightbox-caption'));
 
 				_animate(slideImage, {
 					top: offsetTop,
@@ -2134,7 +2103,6 @@
                         }else if(slideImage.hasClass('cb-lightbox-is-pinching')){
 
                         }else if(!pinching){
-
                             if($('.cb-lightbox-is-zoomed').length && isDraggable){
                                 initMoveMoment(slideImage);
                             }

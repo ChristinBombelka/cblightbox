@@ -1743,7 +1743,7 @@
                             touchEnd2 = e.originalEvent.touches[1],
                             currentPinch = getZoomDistance(touchEnd1, touchEnd2),
                             pinchDistance = (currentPinch - startPinch),
-                            newScale = currentScale + (pinchDistance / 4);
+                            newScale = currentScale + (pinchDistance / 3);
 
                         if(newScale > 100){
                             newScale = 100; 

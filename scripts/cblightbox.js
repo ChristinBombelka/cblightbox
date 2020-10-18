@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.13.1 jQuery
- * 2020-09-03
+ * CBLightbox 3.13.2 jQuery
+ * 2020-10-18
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1447,12 +1447,18 @@
 		function close(){
 			closing = true;
 
+			clearTimeout(momentTimer);
+
 			var el = $(".cb-lightbox-is-selected"),
 				previewImage = el.find('img'),
 				container = $('.cb-lightbox'),
 				$s = container.data('settings'),
 				slide = container.find('.cb-lightbox-slide.cb-lightbox-slide-current'),
 				slideImage = slide.find('.cb-lightbox-slide-image');
+
+			container
+				.removeClass('cb-lightbox-is-open cb-lightbox-is-opening cb-lightbox-show-info cb-lightbox-show-buttons')
+				.addClass('cb-lightbox-is-closing');
 
 			clearTimeout(container.data('watch'));
 
@@ -1466,10 +1472,6 @@
 
 			_animate(container, false, $s.openCloseDuration);
 			_animate(container.find('.cb-lightbox-content'), false, $s.openCloseDuration);
-
-			container
-				.removeClass('cb-lightbox-is-open cb-lightbox-is-opening cb-lightbox-show-info cb-lightbox-show-buttons')
-				.addClass('cb-lightbox-is-closing');
 
 			if($s.openCloseEffect == 'zoom' && el.is(':visible')){
 				var	scaleWidth =  previewImage.width() / slideImage.width(),
@@ -2033,10 +2035,12 @@
 				clearTimeout(positionInterval);
 				clearTimeout(momentTimer);
 
-				$('.cb-lightbox').removeClass('cb-lightbox-is-grabbing');
+				var container = $('.cb-lightbox');
+
+				container.removeClass('cb-lightbox-is-grabbing');
 				$(this).unbind("mousemove.cb-lightbox touchmove.cb-lightbox");
 
-				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || closing || $(e.target).hasClass('cb-lightbox__zoomButton')){
+				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || container.hasClass('cb-lightbox-is-closing') || $(e.target).hasClass('cb-lightbox__zoomButton')){
 					return;
 				}
 

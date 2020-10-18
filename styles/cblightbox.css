@@ -410,7 +410,9 @@
   .cb-lightbox__zoomMap img {
     display: block;
     max-width: 200px;
-    max-height: 200px; }
+    max-height: 200px;
+    width: auto;
+    height: auto; }
 
 .cb-lightbox__zoomMap-handle {
   border: 1px solid rgba(255, 255, 255, 0.7);

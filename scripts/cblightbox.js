@@ -176,7 +176,13 @@
         }
 
         function zoomMapPosition(x,y){
-            var $s = $('.cb-lightbox').data('settings');
+            var container = $('.cb-lightbox');
+
+            if(!container.length){
+            	return;
+            }
+
+            var $s = container.data('settings');
 
             if(!$s.zoomMap){
                 return;

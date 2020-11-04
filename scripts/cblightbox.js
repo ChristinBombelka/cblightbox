@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.13.2 jQuery
- * 2020-10-18
+ * CBLightbox 3.13.3 jQuery
+ * 2020-11-04
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -61,6 +61,7 @@
 			maxWidth: 9999,
 			margin: 40,
 			mobilemargin: 0,
+            insidearrows: false, 
 			zoom : false,
 			zoomDuration : 300,
 			zoomOffset : 0,
@@ -968,6 +969,11 @@
 				watchLoading(slide);
 			}
 
+            if(container.data('grouplength') > 1 && $s.insidearrows){
+                var arrows = $('<div class="cb-lightbox-arrow-prev cb-lightbox-arrow cb-lightbox-arrow--inside"><span></span></div><div class="cb-lightbox-arrow-next cb-lightbox-arrow cb-lightbox-arrow--inside"><span></span></div>');
+                arrows.appendTo(wrapImage);
+            }
+
 			wrapImage.data({
 				'type': cachedSlide.type,
 				'index': i,
@@ -1549,7 +1555,7 @@
 
             tpl.append(tplContent);
 
-			if(grouplength > 1){
+			if(grouplength > 1 && !$s.insidearrows){
 				var arrows = $('<div class="cb-lightbox-arrow-prev cb-lightbox-arrow"><span></span></div><div class="cb-lightbox-arrow-next cb-lightbox-arrow"><span></span></div>');
 				arrows.appendTo(tpl.find(".cb-lightbox-content"));
 			}
@@ -1610,6 +1616,7 @@
 
 			tpl.data({
 				'group': group,
+                'grouplength': grouplength,
 				'settings': $s
 			});
 

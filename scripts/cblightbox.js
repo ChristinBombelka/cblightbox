@@ -1675,7 +1675,7 @@
 			    	e.preventDefault();
 			    }
 
-			    if(closing || opening){
+			    if(closing || opening || $(e.target).hasClass('cb-lightbox-arrow')){
 					return;
 				}
 

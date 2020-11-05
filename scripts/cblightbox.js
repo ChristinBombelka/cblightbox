@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.13.3 jQuery
- * 2020-11-04
+ * CBLightbox 3.13.4 jQuery
+ * 2020-11-05
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -76,6 +76,7 @@
 			slideDuration: 250,
 			slideEffect: 'fade', //slide, fade
 			previewSource: false, //define preview image source on use lazyloading
+            previewimage: true,
 			dragSlide: true,
 			alignHorizontal: 'center', //center, left, right
 			alignVertical: 'center', //center, top, bottom
@@ -986,31 +987,35 @@
 
 			if(cachedSlide.type == "image"){
 
-				var elementPlaceholder = cachedSlide.placeholder.clone().appendTo(wrapImage);
+                if($s.previewimage){
+                    var elementPlaceholder = cachedSlide.placeholder.clone().appendTo(wrapImage);
 
-				elementPlaceholder.show();
+                    elementPlaceholder.show();
 
-				if((elementPlaceholder[0].complete || elementPlaceholder[0].readyState == 'complete') && elementPlaceholder[0].naturalWidth && elementPlaceholder[0].naturalHeight ) {
-					slide.removeClass('cb-lightbox-slide-hide');
+                    if((elementPlaceholder[0].complete || elementPlaceholder[0].readyState == 'complete') && elementPlaceholder[0].naturalWidth && elementPlaceholder[0].naturalHeight ) {
+                        slide.removeClass('cb-lightbox-slide-hide');
+                        setImage(slide, source, item, p);
+                    }else{
 
-					setImage(slide, source, item, p);
+                        elementPlaceholder.one('error', function(){
+                            elementPlaceholder.remove();
+                        }).one('load', function(){
+                            slide.removeClass('cb-lightbox-slide-hide');
 
-				}else{
+                            setImage(slide, source, item, p);
 
-					elementPlaceholder.one('error', function(){
-						elementPlaceholder.remove();
-					}).one('load', function(){
-						slide.removeClass('cb-lightbox-slide-hide');
+                            slides[wrapImage.data('index')].placeholder = elementPlaceholder;
+                        });
+                    }
 
-						setImage(slide, source, item, p);
-
-						slides[wrapImage.data('index')].placeholder = elementPlaceholder;
-					});
-				}
-
-                if(p == 'current'){
-                    container.find('.cb-lightbox__zoomMap-image').append('<img src="'+elementPlaceholder.attr('src')+'">');
+                    if(p == 'current'){
+                        container.find('.cb-lightbox__zoomMap-image').append('<img src="'+elementPlaceholder.attr('src')+'">');
+                    }
+                }else{
+                    slide.removeClass('cb-lightbox-slide-hide');
+                    setImage(slide, source, item, p);
                 }
+				
 
 			}else if(cachedSlide.type == "iframe"){
 
@@ -1284,25 +1289,28 @@
 				type = getType(source);
 
 				if(type == "image"){
-					previewImage = item.find('img');
 
-					if(previewImage.length && previewImage.attr('src') && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64'){
-						placeholderImage = item.find('img').attr('src');
-					}else if($s.previewSource){
+                    if($s.previewimage){
+                        previewImage = item.find('img');
 
-                        if(item.attr($s.previewSource)){
-                            placeholderImage = item.attr($s.previewSource);
-                        }else if(item.find('img')){
-                            placeholderImage = item.find('img').attr( $s.previewSource );
+                        if(previewImage.length && previewImage.attr('src') && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64'){
+                            placeholderImage = item.find('img').attr('src');
+                        }else if($s.previewSource){
+
+                            if(item.attr($s.previewSource)){
+                                placeholderImage = item.attr($s.previewSource);
+                            }else if(item.find('img')){
+                                placeholderImage = item.find('img').attr( $s.previewSource );
+                            }
+                            
+                        }else{
+                            placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
                         }
-						
-					}else{
-						placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
-					}
 
-					placeholder = $('<img />')
-						.addClass('cb-lightbox-image-placeholder')
-						.attr('src', placeholderImage);
+                        placeholder = $('<img />')
+                            .addClass('cb-lightbox-image-placeholder')
+                            .attr('src', placeholderImage);
+                    }
 
 					image = $('<img/>')
 						.addClass('cb-lightbox-image')

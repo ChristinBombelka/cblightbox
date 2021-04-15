@@ -782,7 +782,9 @@
 					return;
 				}
 
-				captionInsidePosition(captionTpl, slide.find('.cb-lightbox-slide-image'));
+				setTimeout(function(){
+					captionInsidePosition(captionTpl, slide.find('.cb-lightbox-slide-image'));
+				});
 
 				var addTo = slide;
 

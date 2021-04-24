@@ -675,7 +675,18 @@
 			}else if($s.alignVertical == 'bottom'){
 				positionTop = windowHeight - newImgHeight - $s.margin[2];
 			}else{
-				positionTop = Math.max((windowHeight - newImgHeight - captionHeight) / 2, $s.margin[0]);
+
+				var marginDiff = 1,
+					divider = 2;
+
+				if($s.margin[0] > 0 && $s.margin[2] > 0){
+					marginDiff = $s.margin[0] / $s.margin[2];
+					divider = (divider + (divider / marginDiff)) / 2;
+				}
+
+				var verticalCenter = (windowHeight - newImgHeight - captionHeight) / divider;
+				positionTop = Math.max(verticalCenter, $s.margin[0]);
+	
 			}
 
 			if($s.alignHorizontal == 'left'){

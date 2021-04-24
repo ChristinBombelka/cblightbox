@@ -1,6 +1,6 @@
 $(function() {
     $(".js-lightbox").cblightbox({
-        margin: [60, 100],
+        margin: [50, 60, 100, 60],
         openCloseEffect: 'zoom',
         openCloseDuration: 750,
         slideEffect: 'slide',

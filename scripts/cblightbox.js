@@ -759,8 +759,19 @@
 	    }
 
 	    function captionInsidePosition(caption, slideImage){
+	    	var $s = slideImage.closest('.cb-lightbox').data('settings'),
+	    		positionBottom = window.innerHeight - slideImage.data('fitHeight');
+
+	    	if($s.alignVertical == 'top'){
+				positionBottom = positionBottom - $s.margin[0];
+			}else if($s.alignVertical == 'bottom'){
+				positionBottom = $s.margin[2];
+			}else{
+				positionBottom = positionBottom - slideImage.data('fitTop');
+			}
+
 	    	caption.css({
-				bottom: (window.innerHeight - slideImage.data('fitHeight')) / 2,
+				bottom: positionBottom,
 				left: slideImage.data('fitLeft'),
 				width: slideImage.data('fitWidth'),
 			});

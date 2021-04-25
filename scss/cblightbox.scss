@@ -69,7 +69,7 @@
     	transform: translate(-50%, -50%) rotate(45deg);
     }
 
-   	.cb-lightbox-no-touch &:hover{
+   	.cb-lightbox-no-touch .cb-lightbox-show-buttons &:hover{
 		opacity: 1;
 	}
 }

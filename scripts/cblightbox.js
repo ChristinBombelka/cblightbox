@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.13.5 jQuery
- * 2021-04-24
+ * CBLightbox 3.13.6 jQuery
+ * 2021-05-26
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1287,7 +1287,7 @@
 	    }
 
 	    function getType(source){
-	    	if(source.match(/(^data:image\/[a-z0-9+\/=]*,)|(\.(jp(e|g|eg)|gif|png|bmp|webp|svg|ico)((\?|#).*)?$)/i) ) {
+	    	if(source.match(/\.(jpg|jpeg|png|gif)/)) {
                 type = 'image';
             }else if(source){
             	type = 'iframe';

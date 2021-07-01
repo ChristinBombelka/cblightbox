@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.13.6 jQuery
- * 2021-05-26
+ * CBLightbox 3.13.7 jQuery
+ * 2021-07-01
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1575,14 +1575,14 @@
 			
             var tplContent = $('<div class="cb-lightbox-content"></div>');
 
-            tplContent.append('<div class="cb-lightbox-close"></div><div class="cb-lightbox-loading"><div class="cb-lightbox-loading-animation"></div></div><div class="cb-lightbox-slides"></div>')
+            tplContent.append('<div class="cb-lightbox-close"></div><div class="cb-lightbox-loading"><div class="cb-lightbox-loading-animation"></div></div><div class="cb-lightbox-slides"></div>');
 
             if($s.zoomMap && $s.zoom){
-                tplContent.append('<div class="cb-lightbox__zoomMap"><div class="cb-lightbox__zoomMap-image"></div><div class="cb-lightbox__zoomMap-handle"></div></div>')
+                tplContent.append('<div class="cb-lightbox__zoomMap"><div class="cb-lightbox__zoomMap-image"></div><div class="cb-lightbox__zoomMap-handle"></div></div>');
             }
 
-            if($s.zoomControlls && $s.zoom){ 
-                tplContent.append('<div class="cb-lightbox__zoomButtons"><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--in"></div><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--out"></div></div>')
+            if($s.zoomControlls && $s.zoom){
+            	tplContent.append('<div class="cb-lightbox__zoomButtons"><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--in"></div><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--out cb-lightbox__zoomButton--disabled"></div></div>');
             }
 
             tpl.append(tplContent);
@@ -1776,13 +1776,24 @@
                             newScale = currentScale + (pinchDistance / 3);
 
                         if(newScale > 100){
-                            newScale = 100; 
+
+                            container.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
+							container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
+
+                            newScale = 100;
+
                         }else if(newScale.toFixed(6) <= parseFloat(slideImage.data('fitPercentage').toFixed(6))){
                             newScale = slideImage.data('fitPercentage');
 
                             isDraggable = false;
                             container.removeClass('cb-lightbox-is-zoomed');
-                        }    
+
+                            container.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
+							container.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
+
+                        }else{
+                        	container.find('.cb-lightbox__zoomButton').removeClass('cb-lightbox__zoomButton--disabled');
+                        }
 
                         //set new scale percentage
                         slideImage.data('currentPercentage', newScale);
@@ -2157,8 +2168,12 @@
 								}
 
 							   	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){
+							   		container.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
+									container.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
 							   		detroyDraggable(slideImage);
 							   	}else{
+							   		container.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
+									container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
 									initDraggable(slideImage, userX, userY);
 							   	}
 
@@ -2189,8 +2204,13 @@
                 var container = $('.cb-lightbox'),
                     $s = container.data('settings'),
                     button = $(this),
+                    buttons = button.closest('.cb-lightbox__zoomButtons'),
                     currentSlide = $('.cb-lightbox-slide-current');
                     slideImage = currentSlide.find('.cb-lightbox-slide-image');
+
+                if(button.hasClass('cb-lightbox__zoomButton--disabled')){
+                	return;
+                }
 
                 var currentScale = slideImage.data('currentPercentage');
 
@@ -2200,19 +2220,27 @@
 
                     var newScale = currentScale + 20;
 
-                    if(newScale > 100){
+                    buttons.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
+
+                    if(newScale >= 100){
                         newScale = 100;
+
+                        button.addClass('cb-lightbox__zoomButton--disabled');
                     }
 
                 }else if(button.hasClass('cb-lightbox__zoomButton--out')){
                     var newScale = currentScale - 20;
 
-                    //round number 
+                    buttons.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
+
+                    //round number
                     if(newScale.toFixed(6) <= parseFloat(slideImage.data('fitPercentage').toFixed(6))){
                         newScale = slideImage.data('fitPercentage');
 
                         isDraggable = false;
                         container.removeClass('cb-lightbox-is-zoomed');
+
+                        button.addClass('cb-lightbox__zoomButton--disabled');
                     }
                 }
 

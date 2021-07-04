@@ -1249,7 +1249,7 @@
 
                 setTimeout(function(){
                 	zoomMapPosition(0, 0);
-                });
+                }, 10);
             }
 
 			//set new previews/next slide

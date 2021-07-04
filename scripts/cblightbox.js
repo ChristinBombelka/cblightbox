@@ -2277,6 +2277,11 @@
 
                 setTimeout(function(){
                     container.removeClass('cb-lightbox-run-zoom');
+
+	                if(!isDraggable){
+	                	container.removeClass('cb-lightbox-is-zoomed');
+	                }
+
                 }, $s.zoomDuration);
             });
 

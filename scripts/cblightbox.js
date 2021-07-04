@@ -2255,11 +2255,20 @@
                     scaleWidth = newWidth / slideImage.width(),
                     scaleHeight = newHeight / slideImage.height();
 
+                //more to original position
+                if(!isDraggable){
+                	newY = slideImage.data('fitTop');
+                	newX = slideImage.data('fitLeft');
+                }else{
+                	newY = checkZoomLimit(newHeight, 'height', newY);
+                	newX = checkZoomLimit(newWidth, 'width', newX);
+                }
+
                 container.addClass('cb-lightbox-run-zoom');
 
                 _animate(slideImage, {
-                    top: checkZoomLimit(newHeight, 'height', newY),
-                    left: checkZoomLimit(newWidth, 'width', newX),
+                    top: newY,
+                    left: newX,
                     scaleX: scaleWidth,
                     scaleY: scaleHeight,
                 }, $s.zoomDuration);

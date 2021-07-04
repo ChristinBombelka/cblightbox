@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.13.7 jQuery
- * 2021-07-01
+ * CBLightbox 3.13.8 jQuery
+ * 2021-07-04
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -103,13 +103,12 @@
 
 			clearTimeout(container.data('watch'));
 			container.removeClass('cb-lightbox-is-loading');
+			container.addClass('cb-lightbox-run-opening');
 
 			setTimeout(function(){
-				container.addClass('cb-lightbox-is-open');
-
 				container
 					.removeClass('cb-lightbox-is-loading')
-					.addClass('cb-lightbox-error-show');
+					.addClass('cb-lightbox-is-error');
 			});
 		}
 
@@ -491,7 +490,7 @@
 		function _animateEnd(el, to){
 			_animateDurationRemove(el);
 
-			if(el.closest('.cb-lightbox').hasClass('cb-lightbox-is-closing')){
+			if(el.closest('.cb-lightbox').hasClass('cb-lightbox-init-closing')){
 				return;
 			}
 
@@ -976,7 +975,7 @@
 				cachedSlide = slides[i];
 			}
 
-			container.removeClass('cb-lightbox-error-show');
+			container.removeClass('cb-lightbox-is-error');
 
 			var slide = $('<div class="cb-lightbox-slide cb-lightbox-slide-' + p + ' cb-lightbox-image-hide"></div>'),
 				wrapImage = $('<div class="cb-lightbox-slide-image"></div>');
@@ -1007,7 +1006,7 @@
 			});
 
 			$('.cb-lightbox-error').remove();
-			$('.cb-lightbox-content').removeClass('cb-lightbox-error-show');
+			$('.cb-lightbox-content').removeClass('cb-lightbox-is-error');
 
 			if(cachedSlide.type == "image"){
 
@@ -1370,6 +1369,8 @@
 				container = $('.cb-lightbox'),
 				cachedSlide = slides[i];
 
+			container.addClass('cb-lightbox-init-transitions');
+
 			setTranslate(slide, {
 				top: 0,
 				left: 0,
@@ -1454,7 +1455,7 @@
 					}, 20);
 				}
 
-				container.addClass('cb-lightbox-is-opening cb-lightbox-show-info cb-lightbox-show-buttons');
+				container.addClass('cb-lightbox-run-opening');
 
 				setTimeout(function(){
 					if(closing){
@@ -1466,7 +1467,7 @@
 					_animateDurationRemove(container);
 					_animateDurationRemove(container.find('.cb-lightbox-content'));
 
-					container.removeClass('cb-lightbox-is-opening').addClass('cb-lightbox-is-open');
+					container.removeClass('cb-lightbox-init-opening cb-lightbox-run-opening cb-lightbox-init-transitions');
 				}, $s.openCloseDuration);
 
 				setTimeout(function(){
@@ -1494,9 +1495,7 @@
 				slide = container.find('.cb-lightbox-slide.cb-lightbox-slide-current'),
 				slideImage = slide.find('.cb-lightbox-slide-image');
 
-			container
-				.removeClass('cb-lightbox-is-open cb-lightbox-is-opening cb-lightbox-show-info cb-lightbox-show-buttons')
-				.addClass('cb-lightbox-is-closing');
+			container.addClass('cb-lightbox-init-closing cb-lightbox-init-transitions');	
 
 			clearTimeout(container.data('watch'));
 
@@ -1510,6 +1509,8 @@
 
 			_animate(container, false, $s.openCloseDuration);
 			_animate(container.find('.cb-lightbox-content'), false, $s.openCloseDuration);
+
+			container.addClass('cb-lightbox-run-closing');
 
 			if($s.openCloseEffect == 'zoom' && el.is(':visible')){
 				var	scaleWidth =  previewImage.width() / slideImage.width(),
@@ -1529,8 +1530,6 @@
 				_animate(slide, {
 					opacity: 0,
 				}, $s.openCloseDuration);
-
-				$('.cb-lightbox').removeClass('cb-lightbox-is-open');
 			}
 
 			setTimeout(function(){
@@ -1571,7 +1570,7 @@
 				_this_index = item.index(item, settings);
 			}
 
-			var tpl = $('<div class="cb-lightbox"></div>').append('<div class="cb-lightbox-overlay"></div>');
+			var tpl = $('<div class="cb-lightbox cb-lightbox-init-opening"></div>').append('<div class="cb-lightbox-overlay"></div>');
 			
             var tplContent = $('<div class="cb-lightbox-content"></div>');
 
@@ -1693,7 +1692,7 @@
 			});
 
 			$(document).on("click", ".cb-lightbox-slide, .cb-lightbox-close", function(e){
-				if($('.cb-lightbox').hasClass('cb-lightbox-is-closing')){
+				if($('.cb-lightbox').hasClass('cb-lightbox-init-closing')){
 					return;
 				}
 
@@ -2090,7 +2089,7 @@
 				container.removeClass('cb-lightbox-is-grabbing');
 				$(this).unbind("mousemove.cb-lightbox touchmove.cb-lightbox");
 
-				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || container.hasClass('cb-lightbox-is-closing') || $(e.target).hasClass('cb-lightbox__zoomButton')){
+				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || container.hasClass('cb-lightbox-init-closing') || $(e.target).hasClass('cb-lightbox__zoomButton')){
 					return;
 				}
 
@@ -2238,7 +2237,7 @@
                         newScale = slideImage.data('fitPercentage');
 
                         isDraggable = false;
-                        container.removeClass('cb-lightbox-is-zoomed');
+                       
 
                         button.addClass('cb-lightbox__zoomButton--disabled');
                     }

@@ -21,7 +21,7 @@
 	width:100%;
 	height:100%;
 	position: absolute;
-	opacity: 0;
+	// opacity: 1;
 }
 
 .cb-lightbox-content{
@@ -43,9 +43,7 @@
 	float: right;
 	overflow: hidden;
 	cursor: pointer;
-	//opacity: 0.65;
 	z-index: 20;
-    //transition: opacity 250ms ease;
 
     &:after{
     	content: "";
@@ -280,36 +278,6 @@
 	}
 }
 
-.cb-lightbox-slide{
-	& > .cb-lightbox-caption{
-		display: none;
-
-		.cb-lightbox-is-open:not(.cb-lightbox-is-zoomed) & {
-			display: block;
-		}
-	}
-}
-
-.cb-lightbox-is-zoomed{
-	.cb-lightbox-slide-draggable{
-		cursor: grab;
-	    cursor: -moz-grab;
-	    cursor: -webkit-grab;
-	}
-
-	&.cb-lightbox-is-grabbing{
-		.cb-lightbox-slide-draggable{
-			cursor: grabbing;
-		    cursor: -moz-grabbing;
-		    cursor: -webkit-grabbing;
-		}
-	}
-
-	.cb-lightbox-slide > .cb-lightbox-caption{
-		display: none;
-	}
-}
-
 .dragarea{
 	position: fixed;
 	width: 100%;
@@ -320,76 +288,6 @@
 	cursor: -webkit-zoom-in;
 	cursor: -moz-zoom-in;
 	cursor: zoom-in;
-}
-
-
-
-.cb-lightbox-is-open{
-	.cb-lightbox-arrow,
-	.cb-lightbox-close{
-		transition: opacity 250ms ease;
-
-		.cb-lightbox-no-touch &:hover{
-			opacity: 0.6;
-		}
-	}
-
-    .cb-lightbox__zoomButtons,
-    .cb-lightbox__zoomMap{
-        transition: opacity 250ms ease;
-    }
-}
-
-.cb-lightbox-error,
-.cb-lightbox-arrow,
-.cb-lightbox-close,
-.cb-lightbox-info,
-.cb-lightbox__zoomButtons,
-.cb-lightbox__zoomMap{
-	transition-timing-function: ease;
-	transition-property: visibility, opacity;
-	transition-duration: inherit;
-	visibility: hidden;
-	opacity: 0;
-}
-
-.cb-lightbox-show-info{
-	.cb-lightbox-info{
-		visibility: visible;
-		opacity: 1;
-	}
-}
-
-.cb-lightbox-error-show,
-.cb-lightbox-show-buttons{
-	.cb-lightbox-close,
-	.cb-lightbox-arrow,
-    .cb-lightbox__zoomButtons,
-    .cb-lightbox__zoomMap{
-		visibility: visible;
-		opacity: 1;
-	}
-}
-
-
-.cb-lightbox-is-opening,
-.cb-lightbox-is-open{
-	.cb-lightbox-overlay{
-		opacity: 1;
-	}
-
-	.cb-lightbox-error{
-		opacity: 1;
-		visibility: visible;
-	}
-}
-
-.cb-lightbox-is-zoomed{
-	.cb-lightbox-arrow,
-	.cb-lightbox-info,
-	.cb-lightbox-caption{
-		display: none;
-	}
 }
 
 //.cb-lightbox-dragging-active,
@@ -519,6 +417,11 @@
     width: 50px;
     height: 50px;
     color: #fff;
+    transition: opacity 250ms;
+
+    .cb-lightbox-no-touch &:not(.cb-lightbox__zoomButton--disabled):hover{
+		opacity: 0.6;
+	}
 }
 
 .cb-lightbox__zoomButton--in,
@@ -556,6 +459,106 @@
 
 .cb-lightbox-slide-dragging-zoommap{
     transition: transform 75ms;
+}
+
+.cb-lightbox-arrow,
+.cb-lightbox-close{
+	transition: opacity 250ms ease;
+
+	.cb-lightbox-no-touch &:hover{
+		opacity: 0.6;
+	}
+}
+
+.cb-lightbox-init-transitions{
+	.cb-lightbox-overlay,
+	.cb-lightbox-error,
+	.cb-lightbox-arrow,
+	.cb-lightbox-close,
+	.cb-lightbox-info,
+	.cb-lightbox__zoomButtons,
+	.cb-lightbox__zoomMap{
+		transition-timing-function: ease;
+		transition-property: visibility, opacity;
+		transition-duration: inherit;
+	}
+}
+
+.cb-lightbox.cb-lightbox-init-opening{
+	.cb-lightbox-overlay,
+	.cb-lightbox-error,
+	.cb-lightbox-close,
+	.cb-lightbox__zoomButtons,
+	.cb-lightbox__zoomMap,
+	.cb-lightbox-info,
+	.cb-lightbox-arrow{
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+
+.cb-lightbox.cb-lightbox-init-closing,
+.cb-lightbox.cb-lightbox-run-opening{
+	.cb-lightbox-overlay,
+	.cb-lightbox-error,
+	.cb-lightbox-close,
+	.cb-lightbox__zoomButtons,
+	.cb-lightbox__zoomMap,
+	.cb-lightbox-info,
+	.cb-lightbox-arrow{
+		opacity: 1;
+		visibility: visible;
+	}
+
+	.cb-lightbox__zoomButton{
+		pointer-events: none;
+	}
+}
+
+.cb-lightbox.cb-lightbox-run-closing{
+	.cb-lightbox-overlay,
+	.cb-lightbox-error,
+	.cb-lightbox-close,
+	.cb-lightbox__zoomButtons,
+	.cb-lightbox__zoomMap,
+	.cb-lightbox-info,
+	.cb-lightbox-arrow{
+		opacity: 0;
+		visibility: hidden;
+	}
+
+	.cb-lightbox__zoomButton{
+		pointer-events: none;
+	}
+}
+
+.cb-lightbox.cb-lightbox-init-opening,
+.cb-lightbox.cb-lightbox-init-closing{
+	.cb-lightbox-slide > .cb-lightbox-caption{
+		visibility: hidden;
+	}
+}
+
+.cb-lightbox-is-zoomed{
+	.cb-lightbox-arrow,
+	.cb-lightbox-info,
+	.cb-lightbox-caption{
+		display: none;
+	}
+	
+	.cb-lightbox-slide-draggable{
+		cursor: grab;
+	    cursor: -moz-grab;
+	    cursor: -webkit-grab;
+	}
+
+	&.cb-lightbox-is-grabbing{
+		.cb-lightbox-slide-draggable{
+			cursor: grabbing;
+		    cursor: -moz-grabbing;
+		    cursor: -webkit-grabbing;
+		}
+	}
 }
 
 @media screen and (max-width: 768px) {

@@ -67,6 +67,7 @@
 			zoomOffset : 0,
             zoomControlls: false,
             zoomMap: false,
+            zoomSize: 20,
 			disableOnMobile: false,
 			breakpoint : 800,
 			counter : true,
@@ -2217,7 +2218,7 @@
                     isDraggable = true;
                     container.addClass('cb-lightbox-is-zoomed');
 
-                    var newScale = currentScale + 20;
+                    var newScale = currentScale + $s.zoomSize;
 
                     buttons.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
 
@@ -2228,7 +2229,7 @@
                     }
 
                 }else if(button.hasClass('cb-lightbox__zoomButton--out')){
-                    var newScale = currentScale - 20;
+                    var newScale = currentScale - $s.zoomSize;
 
                     buttons.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
 

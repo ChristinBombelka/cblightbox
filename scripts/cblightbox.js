@@ -1045,6 +1045,10 @@
 
 				var iframe = cachedSlide.iframe.clone().appendTo(wrapImage);
 
+				if(p == 'current'){
+					container.addClass('cb-lightbox-is-iframe');
+				}
+
 				wrapImage
 					.data({
 						'fullWidth': item.data('width') ? item.data('width') : 16,

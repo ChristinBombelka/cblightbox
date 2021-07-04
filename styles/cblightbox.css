@@ -117,4 +117,6 @@
 .cb-lightbox-is-zoomed .cb-lightbox-slide-draggable { cursor: grab; cursor: -webkit-grab; }
 .cb-lightbox-is-zoomed.cb-lightbox-is-grabbing .cb-lightbox-slide-draggable { cursor: grabbing; cursor: -webkit-grabbing; }
 
+.cb-lightbox-is-iframe .cb-lightbox__zoomMap, .cb-lightbox-is-iframe .cb-lightbox__zoomButtons { display: none; }
+
 @media screen and (max-width: 768px) { .cb-lightbox-lock { padding-right: 0; } }

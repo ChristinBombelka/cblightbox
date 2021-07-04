@@ -545,7 +545,7 @@
 	.cb-lightbox-caption{
 		display: none;
 	}
-	
+
 	.cb-lightbox-slide-draggable{
 		cursor: grab;
 	    cursor: -moz-grab;
@@ -558,6 +558,13 @@
 		    cursor: -moz-grabbing;
 		    cursor: -webkit-grabbing;
 		}
+	}
+}
+
+.cb-lightbox-is-iframe{
+	.cb-lightbox__zoomMap,
+	.cb-lightbox__zoomButtons{
+		display: none;
 	}
 }
 

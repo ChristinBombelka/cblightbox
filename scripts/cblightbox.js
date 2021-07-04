@@ -69,11 +69,11 @@
             zoomMap: false,
             zoomSize: 20,
 			disableOnMobile: false,
-			breakpoint : 800,
-			counter : true,
-			captionPosition : 'outside', //inside, outside
-			openCloseEffect : 'fade', //fade, zoom
-			openCloseDuration : 250,
+			breakpoint: 800,
+			counter: true,
+			captionPosition: 'outside', //inside, outside
+			openCloseEffect: 'fade', //fade, zoom
+			openCloseDuration: 250,
 			slideDuration: 250,
 			slideEffect: 'fade', //slide, fade
 			previewSource: false, //define preview image source on use lazyloading

@@ -1,6 +1,6 @@
 $(function() {
     $(".js-lightbox").cblightbox({
-        margin: [50, 60, 100, 60],
+        margin: [50, 60, 50, 60],
         openCloseEffect: 'zoom',
         openCloseDuration: 1000,
         slideEffect: 'slide',
@@ -9,7 +9,8 @@ $(function() {
         zoomOffset : 0,
         captionPosition: 'inside',
         zoomControlls: true,
-        zoomMap: true
+        zoomMap: true,
+        zoomSteps: 3,
      });
 
     $(".js-lightbox-fade").cblightbox({

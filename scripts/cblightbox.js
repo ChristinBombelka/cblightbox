@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.13.8 jQuery
- * 2021-07-04
+ * CBLightbox 3.14.0 jQuery
+ * 2021-08-02
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -67,7 +67,7 @@
 			zoomOffset : 0,
             zoomControlls: false,
             zoomMap: false,
-            zoomSize: 20,
+            zoomSteps: 3,
 			disableOnMobile: false,
 			breakpoint: 800,
 			counter: true,
@@ -544,6 +544,8 @@
 	        	clickX = userX / slideImage.width(),
 				clickY = userY / slideImage.height();
 
+			slideImage.data('currentZoomStep', $s.zoomSteps);
+
 			if(slideImage.data('fullWidth') > $(window).width()){
 				var positionX = Math.max(slideImage.data('fullWidth') * clickX - ($(window).width() / 2) - $s.zoomOffset[3], -$s.zoomOffset[3]);
 					positionX = -Math.min(slideImage.data('fullWidth') - $(window).width() + $s.zoomOffset[1], positionX);
@@ -597,6 +599,7 @@
 	    	isDraggable = false;
 
             container.addClass('cb-lightbox-run-zoom');
+            slideImage.data('currentZoomStep', 0);
 
 	    	var	scaleWidth = slideImage.data('fitWidth') / slideImage.width(),
 	       		scaleHeight = slideImage.data('fitHeight') / slideImage.height();
@@ -1004,6 +1007,7 @@
 				'index': i,
 				'holderWidth': item.find('img').width(),
 				'holderHeight': item.find('img').height(),
+                'currentZoomStep': 0,
 			});
 
 			$('.cb-lightbox-error').remove();
@@ -1366,6 +1370,19 @@
 				};
 			}
 		}
+
+        function calcZoomSize(item, customStep){
+            var $s = item.closest('.cb-lightbox').data('settings'),
+                zoomStep = customStep ? customStep : item.data('currentZoomStep'),
+                fitScale = item.data('fitPercentage'),
+                a = 2 ** zoomStep;
+
+            if(zoomStep == 0){
+            	a = 0
+            }
+
+            return fitScale + a * (100 - fitScale) / 2 ** $s.zoomSteps;
+        }
 
 		function open(item, i, $s){
 			var source = item.attr('href'),
@@ -1767,6 +1784,7 @@
                         startPinch = getZoomDistance(touchStart1, touchStart2);
 
                     slideImage.addClass('cb-lightbox-is-pinching');
+                    slideImage.data('currentZoomStep', 'auto');
 
                     $(document).bind(is_touch_device() ? 'touchmove.cb-lightbox' : 'mousemove.cb-lightbox', function(e){
                             
@@ -2216,13 +2234,34 @@
                 	return;
                 }
 
-                var currentScale = slideImage.data('currentPercentage');
+                var currentScale = slideImage.data('currentPercentage'),
+                    currentZoomStep = slideImage.data('currentZoomStep');
+
 
                 if(button.hasClass('cb-lightbox__zoomButton--in')){
                     isDraggable = true;
                     container.addClass('cb-lightbox-is-zoomed');
 
-                    var newScale = currentScale + $s.zoomSize;
+                    let newZoom;
+                    if(currentZoomStep == 'auto'){
+                    	for (var i = 0; i <= $s.zoomSteps; i++) {
+                    		calculatedScale = calcZoomSize(slideImage, i);
+
+                    		if(calculatedScale >= currentScale){
+                    			newZoom = i;
+                    			break;
+                    		}
+                    	}
+                    }else{
+                    	newZoom = currentZoomStep + 1;
+	                    if(newZoom > $s.zoomSteps){
+	                    	newZoom = $s.zoomSteps;
+	                    }
+                    }
+
+                    slideImage.data('currentZoomStep', newZoom);
+
+                    var newScale = calcZoomSize(slideImage, false);
 
                     buttons.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
 
@@ -2233,7 +2272,27 @@
                     }
 
                 }else if(button.hasClass('cb-lightbox__zoomButton--out')){
-                    var newScale = currentScale - $s.zoomSize;
+
+                	let newZoom;
+					if(currentZoomStep == 'auto'){
+                    	for (var i = $s.zoomSteps; i >= 0; i--) {
+                    		calculatedScale = calcZoomSize(slideImage, i);
+
+                    		if(calculatedScale <= currentScale){
+                    			newZoom = i;
+                    			break;
+                    		}
+                    	}
+                    }else{
+	                    newZoom = currentZoomStep - 1;
+	                    if(newZoom <= 0){
+	                    	newZoom = 0;
+	                    }
+	                }
+
+                    slideImage.data('currentZoomStep', newZoom);
+
+                    var newScale = calcZoomSize(slideImage, false);
 
                     buttons.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
 
@@ -2242,7 +2301,6 @@
                         newScale = slideImage.data('fitPercentage');
 
                         isDraggable = false;
-                       
 
                         button.addClass('cb-lightbox__zoomButton--disabled');
                     }
@@ -2295,8 +2353,10 @@
 					detroyDraggable($('.cb-lightbox-slide-current .cb-lightbox-slide-image'), true);
 				}
 
-				if($('.cb-lightbox').length){
-					var $s = $('.cb-lightbox').data('settings');
+				let lightbox = $('.cb-lightbox');
+
+				if(lightbox.length){
+					var $s = lightbox.data('settings');
 
 					$('.cb-lightbox-slide').each(function(){
 						var slide = $(this),
@@ -2322,6 +2382,10 @@
 							}
 						}
 					});
+
+					lightbox.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
+					lightbox.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
+
 				}
 			});
 

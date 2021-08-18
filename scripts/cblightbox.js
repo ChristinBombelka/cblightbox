@@ -79,6 +79,7 @@
 			previewSource: false, //define preview image source on use lazyloading
             previewimage: true,
 			dragSlide: true,
+            closeOutsideClick: true,
 			alignHorizontal: 'center', //center, left, right
 			alignVertical: 'center', //center, top, bottom
 			afterInit: $.noop,
@@ -1718,7 +1719,10 @@
 					return;
 				}
 
-				if(($(e.target).hasClass("cb-lightbox-slide") || $(e.target).hasClass("cb-lightbox-close")) && !$(e.target).hasClass("cb-lightbox-arrow")){
+                var container = $('.cb-lightbox'),
+                    $s = container.data('settings');
+
+				if((($(e.target).hasClass("cb-lightbox-slide") && $s.closeOutsideClick) || $(e.target).hasClass("cb-lightbox-close")) && !$(e.target).hasClass("cb-lightbox-arrow")){
 					close();
 				}
 			});

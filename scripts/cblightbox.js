@@ -60,9 +60,9 @@
 			maxHeight: 9999,
 			maxWidth: 9999,
 			margin: 40,
-			mobilemargin: 0,
-            insidearrows: false, 
-			zoom : false,
+			mobileMargin: 0,
+            insideArrows: false, 
+			zoom: false,
 			zoomDuration : 300,
 			zoomOffset : 0,
             zoomControlls: false,
@@ -77,7 +77,7 @@
 			slideDuration: 250,
 			slideEffect: 'fade', //slide, fade
 			previewSource: false, //define preview image source on use lazyloading
-            previewimage: true,
+            previewImage: true,
 			dragSlide: true,
             closeOutsideClick: true,
 			alignHorizontal: 'center', //center, left, right
@@ -999,7 +999,7 @@
 				watchLoading(slide);
 			}
 
-            if(container.data('grouplength') > 1 && $s.insidearrows){
+            if(container.data('grouplength') > 1 && $s.insideArrows){
                 var arrows = $('<div class="cb-lightbox-arrow-prev cb-lightbox-arrow cb-lightbox-arrow--inside"><span></span></div><div class="cb-lightbox-arrow-next cb-lightbox-arrow cb-lightbox-arrow--inside"><span></span></div>');
                 arrows.appendTo(wrapImage);
             }
@@ -1017,7 +1017,7 @@
 
 			if(cachedSlide.type == "image"){
 
-                if($s.previewimage){
+                if($s.previewImage){
                     var elementPlaceholder = cachedSlide.placeholder.clone().appendTo(wrapImage);
 
                     elementPlaceholder.show();
@@ -1395,7 +1395,7 @@
 
 				if(type == "image"){
 
-                    if($s.previewimage){
+                    if($s.previewImage){
                         previewImage = item.find('img');
 
                         if(previewImage.length && previewImage.attr('src') && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64'){
@@ -1681,7 +1681,7 @@
 
             tpl.append(tplContent);
 
-			if(grouplength > 1 && !$s.insidearrows){
+			if(grouplength > 1 && !$s.insideArrows){
 				var arrows = $('<div class="cb-lightbox-arrow-prev cb-lightbox-arrow"><span></span></div><div class="cb-lightbox-arrow-next cb-lightbox-arrow"><span></span></div>');
 				arrows.appendTo(tpl.find(".cb-lightbox-content"));
 			}
@@ -1725,7 +1725,7 @@
 
             //set margins
             if ($(window).width() < $s.breakpoint) {
-				var margin = $s.mobilemargin;
+				var margin = $s.mobileMargin;
 			}else{
 				var margin = $s.margin;
 			}

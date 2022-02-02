@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.14.0 jQuery
- * 2021-08-02
+ * CBLightbox 3.15.0 jQuery
+ * 2022-02-02
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -82,6 +82,7 @@
             closeOutsideClick: true,
 			alignHorizontal: 'center', //center, left, right
 			alignVertical: 'center', //center, top, bottom
+            wrapAround: true,
 			afterInit: $.noop,
 			afterFit: $.noop,
 			afterSlide: $.noop,
@@ -1070,6 +1071,24 @@
 			return slide;
 		}
 
+        function arrowHide(direction, hide){
+            let container = $('.cb-lightbox')
+
+            if(hide){
+                container.find('.cb-lightbox-arrow-' + direction).addClass('cb-lightbox-arrow--disabled')
+            }else{
+                container.find('.cb-lightbox-arrow-' + direction).removeClass('cb-lightbox-arrow--disabled')
+            }
+        }
+
+        function resetSlide(slide){
+            _animate(slide, {
+                left: 0,
+            }, 250);
+
+            slide.removeClass('cb-lightbox-is-sliding');
+        }
+
 	    function slideTo(direction, effect){
 	    	if(typeof effect === "undefined"){
 	    		effect = false;
@@ -1095,6 +1114,14 @@
 				_this_index = _this_index - 1;
 
 				if(_this_index < 0){
+
+                    if($s.wrapAround === false){
+                        resetSlide(oldCurrent);
+                        _this_index = _this_index + 1;
+                        slideing = false;
+                        return;
+                    }
+
 					_this = items.length - 1;
 					_this_index = _this;
 				}
@@ -1116,6 +1143,14 @@
 				_this_index = _this_index + 1;
 
 				if(_this_index > items.length - 1){
+
+                    if($s.wrapAround === false){
+                        resetSlide(oldCurrent);
+                        _this_index = _this_index - 1;
+                        slideing = false;
+                        return;
+                    }
+
 					_this_index = 0;
 				}
 
@@ -1131,6 +1166,17 @@
 				//change current slide
 				var oldCurrentDirection = 'previews';
 			}
+
+            if($s.wrapAround === false){
+                if(items.length - 1 == _this_index){
+                    arrowHide('next', true)
+                }else if(_this_index == 0){
+                    arrowHide('prev', true)
+                }else{
+                    arrowHide('next', false)
+                    arrowHide('prev', false)
+                }
+            }
 
 			container.find('.cb-counter-current').text(_this_index + 1);
 
@@ -1180,34 +1226,36 @@
 
 			values = getImageFit(newCurrentImage);
 
-			setTranslate(newCurrentImage, {
-				width: values.width,
-				height: values.height,
-				left: values.left,
-				top: values.top,
-			});
+            setTimeout(function(){
+                setTranslate(newCurrentImage, {
+                    width: values.width,
+                    height: values.height,
+                    left: values.left,
+                    top: values.top,
+                });
+            })
 
-			//set current slide start position
-			if($s.slideEffect == 'slide' || effect == 'slide'){
-				if(direction == 'previews'){
-					var slideIn = -$(window).width();
-				}else{
-					var slideIn = $(window).width();
-				}
+            //set current slide start position
+            if($s.slideEffect == 'slide' || effect == 'slide'){
+                if(direction == 'previews'){
+                    var slideIn = -$(window).width();
+                }else{
+                    var slideIn = $(window).width();
+                }
 
-				setTranslate(newCurrent, {
-					left: slideIn,
-					opacity: 0,
-				});
-			}else{
-				setTranslate(newCurrent, {
-					left: 0,
-					opacity: 0,
-				});
-			}
+                setTranslate(newCurrent, {
+                    left: slideIn,
+                    opacity: 0,
+                });
+            }else{
+                setTranslate(newCurrent, {
+                    left: 0,
+                    opacity: 0,
+                });
+            }
 
-			clearTimeout($('.cb-lightbox').data('watch'));
-			watchLoading(newCurrent);
+            clearTimeout($('.cb-lightbox').data('watch'));
+            watchLoading(newCurrent);
 
 			if($s.slideEffect == 'slide' || effect == 'slide'){
 				setTimeout(function(){
@@ -1257,8 +1305,19 @@
                 }, 10);
             }
 
-			//set new previews/next slide
-			setSlide(items.eq(_slideIndex), _slideIndex, direction);
+            let appendSlide = true
+            if($s.wrapAround === false){
+                if(direction == 'next' && _slideIndex == 0){
+                    appendSlide = false
+                }else if(direction == 'previews' && _slideIndex == items.length - 1){
+                    appendSlide = false
+                }
+            }
+
+            if(appendSlide){
+                //set new previews/next slide
+                setSlide(items.eq(_slideIndex), _slideIndex, direction);
+			}
 	    }
 
 	    function initPreload(container){
@@ -1267,29 +1326,42 @@
 	    	}
 
     		var group = container.data('group'),
+                $s = container.data('settings'),
 				items = $('a[data-group="'+ group +'"]');
 
 			if(items.length > 1){
 				//cache prev slide
 				var _slideIndex = _this_index - 1;
 
-				if(_slideIndex < 0){
-					_this = items.length - 1;
-					_slideIndex = _this;
-				}
+                if($s.wrapAround){
+                    if(_slideIndex < 0){
+                        _this = items.length - 1;
+                        _slideIndex = _this;
+                    }
+                }else if(_slideIndex < 0){
+                    arrowHide('prev', true);
+                }
 
-				var prevItem = items.eq(_slideIndex);
-				var preSlide = setSlide(prevItem, _slideIndex, 'previews');
+				if(_slideIndex >= 0){
+    				var prevItem = items.eq(_slideIndex);
+    				var preSlide = setSlide(prevItem, _slideIndex, 'previews');
+                }
 
 				//cache next slide
 				var _slideIndex = _this_index + 1;
 
-				if(_slideIndex > items.length - 1){
-					_slideIndex = 0;
-				}
+                if($s.wrapAround){
+    				if(_slideIndex > items.length - 1){
+    					_slideIndex = 0;
+    				}
+                }else if(_slideIndex > items.length - 1){
+                    arrowHide('next', true);
+                }
 
-				var nextItem = items.eq(_slideIndex);
-				var postSlide = setSlide(nextItem, _slideIndex, 'next');
+                if(_slideIndex <= items.length - 1){
+    				var nextItem = items.eq(_slideIndex);
+    				var postSlide = setSlide(nextItem, _slideIndex, 'next');
+                }
 			}
 
 			firstLoad = false;

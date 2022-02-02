@@ -184,6 +184,11 @@
 	}
 }
 
+.cb-lightbox-arrow--disabled{
+    opacity: 0;
+    visibility: hidden;
+}
+
 .cb-lightbox-arrow--inside{
     position: absolute;
     top: 0;

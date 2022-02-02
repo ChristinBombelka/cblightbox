@@ -2,6 +2,7 @@
 	//transition-timing-function: ease;
 	//transition-property: opacity;
 	backface-visibility: visible;
+    color: #fff;
 	transform: translateZ(0px);
 	position: fixed;
 	font: 14px/1.2 arial;
@@ -238,7 +239,6 @@
 
 	.cb-lightbox-caption{
 		transform: translateX(-50%);
-		color: #fff;
 		padding: 15px 90px;
 		text-align: center;
 		min-width: 300px;
@@ -251,7 +251,6 @@
 	//overflow: visible;
 
 	.cb-lightbox-caption{
-		color: #fff;
 		transform: translateY(100%);
 		position: absolute;
 		bottom: 0;
@@ -262,7 +261,6 @@
 }
 
 .cb-lightbox-counter{
-	color: #fff;
 	padding: 15px 20px;
     position: absolute;
     right: 0;

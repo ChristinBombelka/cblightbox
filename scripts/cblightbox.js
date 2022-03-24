@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.15.0 jQuery
- * 2022-02-02
+ * CBLightbox 3.16.0 jQuery
+ * 2022-03-24
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1190,6 +1190,15 @@
 				.removeClass('cb-lightbox-slide-current')
 				.addClass('cb-lightbox-slide-' + oldCurrentDirection);
 
+            //reset iframe
+            //use vimeo/youtube api to stop/play video?
+            if(oldCurrent.find('.cb-lightbox-iframe').length){
+                let iframe = oldCurrent.find('.cb-lightbox-iframe')
+
+                iframe.attr('src', '')
+                iframe.attr('src', iframe.data('source'))
+            }
+
 			if($s.slideEffect == 'slide' || effect == 'slide'){
 
 				if(direction == 'previews'){
@@ -1428,9 +1437,10 @@
 					});
 
 				}else if(type == "iframe"){
-					var iframe = $('<iframe src="" class="cb-lightbox-image cb-lightbox-iframe" allow="autoplay, fullscreen" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>');
 
-					iframe.attr("src", source);
+                    let sourceUrl = extendIframeSource(source)
+
+					iframe = $('<iframe src="'+sourceUrl+'" data-source="'+sourceUrl+'" class="cb-lightbox-image cb-lightbox-iframe" allow="autoplay, fullscreen" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>');
 				}
 
 				slides[i] = {
@@ -1443,6 +1453,37 @@
 				};
 			}
 		}
+
+        function extendIframeSource(url){
+            let protocol = 'https:'
+            if(window.location.protocol === 'http:'){
+                protocol = 'http:'
+            }
+
+            // YouTube
+            if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtube-nocookie\.com|youtu\.?be)\/.+$/.test(url)) {
+
+                let regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+                if(url.match(regex)){
+                    return protocol + '//www.youtube.com/embed/' + RegExp.$2 + '?showinfo=0&rel=0'
+                }
+
+                return url
+            }
+
+            // Vimeo
+            if (/^https?:\/\/(player.vimeo.com\/video\/|vimeo.com)\d{0,9}(?=\b|\/)/.test(url)) {
+
+                let regex = /^.*(vimeo\.com\/(video\/|))([0-9]+)/;
+                if(url.match(regex)){
+                    return 'https:/player.vimeo.com/video/' + RegExp.$3
+                }
+
+                return url
+            }
+
+            return url
+        }
 
         function calcZoomSize(item, customStep){
             var $s = item.closest('.cb-lightbox').data('settings'),

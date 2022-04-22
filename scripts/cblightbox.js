@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.16.1 jQuery
- * 2022-04-02
+ * CBLightbox 3.16.2 jQuery
+ * 2022-04-22
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1168,10 +1168,12 @@
 			}
 
             if($s.wrapAround === false){
-                if(items.length - 1 == _this_index){
+               if(items.length - 1 == _this_index){
                     arrowHide('next', true)
+                    arrowHide('prev', false)
                 }else if(_this_index == 0){
                     arrowHide('prev', true)
+                    arrowHide('next', false)
                 }else{
                     arrowHide('next', false)
                     arrowHide('prev', false)

@@ -543,29 +543,44 @@
 
 	    	$('.cb-lightbox').addClass('cb-lightbox-is-zoomed cb-lightbox-run-zoom');
 
-	        var $s = $('.cb-lightbox').data('settings'),
-	        	slide = slideImage.closest('.cb-lightbox-slide'),
-	        	clickX = userX / slideImage.width(),
-				clickY = userY / slideImage.height();
+	        let $s = $('.cb-lightbox').data('settings')
+            let scaleWidth = slideImage.data('fullWidth') / slideImage.width()
+            let scaleHeight = slideImage.data('fullHeight') / slideImage.height()
+            let positionX 
+            let positionY
 
 			slideImage.data('currentZoomStep', $s.zoomSteps);
 
 			if(slideImage.data('fullWidth') > $(window).width()){
-				var positionX = Math.max(slideImage.data('fullWidth') * clickX - ($(window).width() / 2) - $s.zoomOffset[3], -$s.zoomOffset[3]);
-					positionX = -Math.min(slideImage.data('fullWidth') - $(window).width() + $s.zoomOffset[1], positionX);
+
+                let imageOverlapX = slideImage.data('fullWidth') - $(window).width()
+                positionX = slideImage.offset().left + userX - (userX * scaleWidth)
+
+                // Limit horizontal 
+                if(positionX > $s.zoomOffset[3]){
+                    positionX = $s.zoomOffset[3]
+                }else if(positionX < -(imageOverlapX + $s.zoomOffset[1]) ){
+                    positionX = -(imageOverlapX + $s.zoomOffset[1])
+                }
 			}else{
-				var positionX = ($(window).width() - slideImage.data('fullWidth')) / 2;
+				positionX = ($(window).width() - slideImage.data('fullWidth')) / 2;
 			}
+
 
 			if(slideImage.data('fullHeight') > $(window).height()){
-				var positionY = Math.max(slideImage.data('fullHeight') * clickY - ($(window).height() / 2) - $s.zoomOffset[0], -$s.zoomOffset[0]),
-					positionY = -Math.min(slideImage.data('fullHeight') - $(window).height() + $s.zoomOffset[2], positionY);
-			}else{
-				var positionY = ($(window).height() - slideImage.data('fullHeight')) / 2;
-			}
+                let imageOverlapY = slideImage.data('fullHeight') - $(window).height()
+                
+                positionY = slideImage.offset().top + userY - (userY * scaleHeight)
 
-			scaleWidth = slideImage.data('fullWidth') / slideImage.width();
-	        scaleHeight = slideImage.data('fullHeight') / slideImage.height();
+                Limit vertical
+                if(positionY > $s.zoomOffset[0]){
+                    positionY = $s.zoomOffset[0]
+                }else if (positionY < -(imageOverlapY + $s.zoomOffset[2])){
+                    positionY = -(imageOverlapY + $s.zoomOffset[2])   
+                }
+			}else{
+				positionY = ($(window).height() - slideImage.data('fullHeight')) / 2
+			}
 
 			_animate(slideImage, {
 				top: positionY,

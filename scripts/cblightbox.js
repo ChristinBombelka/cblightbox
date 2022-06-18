@@ -214,24 +214,26 @@
             var zoomMapContainer = $('.cb-lightbox__zoomMap'),
                 zoomMapWidthRatio = windowWidth / imageWidth,
                 zoomMapHeightRatio = windowHeight / imageHeight,
-                zoomMapTop = (Math.max(Math.abs(y), 1) / imageHeight),
-                zoomMapLeft = (Math.max(Math.abs(x), 1) / imageWidth);
+                zoomMapWidth = zoomMapContainer[0].getBoundingClientRect().width,
+                zoomMapHeight = zoomMapContainer[0].getBoundingClientRect().height,
+                zoomHandleTop = y < 0 ? (Math.max(Math.abs(y), 1) / imageHeight) : 0,
+                zoomHandleLeft = x < 0 ? (Math.max(Math.abs(x), 1) / imageWidth) : 0;
 
-            var zoomMapWidth = zoomMapWidthRatio * zoomMapContainer.width();
-            if(zoomMapWidth >= zoomMapContainer.width()){
-                zoomMapWidth = zoomMapContainer.width();
+            var zoomHandleWidth = zoomMapWidthRatio * zoomMapWidth;
+            if(zoomHandleWidth >= zoomMapWidth){
+                zoomHandleWidth = zoomMapWidth;
             }
 
-            var zoomMapHeight = zoomMapHeightRatio * zoomMapContainer.height();
-            if(zoomMapHeight >= zoomMapContainer.height()){
-                zoomMapHeight = zoomMapContainer.height();
+            var zoomHandleHeight = zoomMapHeightRatio * zoomMapHeight;
+            if(zoomHandleHeight >= zoomMapHeight){
+                zoomHandleHeight = zoomMapHeight;
             }
 
             zoomMapContainer.find('.cb-lightbox__zoomMap-handle').css({
-                'width': zoomMapWidth,
-                'height': zoomMapHeight,
-                'top': zoomMapTop * zoomMapContainer.height(),
-                'left': zoomMapLeft * zoomMapContainer.width()
+                'width': zoomHandleWidth,
+                'height': zoomHandleHeight,
+                'top': zoomHandleTop * zoomMapHeight,
+                'left': zoomHandleLeft * zoomMapWidth
             });
         }
 

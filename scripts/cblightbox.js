@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.16.2 jQuery
- * 2022-04-22
+ * CBLightbox 3.16.3 jQuery
+ * 2022-06-18
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -2149,6 +2149,8 @@
                 }
 
                 var area = $(this),
+                    windowWidth = $(window).width(),
+                    windowHeight = $(window).height(),
                     handel = area.find('.cb-lightbox__zoomMap-handle'),
                     handelWidth = handel.outerWidth(),
                     handelHeight = handel.outerHeight(),
@@ -2205,20 +2207,28 @@
                         left: newX
                     });
 
-                    var imageLeft = (newX / areaWidth * imageWidth);
-                    if(imageLeft > imageWidth - $(window).width()){
-                        imageLeft = (imageWidth - $(window).width()) / 2;
+                    let imageLeft = (newX / areaWidth * imageWidth)
+                    if(imageLeft > imageWidth - $(window).width() && imageWidth < windowWidth){
+                        // Center image horizontal
+                        imageLeft = (imageWidth - $(window).width()) / 2
+                    }else if(imageLeft > imageWidth - $(window).width() && imageWidth > windowWidth){
+                        // Set image right limit
+                        imageLeft = imageWidth - $(window).width()
                     }
 
-                    var imageTop = (newY / areaHeight * imageHeight);
-                    if(imageTop > imageHeight - $(window).height()){
-                        imageTop = (imageHeight - $(window).height()) / 2;
+                    let imageTop = (newY / areaHeight * imageHeight)
+                    if(imageTop > imageHeight - $(window).height() && imageHeight < windowHeight){
+                        // Center image vertical
+                        imageTop = (imageHeight - $(window).height()) / 2
+                    }else if(imageTop > imageHeight - $(window).height() && imageHeight > windowHeight){
+                        // Set image bottom limit
+                        imageTop = imageHeight - $(window).height()
                     }
-                    
+                
                     setTranslate(slideImage, {
                         top: -imageTop,
                         left: -imageLeft,
-                    });
+                    })
                 });
             });
 

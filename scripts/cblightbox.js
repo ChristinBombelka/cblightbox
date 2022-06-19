@@ -532,7 +532,7 @@
 			}, duration + 20));
 		}
 
-		function initDraggable(slideImage, userX, userY){
+		function initDraggable(slideImage, x, y){
 	    	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed") || $('.cb-lightbox').hasClass('cb-lightbox-is-loading')){
 	    		return;
 	    	}
@@ -548,13 +548,17 @@
             let scaleHeight = slideImage.data('fullHeight') / slideImage.height()
             let positionX 
             let positionY
+            let offset = {
+                x: x,
+                y: y
+            }
 
 			slideImage.data('currentZoomStep', $s.zoomSteps);
 
 			if(slideImage.data('fullWidth') > $(window).width()){
 
                 let imageOverlapX = slideImage.data('fullWidth') - $(window).width()
-                positionX = slideImage.offset().left + userX - (userX * scaleWidth)
+                positionX = (slideImage.offset().left - $(window).scrollLeft()) + offset.x - (offset.x * scaleWidth)
 
                 // Limit horizontal 
                 if(positionX > $s.zoomOffset[3]){
@@ -566,11 +570,10 @@
 				positionX = ($(window).width() - slideImage.data('fullWidth')) / 2;
 			}
 
-
 			if(slideImage.data('fullHeight') > $(window).height()){
                 let imageOverlapY = slideImage.data('fullHeight') - $(window).height()
                 
-                positionY = slideImage.offset().top + userY - (userY * scaleHeight)
+                positionY = (slideImage.offset().top - $(window).scrollTop()) + offset.y - (offset.y * scaleHeight)
 
                 // Limit vertical
                 if(positionY > $s.zoomOffset[0]){

@@ -2334,8 +2334,8 @@
 									var userX = e.offsetX,
 										userY = e.offsetY;
 								}else{
-									var userX = userXTouch,
-										userY = userYTouch;
+									var userX = userXTouch + $(window).scrollLeft(),
+										userY = userYTouch + $(window).scrollTop();
 								}
 
 							   	if($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")){

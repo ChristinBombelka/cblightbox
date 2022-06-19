@@ -572,7 +572,7 @@
                 
                 positionY = slideImage.offset().top + userY - (userY * scaleHeight)
 
-                Limit vertical
+                // Limit vertical
                 if(positionY > $s.zoomOffset[0]){
                     positionY = $s.zoomOffset[0]
                 }else if (positionY < -(imageOverlapY + $s.zoomOffset[2])){

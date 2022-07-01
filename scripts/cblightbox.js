@@ -556,7 +556,6 @@
 			slideImage.data('currentZoomStep', $s.zoomSteps);
 
 			if(slideImage.data('fullWidth') > $(window).width()){
-
                 let imageOverlapX = slideImage.data('fullWidth') - $(window).width()
                 positionX = (slideImage.offset().left - $(window).scrollLeft()) + offset.x - (offset.x * scaleWidth)
 
@@ -572,7 +571,6 @@
 
 			if(slideImage.data('fullHeight') > $(window).height()){
                 let imageOverlapY = slideImage.data('fullHeight') - $(window).height()
-                
                 positionY = (slideImage.offset().top - $(window).scrollTop()) + offset.y - (offset.y * scaleHeight)
 
                 // Limit vertical
@@ -664,7 +662,6 @@
 					imgHeight = $(".cb-lightbox-image").height();
 				}
 			}else{
-
 				if(slideImage.data('fullHeight') && slideImage.data('fullWidth')){
 					imgHeight = container.height();
 					imgWidth = imgHeight / slideImage.data("fullHeight") * slideImage.data("fullWidth");
@@ -1036,7 +1033,6 @@
 			$('.cb-lightbox-content').removeClass('cb-lightbox-is-error');
 
 			if(cachedSlide.type == "image"){
-
                 if($s.previewImage){
                     var elementPlaceholder = cachedSlide.placeholder.clone().appendTo(wrapImage);
 
@@ -1066,9 +1062,7 @@
                     setImage(slide, source, item, p);
                 }
 				
-
 			}else if(cachedSlide.type == "iframe"){
-
 				var iframe = cachedSlide.iframe.clone().appendTo(wrapImage);
 
 				if(p == 'current'){

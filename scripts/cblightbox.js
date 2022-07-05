@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.16.3 jQuery
- * 2022-06-18
+ * CBLightbox 3.16.4 jQuery
+ * 2022-07-105
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1492,7 +1492,7 @@
 
                 let regex = /^.*(vimeo\.com\/(video\/|))([0-9]+)/;
                 if(url.match(regex)){
-                    return 'https:/player.vimeo.com/video/' + RegExp.$3
+                    return 'https://player.vimeo.com/video/' + RegExp.$3
                 }
 
                 return url

@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.16.4 jQuery
- * 2022-07-105
+ * CBLightbox 3.17.0 jQuery
+ * 2022-07-24
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -13,6 +13,7 @@
 		slides,
 		firstLoad,
 		pinching = false,
+        dragSlide = false,
 		isDraggable = false;
 
 	$.fn.cblightbox = function(options){
@@ -78,7 +79,7 @@
 			slideEffect: 'fade', //slide, fade
 			previewSource: false, //define preview image source on use lazyloading
             previewImage: true,
-			dragSlide: true,
+			slideDraggable: true,
             closeOutsideClick: true,
 			alignHorizontal: 'center', //center, left, right
 			alignVertical: 'center', //center, top, bottom
@@ -1216,17 +1217,24 @@
             }
 
 			if($s.slideEffect == 'slide' || effect == 'slide'){
+                let slideOut
+                let slideOutOpacity = 0
 
-				if(direction == 'previews'){
-					var slideOut = $(window).width();
-				}else{
-					var slideOut = -$(window).width();
-				}
+                if(dragSlide){
+                    slideOutOpacity = 1
+                }
+                   
+                if(direction == 'previews'){
+                    slideOut = $(window).width();
+                }else{
+                    slideOut = -$(window).width();
+                }
 
-				_animate(oldCurrent, {
-					left: slideOut,
-					opacity: 0,
-				}, $s.slideDuration);
+                _animate(oldCurrent, {
+                    left: slideOut,
+                    opacity: slideOutOpacity,
+                }, $s.slideDuration);
+                
 			}else{
 				_animate(oldCurrent, {
 					opacity: 0,
@@ -1262,16 +1270,20 @@
 
             //set current slide start position
             if($s.slideEffect == 'slide' || effect == 'slide'){
-                if(direction == 'previews'){
-                    var slideIn = -$(window).width();
-                }else{
-                    var slideIn = $(window).width();
-                }
+                
+                if(!dragSlide){
+                    if(direction == 'previews'){
+                        var slideIn = -$(window).width();
+                    }else{
+                        var slideIn = $(window).width();
+                    }
 
-                setTranslate(newCurrent, {
-                    left: slideIn,
-                    opacity: 0,
-                });
+                    setTranslate(newCurrent, {
+                        left: slideIn,
+                        opacity: 0,
+                    });
+                }
+                
             }else{
                 setTranslate(newCurrent, {
                     left: 0,
@@ -1305,7 +1317,8 @@
 			}, $s.slideDuration + 10);
 
 			setTimeout(function(){
-				slideing = false;
+				slideing = false
+                dragSlide = false
 			}, 200);
 
 			if(container.find('.cb-lightbox__zoomMap-image').length){
@@ -1844,7 +1857,7 @@
 			});
 
 			$(document).on("click", ".cb-lightbox-slide, .cb-lightbox-close", function(e){
-				if($('.cb-lightbox').hasClass('cb-lightbox-init-closing')){
+				if($('.cb-lightbox').hasClass('cb-lightbox-init-closing') || dragSlide){
 					return;
 				}
 
@@ -1896,8 +1909,8 @@
                     userYTouch = e.originalEvent.touches[0].clientY - $(this).offset().top;
                 }
 
-                //detect pan
                 if(e.type == "touchstart" && e.originalEvent.touches.length >= 2){
+                    // Multitouch zoom - panzoom
 
                     if(slide.hasClass('cb-lightbox-is-sliding')){
                         return;
@@ -1982,7 +1995,9 @@
                     });
 
                 } else if(!container.hasClass('cb-lightbox-is-zoomed') && !container.hasClass('cb-lightbox-is-single')){
-					if(!$s.dragSlide || opening || isDraggable){
+                    // Dragging next/prev/close
+
+                    if(!$s.slideDraggable || opening || isDraggable){
 						return;
 					}
 
@@ -2032,6 +2047,8 @@
 							moveDirection = direction;
 						}
 
+                        container.addClass('cb-lightbox--slide-dragging')
+
 						if(moveDirection == 'y'){
 							setTranslate(slideImage, {
 					        	top: slideImage.data('fitTop') + dragTop,
@@ -2044,16 +2061,35 @@
 						}else if(moveDirection == 'x'){
 							setTranslate(slide, {
 					        	left: dragLeft,
+                                top: 0
 					        });
 
 					        slide
 				        		.addClass('cb-lightbox-is-sliding')
 				        		.data('slideX', dragLeft);
+
+                            let previewSlide = $('.cb-lightbox-slide-previews')
+                            if(previewSlide.length){
+                                setTranslate(previewSlide, {
+                                    left: -$(window).width() + dragLeft,
+                                    top: 0,
+                                    opacity: 1
+                                });
+                            }
+                            
+                            let nextSlide = $('.cb-lightbox-slide-next')
+                            if(nextSlide.length){
+                                setTranslate(nextSlide, {
+                                    left: $(window).width() + dragLeft,
+                                    top: 0,
+                                    opacity: 1
+                                });
+                            }
 						}
 					});
 				
                 }else{
-
+                    // Dragging full size image
     				container.addClass('cb-lightbox-is-grabbing');
 
     				if(!slideImage.hasClass('cb-lightbox-slide-draggable')){
@@ -2267,6 +2303,8 @@
 					var slide = $(".cb-lightbox-slide-current"),
 						slideImage = slide.find('.cb-lightbox-slide-image');
 
+                    container.removeClass('cb-lightbox--slide-dragging')
+
 					if(slide.hasClass('cb-lightbox-is-sliding')){
 						//handle slide
 						var tolerance = 40,
@@ -2275,6 +2313,7 @@
 						if(slide.data('slideX')){
 							if(slide.data('slideX') > 0){
 								if(slide.data('slideX') > 0 + tolerance){
+                                    dragSlide = true
 									slideTo('previews', 'slide');
 								}else{
 									resetSlide = true;
@@ -2282,6 +2321,7 @@
 
 							}else{
 								if(slide.data('slideX') < 0 - tolerance){
+                                    dragSlide = true
 									slideTo('next', 'slide');
 								}else{
 									resetSlide = true;

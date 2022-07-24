@@ -571,6 +571,13 @@
 	}
 }
 
+.cb-lightbox--slide-dragging{
+    .cb-lightbox-close,
+    .cb-lightbox__zoomButtons{
+        pointer-events: none;
+    }
+}
+
 @media screen and (max-width: 768px) {
 	.cb-lightbox-lock{
 		padding-right: 0;

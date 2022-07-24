@@ -103,7 +103,7 @@ $(".js-cblightbox").cblightbox();
     /* Values: string
      * Set preview source for lazyloaded images - previewSource: 'data-original' - this value are display when the preview image is empty or a base64 image
      */
-    dragSlide: true,
+    slideDraggable: true,
     /* Values: true, false
      * Dragging image to slide prev/next
      */

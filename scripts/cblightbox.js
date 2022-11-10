@@ -14,6 +14,7 @@
 		firstLoad,
 		pinching = false,
         dragSlide = false,
+        scrollbarSpaceAdded = false,
 		isDraggable = false;
 
 	$.fn.cblightbox = function(options){
@@ -53,8 +54,10 @@
 			return scrollbarWidth;
 		}
 
-		if(!$(".cb-lightbox-margin").length){
-			$("<style type='text/css'>.cb-lightbox-margin{margin-right:" + getScrollbarWidth() + "px;}</style>").appendTo($("head"));
+		if(!scrollbarSpaceAdded){
+            $("<style type='text/css'>.cb-lightbox-margin{margin-right:" + getScrollbarWidth() + "px;}</style>").appendTo($("head"));
+
+            scrollbarSpaceAdded = true
 		}
 
 		var defaults = {

@@ -2416,6 +2416,10 @@
                     currentSlide = $('.cb-lightbox-slide-current');
                     slideImage = currentSlide.find('.cb-lightbox-slide-image');
 
+                if(!slideImage.hasClass('cb-lightbox-slide-draggable')){
+                	return;
+                }
+
                 if(button.hasClass('cb-lightbox__zoomButton--disabled')){
                 	return;
                 }

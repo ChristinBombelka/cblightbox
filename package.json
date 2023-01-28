@@ -1,0 +1,20 @@
+{
+  "name": "cblightbox",
+  "version": "1.0.0",
+  "description": "Simple and fast image lightbox. \r Features: \r - Responsive\r - Image Zoom\r - Image Zoom Map\r - Iframe ready\r - Nice open/close/slide effects",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChristinBombelka/cblightbox.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChristinBombelka/cblightbox/issues"
+  },
+  "homepage": "https://github.com/ChristinBombelka/cblightbox#readme",
+  "scripts":{
+    "sass": "sass -w --no-source-map scss/:styles/"
+  },
+}

@@ -499,7 +499,7 @@
 		function _animateEnd(el, to){
 			_animateDurationRemove(el);
 
-			if(el.closest('.cb-lightbox').hasClass('cb-lightbox-init-closing')){
+			if(closing){
 				return;
 			}
 
@@ -1851,7 +1851,7 @@
 			});
 
 			$(document).on("click", ".cb-lightbox-slide, .cb-lightbox-close", function(e){
-				if($('.cb-lightbox').hasClass('cb-lightbox-init-closing') || dragSlide){
+				if(closing || dragSlide){
 					return;
 				}
 
@@ -2285,7 +2285,7 @@
 				container.removeClass('cb-lightbox-is-grabbing');
 				$(this).unbind("mousemove.cb-lightbox touchmove.cb-lightbox");
 
-				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || container.hasClass('cb-lightbox-init-closing') || $(e.target).hasClass('cb-lightbox__zoomButton')){
+				if($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || closing || $(e.target).hasClass('cb-lightbox__zoomButton')){
 					return;
 				}
 

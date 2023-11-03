@@ -475,14 +475,14 @@
 .cb-lightbox.cb-lightbox-init-closing .cb-lightbox__zoomButtons,
 .cb-lightbox.cb-lightbox-init-closing .cb-lightbox__zoomMap,
 .cb-lightbox.cb-lightbox-init-closing .cb-lightbox-info,
-.cb-lightbox.cb-lightbox-init-closing .cb-lightbox-arrow,
+.cb-lightbox.cb-lightbox-init-closing .cb-lightbox-arrow:not(.cb-lightbox-arrow--disabled),
 .cb-lightbox.cb-lightbox-run-opening .cb-lightbox-overlay,
 .cb-lightbox.cb-lightbox-run-opening .cb-lightbox-error,
 .cb-lightbox.cb-lightbox-run-opening .cb-lightbox-close,
 .cb-lightbox.cb-lightbox-run-opening .cb-lightbox__zoomButtons,
 .cb-lightbox.cb-lightbox-run-opening .cb-lightbox__zoomMap,
 .cb-lightbox.cb-lightbox-run-opening .cb-lightbox-info,
-.cb-lightbox.cb-lightbox-run-opening .cb-lightbox-arrow {
+.cb-lightbox.cb-lightbox-run-opening .cb-lightbox-arrow:not(.cb-lightbox-arrow--disabled) {
   opacity: 1;
   visibility: visible;
 }

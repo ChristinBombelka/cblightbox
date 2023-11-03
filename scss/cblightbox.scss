@@ -524,7 +524,7 @@
 	.cb-lightbox__zoomButtons,
 	.cb-lightbox__zoomMap,
 	.cb-lightbox-info,
-	.cb-lightbox-arrow{
+	.cb-lightbox-arrow:not(.cb-lightbox-arrow--disabled){
 		opacity: 1;
 		visibility: visible;
 	}

@@ -1369,13 +1369,11 @@
                         _this = items.length - 1;
                         _slideIndex = _this;
                     }
-                }else if(_slideIndex < 0){
-                    arrowHide('prev', true);
                 }
 
 				if(_slideIndex >= 0){
     				var prevItem = items.eq(_slideIndex);
-    				var preSlide = setSlide(prevItem, _slideIndex, 'previews');
+    				setSlide(prevItem, _slideIndex, 'previews');
                 }
 
 				//cache next slide
@@ -1385,13 +1383,11 @@
     				if(_slideIndex > items.length - 1){
     					_slideIndex = 0;
     				}
-                }else if(_slideIndex > items.length - 1){
-                    arrowHide('next', true);
                 }
 
                 if(_slideIndex <= items.length - 1){
     				var nextItem = items.eq(_slideIndex);
-    				var postSlide = setSlide(nextItem, _slideIndex, 'next');
+    				setSlide(nextItem, _slideIndex, 'next');
                 }
 			}
 
@@ -1747,6 +1743,16 @@
 			if(grouplength > 1 && !$s.insideArrows){
 				var arrows = $('<div class="cb-lightbox-arrow-prev cb-lightbox-arrow"><span></span></div><div class="cb-lightbox-arrow-next cb-lightbox-arrow"><span></span></div>');
 				arrows.appendTo(tpl.find(".cb-lightbox-content"));
+
+				setTimeout(() => {
+					if(!$s.wrapAround){
+						if(_this_index == 0){						
+							arrowHide('prev', true);
+						}else if(_this_index == grouplength - 1){
+							arrowHide('next', true);
+						}
+					}
+				})
 			}
 
 			var captionTpl = $('<div class="cb-lightbox-info"></div>');

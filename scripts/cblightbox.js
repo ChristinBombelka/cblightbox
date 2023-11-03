@@ -1835,6 +1835,11 @@
 				firstTouch;
 
 			$(document).on('click', '.cb-lightbox-arrow', function(){
+
+				if(closing){
+					return
+				}
+
 				if($(this).hasClass('cb-lightbox-arrow-prev')){
 					slideTo('previews');
 				}else{

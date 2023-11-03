@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.17.0 jQuery
- * 2022-07-24
+ * CBLightbox 3.18.0 jQuery
+ * 2023-10-03
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */

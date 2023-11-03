@@ -299,11 +299,12 @@
 }
 
 .cb-lightbox-error{
+	background: #fff;
+	color: #000;
 	transform: translate(-50%, -50%);
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	background: #fff;
 	padding: 50px;
 }
 

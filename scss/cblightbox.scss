@@ -1,5 +1,6 @@
 :root{
-    --cb-button-bg-color: rgba(0,0,0,.7);
+    --cb-lightbox-button-color: rgba(0,0,0,.7);
+	--cb-lightbox-margin: 0px;
 }
 
 .cb-lightbox{
@@ -39,7 +40,7 @@
 }
 
 .cb-lightbox-close{
-    background-color: var(--cb-button-bg-color);
+    background-color: var(--cb-lightbox-button-color);
 	width: 50px;
 	height: 50px;
 	position: fixed;
@@ -159,7 +160,7 @@
 }
 
 .cb-lightbox-arrow{
-    background-color: var(--cb-button-bg-color);
+    background-color: var(--cb-lightbox-button-color);
 	position: fixed;
 	top: 50%;
 	width: 50px;
@@ -268,6 +269,7 @@
 
 .cb-lightbox-lock{
 	overflow: visible !important;
+	margin-right: var(--cb-lightbox-margin);
 
 	body{
 		overflow: hidden;
@@ -411,7 +413,7 @@
 }
 
 .cb-lightbox__zoomButton{
-    background-color: var(--cb-button-bg-color);
+    background-color: var(--cb-lightbox-button-color);
     width: 50px;
     height: 50px;
     color: #fff;

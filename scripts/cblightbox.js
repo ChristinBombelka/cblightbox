@@ -55,8 +55,7 @@
 		}
 
 		if(!scrollbarSpaceAdded){
-            $("<style type='text/css'>.cb-lightbox-margin{margin-right:" + getScrollbarWidth() + "px;}</style>").appendTo($("head"));
-
+			$("html").get(0).style.setProperty("--cb-lightbox-margin", getScrollbarWidth() + "px");
             scrollbarSpaceAdded = true
 		}
 
@@ -1694,7 +1693,7 @@
 			setTimeout(function(){
 				detroyDraggable(slide);
 				$(".cb-lightbox").remove();
-				$("html").removeClass("cb-lightbox-lock cb-lightbox-margin");
+				$("html").removeClass("cb-lightbox-lock");
 				el.removeClass('cb-lightbox-is-selected');
 				closing = false;
 
@@ -1771,7 +1770,7 @@
 
 			//lock background
 			if($("body").height() > $(window).height()){
-				$("html").addClass("cb-lightbox-lock cb-lightbox-margin");
+				$("html").addClass("cb-lightbox-lock");
 			}
 
 			//set zoomOffset

@@ -680,7 +680,7 @@
 				wrapperWidth = container.width() - ($s.margin[1] + $s.margin[3]),
 				windowHeight = window.innerHeight ? window.innerHeight : $(window).height();
 
-			var captionHeight = 0;
+			let captionHeight = 0
 			if($(".cb-lightbox-info").length){
 				captionHeight = $(".cb-lightbox-info").outerHeight();
 			}
@@ -696,23 +696,14 @@
 				newImgHeight = imgHeight;
 			}
 
+			let positionTop = 0
 			if($s.alignVertical == 'top'){
-				positionTop = $s.margin[0];
+				positionTop = $s.margin[0]
 			}else if($s.alignVertical == 'bottom'){
-				positionTop = windowHeight - newImgHeight - $s.margin[2];
+				positionTop = windowHeight - newImgHeight - captionHeight - $s.margin[2]
 			}else{
-
-				var marginDiff = 1,
-					divider = 2;
-
-				if($s.margin[0] > 0 && $s.margin[2] > 0){
-					marginDiff = $s.margin[0] / $s.margin[2];
-					divider = (divider + (divider / marginDiff)) / 2;
-				}
-
-				var verticalCenter = (windowHeight - newImgHeight - captionHeight) / divider;
-				positionTop = Math.max(verticalCenter, $s.margin[0]);
-	
+				let centerArea = (windowHeight - newImgHeight - captionHeight - $s.margin[0] - $s.margin[2]) / 2
+				positionTop = centerArea + $s.margin[0]
 			}
 
 			if($s.alignHorizontal == 'left'){

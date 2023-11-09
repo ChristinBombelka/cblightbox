@@ -97,7 +97,7 @@
 		}
 
 		function error(container, slide){
-			$('<div class="cb-lightbox-error">Sorry, this image can\'t loaded!</div>').appendTo(slide);
+			$('<div class="cb-lightbox-error">Sorry, this image can\'t be loaded!</div>').appendTo(slide);
 
 			slide.find('.cb-lightbox-slide-image').remove();
 			slide.removeClass('cb-lightbox-image-hide');

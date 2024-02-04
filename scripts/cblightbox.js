@@ -684,22 +684,24 @@
 				captionHeight = $(".cb-lightbox-info").outerHeight();
 			}
 
+			let zoomable = false
 			if(wrapperHeight - captionHeight < imgHeight || wrapperWidth < imgWidth ) {
 				// Image can zoom
 
 				var minRatio = Math.min(1, wrapperWidth / imgWidth, (wrapperHeight - captionHeight) / imgHeight);
 
-				newImgWidth = Math.floor(minRatio * imgWidth);
-				newImgHeight = Math.floor(minRatio * imgHeight);
+				newImgWidth = Math.floor(minRatio * imgWidth)
+				newImgHeight = Math.floor(minRatio * imgHeight)
 
-				slideImage.addClass('cb-lightbox-slide-zoomable');
+				slideImage.addClass('cb-lightbox-slide-zoomable')
+				zoomable = true
 			}else{
 				// Image cant zoom
 
-				newImgWidth = imgWidth;
-				newImgHeight = imgHeight;
+				newImgWidth = imgWidth
+				newImgHeight = imgHeight
 
-				slideImage.removeClass('cb-lightbox-slide-zoomable');
+				slideImage.removeClass('cb-lightbox-slide-zoomable')
 			}
 
 			let positionTop = 0
@@ -729,7 +731,8 @@
 	 			'fitLeft': positionLeft,
 	 			'fitTop': positionTop,
                 'fitPercentage': minRatio ? (minRatio * 100) : false,
-                'currentPercentage': minRatio ? (minRatio * 100) : false
+                'currentPercentage': minRatio ? (minRatio * 100) : false,
+				'zoomable': zoomable,
 	 		});
 
 			if ($.isFunction($s.afterFit)) {
@@ -1240,10 +1243,18 @@
 			//set new caption befor calc slide height
 			updateCaption(items.eq(_this_index), newCurrent, $s);
 
-			var newCurrentImage = newCurrent.find('.cb-lightbox-slide-image');
+			const newCurrentImage = newCurrent.find('.cb-lightbox-slide-image');
 
-			values = getImageFit(newCurrentImage);
+			// Check image is zoomable, enable oder disable zoom button
+			if($s.zoom && $s.zoomControls){
+				if(newCurrentImage.data('zoomable') == false){
+					container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
+				}else{
+					container.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
+				}
+			}
 
+			let values = getImageFit(newCurrentImage);
             setTimeout(function(){
                 setTranslate(newCurrentImage, {
                     width: values.width,
@@ -1602,6 +1613,13 @@
 				}
 
 				container.addClass('cb-lightbox-run-opening');
+
+				// First image cant zoom, disable zoom button 
+				if($s.zoom && $s.zoomControls){
+					if(slideImage.data('zoomable') == false){
+						container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
+					}
+				}
 
 				setTimeout(function(){
 					if(closing){

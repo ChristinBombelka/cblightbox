@@ -874,15 +874,6 @@
 			}
 		}
 
-		function setImageFit(slideImage){
-			var values = getImageFit(slideImage);
-
-			setTranslate(slideImage, {
-				width: values.width,
-				height: values.height,
-			});
-		}
-
 		function setImage(slide, source, item, p){
 			var elementPlaceholder = slide.find('.cb-lightbox-image-placeholder'),
 				container = $('.cb-lightbox'),
@@ -956,12 +947,12 @@
 					'fullHeight': height,
 				});
 
-				setImageFit(slideImage);
-
-				var values = getImageFit(slideImage);
+				const values = getImageFit(slideImage);
 				setTranslate(slideImage, {
 					top: values.top,
 					left: values.left,
+					width: values.width,
+					height: values.height,
 				});
 			});
 

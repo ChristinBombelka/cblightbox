@@ -68,7 +68,7 @@
 			zoom: false,
 			zoomDuration : 300,
 			zoomOffset : 0,
-            zoomControlls: false,
+            zoomControls: false,
             zoomMap: false,
             zoomSteps: 3,
 			disableOnMobile: false,
@@ -1726,7 +1726,7 @@
                 tplContent.append('<div class="cb-lightbox__zoomMap"><div class="cb-lightbox__zoomMap-image"></div><div class="cb-lightbox__zoomMap-handle"></div></div>');
             }
 
-            if($s.zoomControlls && $s.zoom){
+            if($s.zoomControls && $s.zoom){
             	tplContent.append('<div class="cb-lightbox__zoomButtons"><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--in"></div><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--out cb-lightbox__zoomButton--disabled"></div></div>');
             }
 

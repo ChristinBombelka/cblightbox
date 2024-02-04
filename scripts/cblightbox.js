@@ -651,9 +651,9 @@
 	    }
 
 	    function getImageFit(slideImage){
-			var container = $('.cb-lightbox'),
-				$s = container.data('settings'),
-				type = slideImage.data('type');
+			const container = $('.cb-lightbox')
+			const $s = container.data('settings')
+			const type = slideImage.data('type')
 
 			if(type == 'image'){
 				if(typeof slideImage != 'undefined'){
@@ -837,7 +837,7 @@
 			}
 
 			if(caption){
-				var slideCaption = captionTpl.appendTo(addTo);
+				captionTpl.appendTo(addTo);
 			}
 		}
 
@@ -1101,11 +1101,11 @@
 
 	    	firstLoad = false;
 
-		   	var container = $(".cb-lightbox"),
-				$s = container.data('settings'),
-	    		group = container.data('group'),
-				items = $('a[data-group="'+ group +'"]'),
-				oldCurrent = $('.cb-lightbox-slide.cb-lightbox-slide-current');
+		   	const container = $('.cb-lightbox')
+			const $s = container.data('settings')
+	    	const group = container.data('group')
+			let items = $('a[data-group="'+ group +'"]')
+			let oldCurrent = $('.cb-lightbox-slide.cb-lightbox-slide-current')
 
 			if(container.hasClass('cb-lightbox-is-zoomed') || slideing || items.length <= 1){
 				return;

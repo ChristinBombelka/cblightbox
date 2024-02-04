@@ -556,6 +556,7 @@
                 y: y
             }
 
+			// Set zoom to max
 			slideImage.data('currentZoomStep', $s.zoomSteps);
 
 			if(slideImage.data('fullWidth') > $(window).width()){
@@ -622,6 +623,8 @@
 	    	isDraggable = false;
 
             container.addClass('cb-lightbox-run-zoom');
+
+			//Set zoom to min
             slideImage.data('currentZoomStep', 0);
 
 	    	var	scaleWidth = slideImage.data('fitWidth') / slideImage.width(),

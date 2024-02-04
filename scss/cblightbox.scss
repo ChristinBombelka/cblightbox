@@ -565,14 +565,14 @@
 		display: none;
 	}
 
-	.cb-lightbox-slide-draggable{
+	.cb-lightbox-slide-zoomable{
 		cursor: grab;
 	    cursor: -moz-grab;
 	    cursor: -webkit-grab;
 	}
 
 	&.cb-lightbox-is-grabbing{
-		.cb-lightbox-slide-draggable{
+		.cb-lightbox-slide-zoomable{
 			cursor: grabbing;
 		    cursor: -moz-grabbing;
 		    cursor: -webkit-grabbing;

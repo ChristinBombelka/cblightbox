@@ -685,14 +685,21 @@
 			}
 
 			if(wrapperHeight - captionHeight < imgHeight || wrapperWidth < imgWidth ) {
+				// Image can zoom
+
 				var minRatio = Math.min(1, wrapperWidth / imgWidth, (wrapperHeight - captionHeight) / imgHeight);
 
 				newImgWidth = Math.floor(minRatio * imgWidth);
 				newImgHeight = Math.floor(minRatio * imgHeight);
-			}
-			else{
+
+				slideImage.addClass('cb-lightbox-slide-zoomable');
+			}else{
+				// Image cant zoom
+
 				newImgWidth = imgWidth;
 				newImgHeight = imgHeight;
+
+				slideImage.removeClass('cb-lightbox-slide-zoomable');
 			}
 
 			let positionTop = 0
@@ -724,12 +731,6 @@
                 'fitPercentage': minRatio ? (minRatio * 100) : false,
                 'currentPercentage': minRatio ? (minRatio * 100) : false
 	 		});
-
-			if((imgWidth > $(window).width() || imgHeight > windowHeight) && $s.zoom){
-				slideImage.addClass('cb-lightbox-slide-draggable');
-			}else{
-				slideImage.removeClass('cb-lightbox-slide-draggable');
-			}
 
 			if ($.isFunction($s.afterFit)) {
 				$s.afterFit.call(this, container, slideImage.closest('.cb-lightbox-slide'));
@@ -2096,7 +2097,7 @@
                     // Dragging full size image
     				container.addClass('cb-lightbox-is-grabbing');
 
-    				if(!slideImage.hasClass('cb-lightbox-slide-draggable')){
+    				if(!slideImage.hasClass('cb-lightbox-slide-zoomable')){
     					return;
     				}
 
@@ -2196,7 +2197,7 @@
                 container.addClass('cb-lightbox-is-grabbing');
                 slideImage.addClass('cb-lightbox-slide-dragging-zoommap');
 
-                if(!slideImage.hasClass('cb-lightbox-slide-draggable')){
+                if(!slideImage.hasClass('cb-lightbox-slide-zoomable')){
                     return;
                 }
 
@@ -2363,7 +2364,7 @@
 						if(clickTimer){
 							//handle after click
 							if(!slideImage.hasClass("cb-lightbox-slide-dragging")){
-								if(!slideImage.hasClass('cb-lightbox-slide-draggable')){
+								if(!slideImage.hasClass('cb-lightbox-slide-zoomable')){
 									return;
 								}
 
@@ -2417,7 +2418,7 @@
                     currentSlide = $('.cb-lightbox-slide-current');
                     slideImage = currentSlide.find('.cb-lightbox-slide-image');
 
-                if(!slideImage.hasClass('cb-lightbox-slide-draggable')){
+                if(!slideImage.hasClass('cb-lightbox-slide-zoomable')){
                 	return;
                 }
 

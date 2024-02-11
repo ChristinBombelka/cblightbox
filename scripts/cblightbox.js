@@ -2581,15 +2581,23 @@
 						}
 
 						if(slide.hasClass('cb-lightbox-slide-current')){
+							// After resize check if can zoom current image
+							if($s.zoom && $s.zoomControls){
+								if(slideImage.data('zoomable') == false){
+									lightbox.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
+								}else{
+									lightbox.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
+								}
+
+								lightbox.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
+							}
+
+							// Callback after resize current image
 							if ($.isFunction($s.onResize)) {
 								$s.onResize.call(this, $('.cb-lightbox'), slide);
 							}
 						}
 					});
-
-					lightbox.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
-					lightbox.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
-
 				}
 			});
 

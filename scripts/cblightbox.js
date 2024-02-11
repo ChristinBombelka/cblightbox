@@ -678,9 +678,9 @@
 				}
 			}
 
-			var wrapperHeight = container.height() - ($s.margin[0] + $s.margin[2]),
-				wrapperWidth = container.width() - ($s.margin[1] + $s.margin[3]),
-				windowHeight = window.innerHeight ? window.innerHeight : $(window).height();
+			const wrapperHeight = container.height() - ($s.margin[0] + $s.margin[2])
+			const wrapperWidth = container.width() - ($s.margin[1] + $s.margin[3])
+			const windowHeight = window.innerHeight ? window.innerHeight : $(window).height()
 
 			let captionHeight = 0
 			if($(".cb-lightbox-info").length){
@@ -688,10 +688,11 @@
 			}
 
 			let zoomable = false
+			let minRatio
 			if(wrapperHeight - captionHeight < imgHeight || wrapperWidth < imgWidth ) {
 				// Image can zoom
 
-				var minRatio = Math.min(1, wrapperWidth / imgWidth, (wrapperHeight - captionHeight) / imgHeight);
+				minRatio = Math.min(1, wrapperWidth / imgWidth, (wrapperHeight - captionHeight) / imgHeight)
 
 				newImgWidth = Math.floor(minRatio * imgWidth)
 				newImgHeight = Math.floor(minRatio * imgHeight)
@@ -725,8 +726,8 @@
 				positionLeft = (container.width() - newImgWidth) / 2;
 			}
 
-			var	scaleWidth = newImgWidth / slideImage.data('holderWidth'),
-   				scaleHeight = newImgHeight / slideImage.data('holderHeight');
+			const scaleWidth = newImgWidth / slideImage.data('holderWidth')
+   			const scaleHeight = newImgHeight / slideImage.data('holderHeight')
 
 			slideImage.data({
 	 			'fitHeight': newImgHeight,
@@ -753,7 +754,7 @@
 		};
 
 		function reposition(){
-	    	//reset dragging position
+	    	// Reset dragging position
 		    var slide = $('.cb-lightbox-slide.cb-lightbox-slide-current'),
 				$s = slide.closest('.cb-lightbox').data('settings'),
 		    	slideImage = slide.find('.cb-lightbox-slide-image'),

@@ -2434,7 +2434,8 @@
 				const zoomFactor = slideImage.data('zoomFactor')
 				const newScaleSize = fitScale * (zoomFactor ** zoomStep)
 
-				return newScaleSize
+				// Round news scale size 
+				return parseFloat(newScaleSize.toFixed(4))
 			}
 
             $(document).on('click', '.cb-lightbox__zoomButton', function(){
@@ -2517,7 +2518,7 @@
                     buttons.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
 
                     // Limit zoom out
-                    if(newScale.toFixed(6) <= parseFloat(slideImage.data('fitPercentage').toFixed(6))){
+                    if(newScale.toFixed(4) <= parseFloat(slideImage.data('fitPercentage').toFixed(4))){
                         newScale = slideImage.data('fitPercentage');
 
                         isDraggable = false;

@@ -10,7 +10,7 @@ $(function() {
         captionPosition: 'outside',
         zoomControls: true,
         zoomMap: true,
-        zoomSteps: 3,
+        zoomFactor: 1.5,
      });
 
     $(".js-lightbox-fade").cblightbox({

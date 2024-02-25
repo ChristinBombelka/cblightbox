@@ -70,7 +70,7 @@
 			zoomOffset : 0,
             zoomControls: false,
             zoomMap: false,
-            zoomSteps: 3,
+			zoomFactor: 2,
 			disableOnMobile: false,
 			breakpoint: 800,
 			counter: true,
@@ -556,9 +556,6 @@
                 y: y
             }
 
-			// Set zoom to max
-			slideImage.data('currentZoomStep', $s.zoomSteps);
-
 			if(slideImage.data('fullWidth') > $(window).width()){
                 let imageOverlapX = slideImage.data('fullWidth') - $(window).width()
                 positionX = (slideImage.offset().left - $(window).scrollLeft()) + offset.x - (offset.x * scaleWidth)
@@ -602,6 +599,8 @@
 			}, $s.zoomDuration);
 
             slideImage.data('currentPercentage', 100);
+			slideImage.data('currentZoomStep', 'auto');
+
             zoomMapPosition(positionX, positionY);
 	    }
 
@@ -623,9 +622,6 @@
 	    	isDraggable = false;
 
             container.addClass('cb-lightbox-run-zoom');
-
-			//Set zoom to min
-            slideImage.data('currentZoomStep', 0);
 
 	    	var	scaleWidth = slideImage.data('fitWidth') / slideImage.width(),
 	       		scaleHeight = slideImage.data('fitHeight') / slideImage.height();
@@ -649,6 +645,7 @@
     		}, duration + 30);
 
             slideImage.data('currentPercentage', slideImage.data('fitPercentage'));
+			slideImage.data('currentZoomStep', 0);
 
             zoomMapPosition(slideImage.data('fitLeft'), slideImage.data('fitTop'));
 	    }
@@ -689,10 +686,13 @@
 
 			let zoomable = false
 			let minRatio
+			let fitPercantage = false
 			if(wrapperHeight - captionHeight < imgHeight || wrapperWidth < imgWidth ) {
 				// Image can zoom
 
 				minRatio = Math.min(1, wrapperWidth / imgWidth, (wrapperHeight - captionHeight) / imgHeight)
+
+				fitPercantage = minRatio * 100
 
 				newImgWidth = Math.floor(minRatio * imgWidth)
 				newImgHeight = Math.floor(minRatio * imgHeight)
@@ -726,6 +726,24 @@
 				positionLeft = (container.width() - newImgWidth) / 2;
 			}
 
+			let calculatedZoomFactor = $s.zoomFactor
+			if(zoomable){
+				// Calc optimal zoom factor 
+				const startSize = newImgWidth
+				const endSize = imgWidth
+
+				let steps = 0
+				let factor
+
+				do{
+					steps = steps+1
+					factor = (endSize / startSize) ** (1/steps)
+				}while(factor > $s.zoomFactor)
+
+				calculatedZoomFactor = factor
+			}
+
+
 			const scaleWidth = newImgWidth / slideImage.data('holderWidth')
    			const scaleHeight = newImgHeight / slideImage.data('holderHeight')
 
@@ -734,9 +752,10 @@
 	 			'fitWidth': newImgWidth,
 	 			'fitLeft': positionLeft,
 	 			'fitTop': positionTop,
-                'fitPercentage': minRatio ? (minRatio * 100) : false,
-                'currentPercentage': minRatio ? (minRatio * 100) : false,
+                'fitPercentage': fitPercantage,
+                'currentPercentage': fitPercantage,
 				'zoomable': zoomable,
+				'zoomFactor': calculatedZoomFactor
 	 		});
 
 			if ($.isFunction($s.afterFit)) {
@@ -1508,19 +1527,6 @@
             }
 
             return url
-        }
-
-        function calcZoomSize(item, customStep){
-            var $s = item.closest('.cb-lightbox').data('settings'),
-                zoomStep = customStep ? customStep : item.data('currentZoomStep'),
-                fitScale = item.data('fitPercentage'),
-                a = 2 ** zoomStep;
-
-            if(zoomStep == 0){
-            	a = 0
-            }
-
-            return fitScale + a * (100 - fitScale) / 2 ** $s.zoomSteps;
         }
 
 		function open(item, i, $s){
@@ -2423,13 +2429,21 @@
 				}
 			});
 
+			function calcZoomStep(slideImage, zoomStep){
+				const fitScale = slideImage.data('fitPercentage')
+				const zoomFactor = slideImage.data('zoomFactor')
+				const newScaleSize = fitScale * (zoomFactor ** zoomStep)
+
+				return newScaleSize
+			}
+
             $(document).on('click', '.cb-lightbox__zoomButton', function(){
-                var container = $('.cb-lightbox'),
-                    $s = container.data('settings'),
-                    button = $(this),
-                    buttons = button.closest('.cb-lightbox__zoomButtons'),
-                    currentSlide = $('.cb-lightbox-slide-current');
-                    slideImage = currentSlide.find('.cb-lightbox-slide-image');
+                const container = $('.cb-lightbox')
+                const $s = container.data('settings')
+                const button = $(this)
+                const buttons = button.closest('.cb-lightbox__zoomButtons')
+				const currentSlide = $('.cb-lightbox-slide-current')
+				const slideImage = currentSlide.find('.cb-lightbox-slide-image')
 
                 if(!slideImage.hasClass('cb-lightbox-slide-zoomable')){
                 	return;
@@ -2439,18 +2453,18 @@
                 	return;
                 }
 
-                var currentScale = slideImage.data('currentPercentage'),
-                    currentZoomStep = slideImage.data('currentZoomStep');
-
+                let currentScale = slideImage.data('currentPercentage')
+                let currentZoomStep = slideImage.data('currentZoomStep')
+				let newScale = false
 
                 if(button.hasClass('cb-lightbox__zoomButton--in')){
                     isDraggable = true;
                     container.addClass('cb-lightbox-is-zoomed');
 
-                    let newZoom;
+                    let newZoom = 0;
                     if(currentZoomStep == 'auto'){
-                    	for (var i = 0; i <= $s.zoomSteps; i++) {
-                    		calculatedScale = calcZoomSize(slideImage, i);
+                    	for (let i = 0; i <= 99; i++) {
+                    		calculatedScale = calcZoomStep(slideImage, i);
 
                     		if(calculatedScale >= currentScale){
                     			newZoom = i;
@@ -2465,11 +2479,11 @@
                     }
 
                     slideImage.data('currentZoomStep', newZoom);
-
-                    var newScale = calcZoomSize(slideImage, false);
+					newScale = calcZoomStep(slideImage, newZoom)
 
                     buttons.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
 
+					// Limit zoom in 
                     if(newScale >= 100){
                         newScale = 100;
 
@@ -2480,11 +2494,13 @@
 
                 	let newZoom;
 					if(currentZoomStep == 'auto'){
-                    	for (var i = $s.zoomSteps; i >= 0; i--) {
-                    		calculatedScale = calcZoomSize(slideImage, i);
+                    	for (let i = 0; i <= 99; i++) {
 
-                    		if(calculatedScale <= currentScale){
-                    			newZoom = i;
+                    		calculatedScale = calcZoomStep(slideImage, i);
+
+                    		if(calculatedScale >= currentScale){
+                    			newZoom = i-1;
+
                     			break;
                     		}
                     	}
@@ -2495,13 +2511,12 @@
 	                    }
 	                }
 
-                    slideImage.data('currentZoomStep', newZoom);
-
-                    var newScale = calcZoomSize(slideImage, false);
+                    slideImage.data('currentZoomStep', newZoom)
+					newScale = calcZoomStep(slideImage, newZoom)	
 
                     buttons.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
 
-                    //round number
+                    // Limit zoom out
                     if(newScale.toFixed(6) <= parseFloat(slideImage.data('fitPercentage').toFixed(6))){
                         newScale = slideImage.data('fitPercentage');
 

@@ -67,6 +67,10 @@ $(".js-cblightbox").cblightbox();
     /* Value: true, false
      * Show small image with zoom area
      */
+    zoomFactor: 2,
+    /* Value: float number min 1.1
+     * Zoom factor for zoom buttons 
+     */
     disableOnMobile: false,
     /*  Values: true, false
      *  Disable lightbox on "breakpoint"

@@ -2627,9 +2627,9 @@
 		}
 
 		return $(this).each(function(){
-			var item = $(this);
+			const item = $(this);
 
-			var settings = $.extend({}, defaults, options);
+			const settings = $.extend({}, defaults, options);
 
 			item.on("click", function(e){
 				e.stopPropagation();

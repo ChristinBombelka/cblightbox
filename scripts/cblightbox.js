@@ -2573,6 +2573,12 @@
 					detroyDraggable($('.cb-lightbox-slide-current .cb-lightbox-slide-image'), true);
 				}
 
+				// TODO trigger fit after opening
+
+				if(closing || opening){
+					return;
+				}
+
 				let lightbox = $('.cb-lightbox');
 
 				if(lightbox.length){

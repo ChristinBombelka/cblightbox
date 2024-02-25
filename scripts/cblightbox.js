@@ -70,7 +70,7 @@
 			zoomOffset : 0,
             zoomControls: false,
             zoomMap: false,
-			zoomFactor: 2,
+			zoomFactor: 2, // min 1.1 
 			disableOnMobile: false,
 			breakpoint: 800,
 			counter: true,
@@ -726,6 +726,11 @@
 				positionLeft = (container.width() - newImgWidth) / 2;
 			}
 
+			// Define min zoom factor 
+			if($s.zoomFactor <= 1.1){
+				$s.zoomFactor = 2
+			}
+
 			let calculatedZoomFactor = $s.zoomFactor
 			if(zoomable){
 				// Calc optimal zoom factor 
@@ -742,7 +747,6 @@
 
 				calculatedZoomFactor = factor
 			}
-
 
 			const scaleWidth = newImgWidth / slideImage.data('holderWidth')
    			const scaleHeight = newImgHeight / slideImage.data('holderHeight')

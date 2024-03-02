@@ -161,7 +161,6 @@
   display: block;
   height: 10px;
   width: 10px;
-  margin-top: -8px;
   position: absolute;
   top: 50%;
   transition: all 250ms ease;
@@ -186,7 +185,7 @@
 }
 .cb-lightbox-arrow-prev span {
   left: 20px;
-  transform: rotate(135deg);
+  transform: translateY(-50%) rotate(135deg);
 }
 
 .cb-lightbox-arrow-next {
@@ -194,7 +193,7 @@
 }
 .cb-lightbox-arrow-next span {
   right: 20px;
-  transform: rotate(-45deg);
+  transform: translateY(-50%) rotate(-45deg);
 }
 
 #cb-loading-image {

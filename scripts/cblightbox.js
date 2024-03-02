@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.18.1 jQuery
- * 2024-02-25
+ * CBLightbox 3.18.2 jQuery
+ * 2024-03-02
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -2314,7 +2314,8 @@
 				clearTimeout(positionInterval);
 				clearTimeout(momentTimer);
 
-				var container = $('.cb-lightbox');
+				const container = $('.cb-lightbox')
+				const $s = container.data('settings')
 
 				container.removeClass('cb-lightbox-is-grabbing');
 				$(this).unbind("mousemove.cb-lightbox touchmove.cb-lightbox");
@@ -2387,7 +2388,7 @@
 						if(clickTimer){
 							//handle after click
 							if(!slideImage.hasClass("cb-lightbox-slide-dragging")){
-								if(!slideImage.hasClass('cb-lightbox-slide-zoomable')){
+								if($s.zoom == false){
 									return;
 								}
 

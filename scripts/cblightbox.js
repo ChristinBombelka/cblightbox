@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.18.2 jQuery
- * 2024-03-02
+ * CBLightbox 3.18.3 jQuery
+ * 2024-05-06
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1455,16 +1455,14 @@
 					if ($s.previewImage) {
 						previewImage = item.find('img');
 
-						if (previewImage.length && previewImage.attr('src') && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64') {
-							placeholderImage = item.find('img').attr('src');
-						} else if ($s.previewSource) {
-
+						if ($s.previewSource) {
 							if (item.attr($s.previewSource)) {
 								placeholderImage = item.attr($s.previewSource);
 							} else if (item.find('img')) {
 								placeholderImage = item.find('img').attr($s.previewSource);
 							}
-
+						} else if (previewImage.length && previewImage.attr('src') && previewImage.attr('src').substr(0, 21) != 'data:image/png;base64') {
+							placeholderImage = item.find('img').attr('src');
 						} else {
 							placeholderImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
 						}

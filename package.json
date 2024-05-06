@@ -15,6 +15,6 @@
   },
   "homepage": "https://github.com/ChristinBombelka/cblightbox#readme",
   "scripts":{
-    "sass": "sass -w --no-source-map scss/:styles/"
+    "sass": "sass -w --no-source-map scss/:styles/ --style compressed" 
   }
 }

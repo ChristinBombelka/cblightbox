@@ -68,7 +68,7 @@
 			zoom: false,
 			zoomDuration: 300,
 			zoomOffset: 0,
-			zoomControls: false,
+			zoomButtons: false,
 			zoomMap: false,
 			zoomFactor: 2, // min 1.1 
 			disableOnMobile: false,
@@ -1273,7 +1273,7 @@
 			const newCurrentImage = newCurrent.find('.cb-lightbox-slide-image');
 
 			// Check image is zoomable, enable oder disable zoom button
-			if ($s.zoom && $s.zoomControls) {
+			if ($s.zoom && $s.zoomButtons) {
 				if (newCurrentImage.data('zoomable') == false) {
 					container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
 				} else {
@@ -1627,7 +1627,7 @@
 				container.addClass('cb-lightbox-run-opening');
 
 				// First image cant zoom, disable zoom button 
-				if ($s.zoom && $s.zoomControls) {
+				if ($s.zoom && $s.zoomButtons) {
 					if (slideImage.data('zoomable') == false) {
 						container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
 					}
@@ -1756,7 +1756,7 @@
 				tplContent.append('<div class="cb-lightbox__zoomMap"><div class="cb-lightbox__zoomMap-image"></div><div class="cb-lightbox__zoomMap-handle"></div></div>');
 			}
 
-			if ($s.zoomControls && $s.zoom) {
+			if ($s.zoomButtons && $s.zoom) {
 				tplContent.append('<div class="cb-lightbox__zoomButtons"><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--in"></div><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--out cb-lightbox__zoomButton--disabled"></div></div>');
 			}
 
@@ -2608,7 +2608,7 @@
 
 						if (slide.hasClass('cb-lightbox-slide-current')) {
 							// After resize check if can zoom current image
-							if ($s.zoom && $s.zoomControls) {
+							if ($s.zoom && $s.zoomButtons) {
 								if (slideImage.data('zoomable') == false) {
 									lightbox.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
 								} else {

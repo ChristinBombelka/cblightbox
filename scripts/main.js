@@ -8,7 +8,7 @@ $(function() {
         zoom: true,
         zoomOffset : 0,
         captionPosition: 'outside',
-        zoomControls: true,
+        zoomButtons: true,
         zoomMap: true,
         zoomFactor: 1.5,
      });
@@ -19,7 +19,7 @@ $(function() {
         openCloseDuration: 1000,
         slideDuration: 500,
         zoom: true,
-        zoomControls: true,
+        zoomButtons: true,
         zoomMap: true
     });
 });

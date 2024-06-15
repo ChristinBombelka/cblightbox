@@ -19,7 +19,7 @@ Features:
 
 <a href="image.jpg" class="js-cblightbox" data-group="gallery" data-width="1000" data-height="1500" data-caption="Lorm ypsum"><img src="thumb.jpg"></a>
 
-<script type="text/javascript" src="scripts/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="scripts/jquery-3.7.1.min.js"></script>
 <script type="text/javascript" src="scripts/cblightbox.js"></script>
 <script>
 $(".js-cblightbox").cblightbox();
@@ -31,14 +31,6 @@ $(".js-cblightbox").cblightbox();
 
 ```js
 {
-    maxHeight: 9999,
-    /*  Values: number
-     *  Limit image height
-     */
-    maxWidth: 9999,
-    /*   Values: number
-     *   Limit image maxWidth
-     */
     margin: 40,
     /*  Values: 40, [40, 40], [40, 40, 40, 40]
      *  Margin to screen border

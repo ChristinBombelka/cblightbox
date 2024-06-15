@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.18.3 jQuery
- * 2024-05-06
+ * CBLightbox 3.18.4 jQuery
+ * 2024-06-15
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -60,8 +60,6 @@
 		}
 
 		var defaults = {
-			maxHeight: 9999,
-			maxWidth: 9999,
 			margin: 40,
 			mobileMargin: 0,
 			insideArrows: false,

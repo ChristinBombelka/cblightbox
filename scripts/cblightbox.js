@@ -1877,7 +1877,18 @@
 					slideTo('previews');
 				} else if (e.keyCode == 39) {
 					slideTo('next');
+				} else if(e.keyCode == 171){
+					if($('.cb-lightbox__zoomButtons').length){
+						$('.cb-lightbox__zoomButton--in').trigger('click')
+					}
+				}else if(e.keyCode == 173){
+					if($('.cb-lightbox__zoomButtons').length){
+						$('.cb-lightbox__zoomButton--out').trigger('click')
+					}
+				}else if(e.key  == 'Escape'){
+					close();
 				}
+
 			});
 
 			$(document).on("click", ".cb-lightbox-slide, .cb-lightbox-close", function (e) {

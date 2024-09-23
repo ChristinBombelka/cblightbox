@@ -1872,23 +1872,26 @@
 				}
 			});
 
-			$(document).on("keyup", function (e) {
+			$(document).on("keypress", function (e) {
+				if(e.which == 43){
+					if($('.cb-lightbox__zoomButtons').length){
+						$('.cb-lightbox__zoomButton--in').trigger('click')
+					}
+				}else if(e.which == 45){
+					if($('.cb-lightbox__zoomButtons').length){
+						$('.cb-lightbox__zoomButton--out').trigger('click')
+					}
+				}
+			})
+
+			$(document).on("keydown", function (e) {
 				if (e.keyCode == 37) {
 					slideTo('previews');
 				} else if (e.keyCode == 39) {
 					slideTo('next');
-				} else if(e.keyCode == 171){
-					if($('.cb-lightbox__zoomButtons').length){
-						$('.cb-lightbox__zoomButton--in').trigger('click')
-					}
-				}else if(e.keyCode == 173){
-					if($('.cb-lightbox__zoomButtons').length){
-						$('.cb-lightbox__zoomButton--out').trigger('click')
-					}
 				}else if(e.key  == 'Escape'){
 					close();
 				}
-
 			});
 
 			$(document).on("click", ".cb-lightbox-slide, .cb-lightbox-close", function (e) {

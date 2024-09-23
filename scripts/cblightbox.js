@@ -2637,6 +2637,10 @@
 				e.stopPropagation();
 				e.preventDefault();
 
+				if($('.cb-lightbox').length){
+					return;
+				}
+
 				if (settings.disableOnMobile && $(window).width() < settings.breakpoint) {
 					return;
 				}

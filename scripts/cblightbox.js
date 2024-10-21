@@ -1,6 +1,6 @@
 /*
- * CBLightbox 3.18.4 jQuery
- * 2024-06-15
+ * CBLightbox 3.18.5 jQuery
+ * 2024-10-21
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
@@ -1273,9 +1273,9 @@
 			// Check image is zoomable, enable oder disable zoom button
 			if ($s.zoom && $s.zoomButtons) {
 				if (newCurrentImage.data('zoomable') == false) {
-					container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
+					container.find('.cb-lightbox-zoom-button--in').addClass('cb-lightbox-zoom-button--disabled');
 				} else {
-					container.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
+					container.find('.cb-lightbox-zoom-button--in').removeClass('cb-lightbox-zoom-button--disabled');
 				}
 			}
 
@@ -1530,11 +1530,11 @@
 		}
 
 		function open(item, i, $s) {
-			var source = item.attr('href'),
-				slide = setSlide(item, i, 'current'),
-				slideImage = slide.find('.cb-lightbox-slide-image'),
-				container = $('.cb-lightbox'),
-				cachedSlide = slides[i];
+			let source = item.attr('href')
+			let slide = setSlide(item, i, 'current')
+			let slideImage = slide.find('.cb-lightbox-slide-image')
+			let container = $('.cb-lightbox')
+			let cachedSlide = slides[i]
 
 			container.addClass('cb-lightbox-init-transitions');
 
@@ -1627,7 +1627,7 @@
 				// First image cant zoom, disable zoom button 
 				if ($s.zoom && $s.zoomButtons) {
 					if (slideImage.data('zoomable') == false) {
-						container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
+						container.find('.cb-lightbox-zoom-button--in').addClass('cb-lightbox-zoom-button--disabled');
 					}
 				}
 
@@ -1662,12 +1662,18 @@
 
 			clearTimeout(momentTimer);
 
-			var el = $(".cb-lightbox-is-selected"),
-				previewImage = el.find('img'),
-				container = $('.cb-lightbox'),
-				$s = container.data('settings'),
-				slide = container.find('.cb-lightbox-slide.cb-lightbox-slide-current'),
-				slideImage = slide.find('.cb-lightbox-slide-image');
+			let el = $(".cb-lightbox-is-selected")
+			let previewImage = el.find('img')
+			let container = $('.cb-lightbox')
+
+			if (!container.length) {
+				return
+			}
+
+			let $s = container.data('settings')
+			let slide = container.find('.cb-lightbox-slide.cb-lightbox-slide-current')
+			let slideImage = slide.find('.cb-lightbox-slide-image')
+
 
 			container.addClass('cb-lightbox-init-closing cb-lightbox-init-transitions');
 
@@ -1747,21 +1753,26 @@
 			var tpl = $('<div class="cb-lightbox cb-lightbox-init-opening"></div>').append('<div class="cb-lightbox-overlay"></div>');
 
 			var tplContent = $('<div class="cb-lightbox-content"></div>');
-
-			tplContent.append('<div class="cb-lightbox-close"></div><div class="cb-lightbox-loading"><div class="cb-lightbox-loading-animation"></div></div><div class="cb-lightbox-slides"></div>');
+			
+		
+			tplContent.append('<div class="cb-lightbox-loading"><div class="cb-lightbox-loading-animation"></div></div><div class="cb-lightbox-slides"></div>');
 
 			if ($s.zoomMap && $s.zoom) {
 				tplContent.append('<div class="cb-lightbox__zoomMap"><div class="cb-lightbox__zoomMap-image"></div><div class="cb-lightbox__zoomMap-handle"></div></div>');
 			}
 
+			let toolbar = $('<div class="cb-lightbox-toolbar"></div>')
 			if ($s.zoomButtons && $s.zoom) {
-				tplContent.append('<div class="cb-lightbox__zoomButtons"><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--in"></div><div class="cb-lightbox__zoomButton cb-lightbox__zoomButton--out cb-lightbox__zoomButton--disabled"></div></div>');
+				toolbar.append('<button class="cb-lightbox-zoom-button cb-lightbox-zoom-button--in" aria-label="Zoom in"></button><button class="cb-lightbox-zoom-button cb-lightbox-zoom-button--out cb-lightbox-zoom-button--disabled" aria-label="Zoom out"></button>');
 			}
+			toolbar.append('<button class="cb-lightbox-close" aria-label="Close"></button>')
+			tplContent.prepend(toolbar)
+
 
 			tpl.append(tplContent);
 
 			if (grouplength > 1 && !$s.insideArrows) {
-				var arrows = $('<div class="cb-lightbox-arrow-prev cb-lightbox-arrow"><span></span></div><div class="cb-lightbox-arrow-next cb-lightbox-arrow"><span></span></div>');
+				var arrows = $('<button class="cb-lightbox-arrow-prev cb-lightbox-arrow" aria-label="Previous image"><span></span></button><button class="cb-lightbox-arrow-next cb-lightbox-arrow" aria-label="Next image"><span></span></button>');
 				arrows.appendTo(tpl.find(".cb-lightbox-content"));
 
 				setTimeout(() => {
@@ -1873,13 +1884,13 @@
 			});
 
 			$(document).on("keypress", function (e) {
-				if(e.which == 43){
-					if($('.cb-lightbox__zoomButtons').length){
-						$('.cb-lightbox__zoomButton--in').trigger('click')
+				if (e.which == 43) {
+					if ($('.cb-lightbox-zoom-button').length) {
+						$('.cb-lightbox-zoom-button--in').trigger('click')
 					}
-				}else if(e.which == 45){
-					if($('.cb-lightbox__zoomButtons').length){
-						$('.cb-lightbox__zoomButton--out').trigger('click')
+				} else if (e.which == 45) {
+					if ($('.cb-lightbox-zoom-button').length) {
+						$('.cb-lightbox-zoom-button--out').trigger('click')
 					}
 				}
 			})
@@ -1889,7 +1900,7 @@
 					slideTo('previews');
 				} else if (e.keyCode == 39) {
 					slideTo('next');
-				}else if(e.key  == 'Escape'){
+				} else if (e.key == 'Escape') {
 					close();
 				}
 			});
@@ -1983,8 +1994,8 @@
 
 						if (newScale > 100) {
 
-							container.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
-							container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
+							container.find('.cb-lightbox-zoom-button--out').removeClass('cb-lightbox-zoom-button--disabled');
+							container.find('.cb-lightbox-zoom-button--in').addClass('cb-lightbox-zoom-button--disabled');
 
 							newScale = 100;
 
@@ -1994,11 +2005,11 @@
 							isDraggable = false;
 							container.removeClass('cb-lightbox-is-zoomed');
 
-							container.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
-							container.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
+							container.find('.cb-lightbox-zoom-button--out').addClass('cb-lightbox-zoom-button--disabled');
+							container.find('.cb-lightbox-zoom-button--in').removeClass('cb-lightbox-zoom-button--disabled');
 
 						} else {
-							container.find('.cb-lightbox__zoomButton').removeClass('cb-lightbox__zoomButton--disabled');
+							container.find('.cb-lightbox-zoom-button').removeClass('cb-lightbox-zoom-button--disabled');
 						}
 
 						//set new scale percentage
@@ -2330,7 +2341,7 @@
 				container.removeClass('cb-lightbox-is-grabbing');
 				$(this).unbind("mousemove.cb-lightbox touchmove.cb-lightbox");
 
-				if ($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || closing || $(e.target).hasClass('cb-lightbox__zoomButton')) {
+				if ($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || closing || $(e.target).hasClass('cb-lightbox-zoom-button')) {
 					return;
 				}
 
@@ -2412,12 +2423,12 @@
 								}
 
 								if ($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")) {
-									container.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
-									container.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
+									container.find('.cb-lightbox-zoom-button--out').addClass('cb-lightbox-zoom-button--disabled');
+									container.find('.cb-lightbox-zoom-button--in').removeClass('cb-lightbox-zoom-button--disabled');
 									detroyDraggable(slideImage);
 								} else {
-									container.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
-									container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
+									container.find('.cb-lightbox-zoom-button--out').removeClass('cb-lightbox-zoom-button--disabled');
+									container.find('.cb-lightbox-zoom-button--in').addClass('cb-lightbox-zoom-button--disabled');
 									initDraggable(slideImage, userX, userY);
 								}
 
@@ -2453,11 +2464,11 @@
 				return parseFloat(newScaleSize.toFixed(4))
 			}
 
-			$(document).on('click', '.cb-lightbox__zoomButton', function () {
+			$(document).on('click', '.cb-lightbox-zoom-button', function () {
 				const container = $('.cb-lightbox')
 				const $s = container.data('settings')
 				const button = $(this)
-				const buttons = button.closest('.cb-lightbox__zoomButtons')
+				const buttons = button.closest('.cb-lightbox-toolbar')
 				const currentSlide = $('.cb-lightbox-slide-current')
 				const slideImage = currentSlide.find('.cb-lightbox-slide-image')
 
@@ -2465,7 +2476,7 @@
 					return;
 				}
 
-				if (button.hasClass('cb-lightbox__zoomButton--disabled')) {
+				if (button.hasClass('cb-lightbox-zoom-button--disabled')) {
 					return;
 				}
 
@@ -2473,7 +2484,7 @@
 				let currentZoomStep = slideImage.data('currentZoomStep')
 				let newScale = false
 
-				if (button.hasClass('cb-lightbox__zoomButton--in')) {
+				if (button.hasClass('cb-lightbox-zoom-button--in')) {
 					isDraggable = true;
 					container.addClass('cb-lightbox-is-zoomed');
 
@@ -2497,16 +2508,16 @@
 					slideImage.data('currentZoomStep', newZoom);
 					newScale = calcZoomStep(slideImage, newZoom)
 
-					buttons.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
+					buttons.find('.cb-lightbox-zoom-button--out').removeClass('cb-lightbox-zoom-button--disabled');
 
 					// Limit zoom in 
 					if (newScale >= 100) {
 						newScale = 100;
 
-						button.addClass('cb-lightbox__zoomButton--disabled');
+						button.addClass('cb-lightbox-zoom-button--disabled');
 					}
 
-				} else if (button.hasClass('cb-lightbox__zoomButton--out')) {
+				} else if (button.hasClass('cb-lightbox-zoom-button--out')) {
 
 					let newZoom;
 					if (currentZoomStep == 'auto') {
@@ -2530,7 +2541,7 @@
 					slideImage.data('currentZoomStep', newZoom)
 					newScale = calcZoomStep(slideImage, newZoom)
 
-					buttons.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
+					buttons.find('.cb-lightbox-zoom-button--in').removeClass('cb-lightbox-zoom-button--disabled');
 
 					// Limit zoom out
 					if (newScale.toFixed(4) <= parseFloat(slideImage.data('fitPercentage').toFixed(4))) {
@@ -2538,7 +2549,7 @@
 
 						isDraggable = false;
 
-						button.addClass('cb-lightbox__zoomButton--disabled');
+						button.addClass('cb-lightbox-zoom-button--disabled');
 					}
 				}
 
@@ -2622,12 +2633,12 @@
 							// After resize check if can zoom current image
 							if ($s.zoom && $s.zoomButtons) {
 								if (slideImage.data('zoomable') == false) {
-									lightbox.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
+									lightbox.find('.cb-lightbox-zoom-button--in').addClass('cb-lightbox-zoom-button--disabled');
 								} else {
-									lightbox.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
+									lightbox.find('.cb-lightbox-zoom-button--in').removeClass('cb-lightbox-zoom-button--disabled');
 								}
 
-								lightbox.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
+								lightbox.find('.cb-lightbox-zoom-button--out').addClass('cb-lightbox-zoom-button--disabled');
 							}
 
 							// Callback after resize current image
@@ -2651,7 +2662,7 @@
 				e.stopPropagation();
 				e.preventDefault();
 
-				if($('.cb-lightbox').length){
+				if ($('.cb-lightbox').length) {
 					return;
 				}
 

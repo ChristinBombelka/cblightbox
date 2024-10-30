@@ -1,21 +1,21 @@
 /*
- * CBLightbox 3.18.5 jQuery
- * 2024-10-21
+ * CBLightbox 3.19.0 jQuery
+ * 2024-10-30
  * Copyright Christin Bombelka
  * https://github.com/ChristinBombelka/cblightbox
  */
 
 (function ($) {
-	var caption,
-		opening,
-		closing,
-		slideing = false,
-		slides,
-		firstLoad,
-		pinching = false,
-		dragSlide = false,
-		scrollbarSpaceAdded = false,
-		isDraggable = false;
+	let opening
+	let closing
+	let slideing = false
+	let slides
+	let firstLoad
+	let pinching = false
+	let dragSlide = false
+	let scrollbarSpaceAdded = false
+	let isDraggable = false
+	let timeoutZoomTransition
 
 	$.fn.cblightbox = function (options) {
 
@@ -180,24 +180,30 @@
 			};
 		}
 
-		function zoomMapPosition(x, y) {
-			var container = $('.cb-lightbox');
+		function zoomMapPosition(x, y, animate = false) {
+			const container = $('.cb-lightbox')
 
 			if (!container.length) {
 				return;
 			}
 
-			var $s = container.data('settings');
+			const $s = container.data('settings')
 
 			if (!$s.zoomMap) {
 				return;
 			}
 
-			var currentImage = $('.cb-lightbox-slide-current .cb-lightbox-slide-image'),
-				imageWidth = currentImage.data('fullWidth') * (currentImage.data('currentPercentage') / 100),
-				imageHeight = currentImage.data('fullHeight') * (currentImage.data('currentPercentage') / 100),
-				windowHeight = $(window).height(),
-				windowWidth = $(window).width();
+			if (animate) {
+				container.addClass('cb-lightbox-run-zoom')
+			}
+
+			clearTimeout(timeoutZoomTransition)
+
+			const currentImage = $('.cb-lightbox-slide-current .cb-lightbox-slide-image')
+			const imageWidth = currentImage.data('fullWidth') * (currentImage.data('currentPercentage') / 100)
+			const imageHeight = currentImage.data('fullHeight') * (currentImage.data('currentPercentage') / 100)
+			const windowHeight = $(window).height()
+			const windowWidth = $(window).width()
 
 			//set limits
 			if (y >= 0) {
@@ -212,13 +218,13 @@
 				x = windowWidth - imageWidth;
 			}
 
-			var zoomMapContainer = $('.cb-lightbox__zoomMap'),
-				zoomMapWidthRatio = windowWidth / imageWidth,
-				zoomMapHeightRatio = windowHeight / imageHeight,
-				zoomMapWidth = zoomMapContainer[0].getBoundingClientRect().width,
-				zoomMapHeight = zoomMapContainer[0].getBoundingClientRect().height,
-				zoomHandleTop = y < 0 ? (Math.max(Math.abs(y), 1) / imageHeight) : 0,
-				zoomHandleLeft = x < 0 ? (Math.max(Math.abs(x), 1) / imageWidth) : 0;
+			const zoomMapContainer = $('.cb-lightbox__zoomMap')
+			const zoomMapWidthRatio = windowWidth / imageWidth
+			const zoomMapHeightRatio = windowHeight / imageHeight
+			const zoomMapWidth = zoomMapContainer[0].getBoundingClientRect().width
+			const zoomMapHeight = zoomMapContainer[0].getBoundingClientRect().height
+			const zoomHandleTop = y < 0 ? (Math.max(Math.abs(y), 1) / imageHeight) : 0
+			const zoomHandleLeft = x < 0 ? (Math.max(Math.abs(x), 1) / imageWidth) : 0
 
 			var zoomHandleWidth = zoomMapWidthRatio * zoomMapWidth;
 			if (zoomHandleWidth >= zoomMapWidth) {
@@ -236,6 +242,10 @@
 				'top': zoomHandleTop * zoomMapHeight,
 				'left': zoomHandleLeft * zoomMapWidth
 			});
+
+			timeoutZoomTransition = setTimeout(() => {
+				container.removeClass('cb-lightbox-run-zoom')
+			}, $s.zoomDuration)
 		}
 
 		function getZoomDistance(f1, f2) {
@@ -542,7 +552,7 @@
 				return;
 			}
 
-			$('.cb-lightbox').addClass('cb-lightbox-is-zoomed cb-lightbox-run-zoom');
+			$('.cb-lightbox').addClass('cb-lightbox-is-zoomed');
 
 			let $s = $('.cb-lightbox').data('settings')
 			let scaleWidth = slideImage.data('fullWidth') / slideImage.width()
@@ -591,15 +601,12 @@
 
 			setTimeout(function () {
 				isDraggable = true;
-
-				$('.cb-lightbox').removeClass('cb-lightbox-run-zoom');
-
 			}, $s.zoomDuration);
 
 			slideImage.data('currentPercentage', 100);
 			slideImage.data('currentZoomStep', 'auto');
 
-			zoomMapPosition(positionX, positionY);
+			zoomMapPosition(positionX, positionY, true);
 		}
 
 		function detroyDraggable(slideImage, disableAnimation) {
@@ -619,8 +626,6 @@
 
 			isDraggable = false;
 
-			container.addClass('cb-lightbox-run-zoom');
-
 			var scaleWidth = slideImage.data('fitWidth') / slideImage.width(),
 				scaleHeight = slideImage.data('fitHeight') / slideImage.height();
 
@@ -639,13 +644,13 @@
 			}, duration);
 
 			setTimeout(function () {
-				container.removeClass('cb-lightbox-is-zoomed cb-lightbox-run-zoom');
+				container.removeClass('cb-lightbox-is-zoomed');
 			}, duration + 30);
 
 			slideImage.data('currentPercentage', slideImage.data('fitPercentage'));
 			slideImage.data('currentZoomStep', 0);
 
-			zoomMapPosition(slideImage.data('fitLeft'), slideImage.data('fitTop'));
+			zoomMapPosition(slideImage.data('fitLeft'), slideImage.data('fitTop'), true);
 		}
 
 		function getImageFit(slideImage) {
@@ -1099,6 +1104,75 @@
 			return slide;
 		}
 
+		function moveImage(direction, distance = 100) {
+			const container = $('.cb-lightbox')
+			const $s = container.data('settings')
+			const current = container.find('.cb-lightbox-slide-current')
+			const slideImage = current.find('.cb-lightbox-slide-image')
+
+			if (closing) {
+				return
+			}
+
+			// Define current image size
+			const imageSizes = getImageSizes(slideImage)
+			const imageWidth = imageSizes.width
+			const imageHeight = imageSizes.height
+			const windowWidth = $(window).width()
+			const windowHeight = $(window).height()
+
+			// Define last transform position
+			const lastTransform = getLastTransform(slideImage)
+			let newY = lastTransform.y
+			let newX = lastTransform.x
+
+			if (direction == 'up') {
+				if (imageHeight > windowHeight) {
+					const limitUp = $s.zoomOffset[0]
+					newY = lastTransform.y + 100
+
+					if (newY > limitUp) {
+						newY = limitUp
+					}
+				}
+			} else if (direction == 'down') {
+				if (imageHeight > windowHeight) {
+					const limitDown = imageSizes.height - windowHeight + $s.zoomOffset[2]
+					newY = lastTransform.y - 100
+
+					if (Math.abs(newY) > limitDown) {
+						newY = -1 * limitDown
+					}
+				}
+			} else if (direction == 'left') {
+				if (imageWidth > windowWidth) {
+
+					const limitLeft = $s.zoomOffset[3]
+					newX = lastTransform.x + 100
+
+					if (newX > limitLeft) {
+						newX = limitLeft
+					}
+				}
+			} else if (direction == 'right') {
+				if (imageWidth > windowWidth) {
+					const limitRight = imageSizes.width - windowWidth + $s.zoomOffset[1]
+					newX = lastTransform.x - 100
+
+					if (Math.abs(newX) > limitRight) {
+						newX = -1 * limitRight
+					}
+				}
+			}
+
+			_animate(slideImage, {
+				top: newY,
+				left: newX,
+			}, $s.zoomDuration);
+
+			zoomMapPosition(newX, newY, true)
+		}
+
 		function arrowHide(direction, hide) {
 			let container = $('.cb-lightbox')
 
@@ -1273,9 +1347,9 @@
 			// Check image is zoomable, enable oder disable zoom button
 			if ($s.zoom && $s.zoomButtons) {
 				if (newCurrentImage.data('zoomable') == false) {
-					container.find('.cb-lightbox-zoom-button--in').addClass('cb-lightbox-zoom-button--disabled');
+					container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
 				} else {
-					container.find('.cb-lightbox-zoom-button--in').removeClass('cb-lightbox-zoom-button--disabled');
+					container.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
 				}
 			}
 
@@ -1627,7 +1701,7 @@
 				// First image cant zoom, disable zoom button 
 				if ($s.zoom && $s.zoomButtons) {
 					if (slideImage.data('zoomable') == false) {
-						container.find('.cb-lightbox-zoom-button--in').addClass('cb-lightbox-zoom-button--disabled');
+						container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
 					}
 				}
 
@@ -1642,6 +1716,12 @@
 					_animateDurationRemove(container.find('.cb-lightbox-content'));
 
 					container.removeClass('cb-lightbox-init-opening cb-lightbox-run-opening cb-lightbox-init-transitions');
+
+					item.blur()
+					container.focus()
+					console.log(container)
+
+
 				}, $s.openCloseDuration);
 
 				setTimeout(function () {
@@ -1753,21 +1833,16 @@
 			var tpl = $('<div class="cb-lightbox cb-lightbox-init-opening"></div>').append('<div class="cb-lightbox-overlay"></div>');
 
 			var tplContent = $('<div class="cb-lightbox-content"></div>');
-			
-		
-			tplContent.append('<div class="cb-lightbox-loading"><div class="cb-lightbox-loading-animation"></div></div><div class="cb-lightbox-slides"></div>');
+
+			tplContent.append('<button class="cb-lightbox-close" aria-label="Close"></button><div class="cb-lightbox-loading"><div class="cb-lightbox-loading-animation"></div></div><div class="cb-lightbox-slides"></div>');
 
 			if ($s.zoomMap && $s.zoom) {
 				tplContent.append('<div class="cb-lightbox__zoomMap"><div class="cb-lightbox__zoomMap-image"></div><div class="cb-lightbox__zoomMap-handle"></div></div>');
 			}
 
-			let toolbar = $('<div class="cb-lightbox-toolbar"></div>')
 			if ($s.zoomButtons && $s.zoom) {
-				toolbar.append('<button class="cb-lightbox-zoom-button cb-lightbox-zoom-button--in" aria-label="Zoom in"></button><button class="cb-lightbox-zoom-button cb-lightbox-zoom-button--out cb-lightbox-zoom-button--disabled" aria-label="Zoom out"></button>');
+				tplContent.append('<div class="cb-lightbox__zoomButtons"><button class="cb-lightbox__zoomButton cb-lightbox__zoomButton--in" aria-label="Zoom in"></button><button class="cb-lightbox__zoomButton cb-lightbox__zoomButton--out cb-lightbox__zoomButton--disabled" aria-label="Zoom out"></button></div>');
 			}
-			toolbar.append('<button class="cb-lightbox-close" aria-label="Close"></button>')
-			tplContent.prepend(toolbar)
-
 
 			tpl.append(tplContent);
 
@@ -1885,22 +1960,42 @@
 
 			$(document).on("keypress", function (e) {
 				if (e.which == 43) {
-					if ($('.cb-lightbox-zoom-button').length) {
-						$('.cb-lightbox-zoom-button--in').trigger('click')
+					if ($('.cb-lightbox__zoomButtons').length) {
+						$('.cb-lightbox__zoomButton--in').trigger('click')
 					}
 				} else if (e.which == 45) {
-					if ($('.cb-lightbox-zoom-button').length) {
-						$('.cb-lightbox-zoom-button--out').trigger('click')
+					if ($('.cb-lightbox__zoomButtons').length) {
+						$('.cb-lightbox__zoomButton--out').trigger('click')
 					}
 				}
 			})
 
 			$(document).on("keydown", function (e) {
-				if (e.keyCode == 37) {
-					slideTo('previews');
-				} else if (e.keyCode == 39) {
-					slideTo('next');
-				} else if (e.key == 'Escape') {
+				const container = $('.cb-lightbox')
+
+				if (!container.length) {
+					return
+				}
+
+				if (container.hasClass('cb-lightbox-is-zoomed')) {
+					if (e.keyCode == 38) {
+						moveImage('up')
+					} else if (e.keyCode == 40) {
+						moveImage('down')
+					} else if (e.keyCode == 37) {
+						moveImage('left')
+					} else if (e.keyCode == 39) {
+						moveImage('right')
+					}
+				} else {
+					if (e.keyCode == 37) {
+						slideTo('previews');
+					} else if (e.keyCode == 39) {
+						slideTo('next');
+					}
+				}
+
+				if (e.key == 'Escape') {
 					close();
 				}
 			});
@@ -1994,8 +2089,8 @@
 
 						if (newScale > 100) {
 
-							container.find('.cb-lightbox-zoom-button--out').removeClass('cb-lightbox-zoom-button--disabled');
-							container.find('.cb-lightbox-zoom-button--in').addClass('cb-lightbox-zoom-button--disabled');
+							container.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
+							container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
 
 							newScale = 100;
 
@@ -2005,11 +2100,11 @@
 							isDraggable = false;
 							container.removeClass('cb-lightbox-is-zoomed');
 
-							container.find('.cb-lightbox-zoom-button--out').addClass('cb-lightbox-zoom-button--disabled');
-							container.find('.cb-lightbox-zoom-button--in').removeClass('cb-lightbox-zoom-button--disabled');
+							container.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
+							container.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
 
 						} else {
-							container.find('.cb-lightbox-zoom-button').removeClass('cb-lightbox-zoom-button--disabled');
+							container.find('.cb-lightbox__zoomButton').removeClass('cb-lightbox__zoomButton--disabled');
 						}
 
 						//set new scale percentage
@@ -2341,7 +2436,7 @@
 				container.removeClass('cb-lightbox-is-grabbing');
 				$(this).unbind("mousemove.cb-lightbox touchmove.cb-lightbox");
 
-				if ($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || closing || $(e.target).hasClass('cb-lightbox-zoom-button')) {
+				if ($(e.target).hasClass('cb-lightbox-close') || $(e.target).hasClass('cb-lightbox-content') || closing || $(e.target).hasClass('cb-lightbox__zoomButton')) {
 					return;
 				}
 
@@ -2423,12 +2518,12 @@
 								}
 
 								if ($(".cb-lightbox").hasClass("cb-lightbox-is-zoomed")) {
-									container.find('.cb-lightbox-zoom-button--out').addClass('cb-lightbox-zoom-button--disabled');
-									container.find('.cb-lightbox-zoom-button--in').removeClass('cb-lightbox-zoom-button--disabled');
+									container.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
+									container.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
 									detroyDraggable(slideImage);
 								} else {
-									container.find('.cb-lightbox-zoom-button--out').removeClass('cb-lightbox-zoom-button--disabled');
-									container.find('.cb-lightbox-zoom-button--in').addClass('cb-lightbox-zoom-button--disabled');
+									container.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
+									container.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
 									initDraggable(slideImage, userX, userY);
 								}
 
@@ -2464,11 +2559,11 @@
 				return parseFloat(newScaleSize.toFixed(4))
 			}
 
-			$(document).on('click', '.cb-lightbox-zoom-button', function () {
+			$(document).on('click', '.cb-lightbox__zoomButton', function () {
 				const container = $('.cb-lightbox')
 				const $s = container.data('settings')
 				const button = $(this)
-				const buttons = button.closest('.cb-lightbox-toolbar')
+				const buttons = button.closest('.cb-lightbox__zoomButtons')
 				const currentSlide = $('.cb-lightbox-slide-current')
 				const slideImage = currentSlide.find('.cb-lightbox-slide-image')
 
@@ -2476,7 +2571,7 @@
 					return;
 				}
 
-				if (button.hasClass('cb-lightbox-zoom-button--disabled')) {
+				if (button.hasClass('cb-lightbox__zoomButton--disabled')) {
 					return;
 				}
 
@@ -2484,7 +2579,7 @@
 				let currentZoomStep = slideImage.data('currentZoomStep')
 				let newScale = false
 
-				if (button.hasClass('cb-lightbox-zoom-button--in')) {
+				if (button.hasClass('cb-lightbox__zoomButton--in')) {
 					isDraggable = true;
 					container.addClass('cb-lightbox-is-zoomed');
 
@@ -2508,16 +2603,16 @@
 					slideImage.data('currentZoomStep', newZoom);
 					newScale = calcZoomStep(slideImage, newZoom)
 
-					buttons.find('.cb-lightbox-zoom-button--out').removeClass('cb-lightbox-zoom-button--disabled');
+					buttons.find('.cb-lightbox__zoomButton--out').removeClass('cb-lightbox__zoomButton--disabled');
 
 					// Limit zoom in 
 					if (newScale >= 100) {
 						newScale = 100;
 
-						button.addClass('cb-lightbox-zoom-button--disabled');
+						button.addClass('cb-lightbox__zoomButton--disabled');
 					}
 
-				} else if (button.hasClass('cb-lightbox-zoom-button--out')) {
+				} else if (button.hasClass('cb-lightbox__zoomButton--out')) {
 
 					let newZoom;
 					if (currentZoomStep == 'auto') {
@@ -2541,7 +2636,7 @@
 					slideImage.data('currentZoomStep', newZoom)
 					newScale = calcZoomStep(slideImage, newZoom)
 
-					buttons.find('.cb-lightbox-zoom-button--in').removeClass('cb-lightbox-zoom-button--disabled');
+					buttons.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
 
 					// Limit zoom out
 					if (newScale.toFixed(4) <= parseFloat(slideImage.data('fitPercentage').toFixed(4))) {
@@ -2549,7 +2644,7 @@
 
 						isDraggable = false;
 
-						button.addClass('cb-lightbox-zoom-button--disabled');
+						button.addClass('cb-lightbox__zoomButton--disabled');
 					}
 				}
 
@@ -2574,8 +2669,6 @@
 					newX = checkZoomLimit(newWidth, 'width', newX);
 				}
 
-				container.addClass('cb-lightbox-run-zoom');
-
 				_animate(slideImage, {
 					top: newY,
 					left: newX,
@@ -2583,11 +2676,9 @@
 					scaleY: scaleHeight,
 				}, $s.zoomDuration);
 
-				zoomMapPosition(newX, newY);
+				zoomMapPosition(newX, newY, true);
 
 				setTimeout(function () {
-					container.removeClass('cb-lightbox-run-zoom');
-
 					if (!isDraggable) {
 						container.removeClass('cb-lightbox-is-zoomed');
 					}
@@ -2633,12 +2724,12 @@
 							// After resize check if can zoom current image
 							if ($s.zoom && $s.zoomButtons) {
 								if (slideImage.data('zoomable') == false) {
-									lightbox.find('.cb-lightbox-zoom-button--in').addClass('cb-lightbox-zoom-button--disabled');
+									lightbox.find('.cb-lightbox__zoomButton--in').addClass('cb-lightbox__zoomButton--disabled');
 								} else {
-									lightbox.find('.cb-lightbox-zoom-button--in').removeClass('cb-lightbox-zoom-button--disabled');
+									lightbox.find('.cb-lightbox__zoomButton--in').removeClass('cb-lightbox__zoomButton--disabled');
 								}
 
-								lightbox.find('.cb-lightbox-zoom-button--out').addClass('cb-lightbox-zoom-button--disabled');
+								lightbox.find('.cb-lightbox__zoomButton--out').addClass('cb-lightbox__zoomButton--disabled');
 							}
 
 							// Callback after resize current image

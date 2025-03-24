@@ -173,6 +173,7 @@
 	overflow: hidden;
 	position: absolute;
 	backface-visibility: hidden;
+	will-change: transform;
 	user-select: none;
 	z-index: 1;
 
@@ -194,6 +195,8 @@
 	box-sizing: border-box;
 	background-color: #000; //optimize gpu rendering
 	position: absolute;
+	image-rendering: auto;
+	will-change: transform;
 	top: 0;
 	left: 0;
 	width: auto;
